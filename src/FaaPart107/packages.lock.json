@@ -4,9 +4,9 @@
     "net10.0": {
       "RulesFactory.Maps.FaaPart107": {
         "type": "Direct",
-        "requested": "[3.0.0, 3.0.0]",
-        "resolved": "3.0.0",
-        "contentHash": "sZ1rAzEuf469MGaqicF57sTySmhXQaFwv7akYC7wj3fu4YWgGzWqx61tnkNaX8l4K5kDxPiTS34p3YTcA18R0w=="
+        "requested": "[4.0.0, 4.0.0]",
+        "resolved": "4.0.0",
+        "contentHash": "YoOge0rgMHPZVSB8KC97L9YKsT9/mO79P8InEMAoeXsQY7UhuT+PdAD6kZu6dzGULOk8dVNubTuPCgBkVhmdLA=="
       },
       "RulesKernel": {
         "type": "Direct",
@@ -18,9 +18,9 @@
     "net8.0": {
       "RulesFactory.Maps.FaaPart107": {
         "type": "Direct",
-        "requested": "[3.0.0, 3.0.0]",
-        "resolved": "3.0.0",
-        "contentHash": "sZ1rAzEuf469MGaqicF57sTySmhXQaFwv7akYC7wj3fu4YWgGzWqx61tnkNaX8l4K5kDxPiTS34p3YTcA18R0w=="
+        "requested": "[4.0.0, 4.0.0]",
+        "resolved": "4.0.0",
+        "contentHash": "YoOge0rgMHPZVSB8KC97L9YKsT9/mO79P8InEMAoeXsQY7UhuT+PdAD6kZu6dzGULOk8dVNubTuPCgBkVhmdLA=="
       },
       "RulesKernel": {
         "type": "Direct",
