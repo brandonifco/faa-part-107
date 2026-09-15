@@ -42,6 +42,12 @@ The remote pilot in command may reduce the intensity of, but may not extinguish,
 
 - `waivable-regulations` -- no backlog item (scope: out -- the engine answers OutsideCurrentScope)
 
+## Cross-references
+
+`crossReferences` -- each pointer the evidence makes, and the entry or the recorded reason it resolves to:
+
+- none
+
 ## Acceptance criteria
 
 - [ ] The engine demands this fact of the caller rather than deciding it; what the caller states is what the engine evaluates.

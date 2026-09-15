@@ -50,6 +50,12 @@ The two minimums are joined by "and" and no clearance above a cloud is stated. R
 
 - `waivable-regulations` -- no backlog item (scope: out -- the engine answers OutsideCurrentScope)
 
+## Cross-references
+
+`crossReferences` -- each pointer the evidence makes, and the entry or the recorded reason it resolves to:
+
+- none
+
 ## Acceptance criteria
 
 - [ ] The engine states this value as the evidence prints it -- every figure and unit, and where the corpus prints a finite table, the whole table.
