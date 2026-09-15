@@ -136,8 +136,8 @@ public sealed class CorrespondenceTests
     }
 
     [Fact]
-    public void speed_limit__declines_UnsupportedRule_row_2() =>
-        AssertDeclines("speed-limit", UnresolvedReason.UnsupportedRule, EntryPoints.SpeedLimit.Resolve(global::FaaPart107.Requests.SpeedLimitRequest.Empty), new SourceLocator("cfr-14-107", "§ 107.51(a)"));
+    public void speed_limit__is_implemented_so_a_hand_written_handler_answers_it() =>
+        Assert.True(Registry.HasImplementation("speed-limit"), "speed-limit is implemented in the overlay and has no [Implements] handler");
 
     [Fact]
     public void altitude_limit__declines_UnsupportedRule_row_2() =>
@@ -156,8 +156,8 @@ public sealed class CorrespondenceTests
         AssertDeclines("civil-twilight-window", UnresolvedReason.UnsupportedRule, EntryPoints.CivilTwilightWindow.Resolve(global::FaaPart107.Requests.CivilTwilightWindowRequest.Empty), new SourceLocator("cfr-14-107", "§ 107.29(c)(1)-(2)"));
 
     [Fact]
-    public void speed_within_limit__declines_UnsupportedRule_row_2() =>
-        AssertDeclines("speed-within-limit", UnresolvedReason.UnsupportedRule, EntryPoints.SpeedWithinLimit.Resolve(global::FaaPart107.Requests.SpeedWithinLimitRequest.Empty), new SourceLocator("cfr-14-107", "§ 107.51(a)"));
+    public void speed_within_limit__is_implemented_so_a_hand_written_handler_answers_it() =>
+        Assert.True(Registry.HasImplementation("speed-within-limit"), "speed-within-limit is implemented in the overlay and has no [Implements] handler");
 
     [Fact]
     public void altitude_within_limit__declines_UnsupportedRule_row_2() =>

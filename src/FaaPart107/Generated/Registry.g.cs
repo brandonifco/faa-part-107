@@ -130,12 +130,12 @@ public static class Registry
 {
     private static readonly ImmutableArray<RegisteredEntry> All =
     [
-        new("speed-limit", EntryStatus.Mapped, CorrespondenceRow.NotBuilt, [MapEntries.SpeedLimit.Locator]),
+        new("speed-limit", EntryStatus.Implemented, CorrespondenceRow.UnresolvedAmbiguity, [MapEntries.SpeedLimit.Locator]),
         new("altitude-limit", EntryStatus.Mapped, CorrespondenceRow.NotBuilt, [MapEntries.AltitudeLimit.Locator]),
         new("visibility-minimum", EntryStatus.Mapped, CorrespondenceRow.NotBuilt, [MapEntries.VisibilityMinimum.Locator]),
         new("cloud-clearance", EntryStatus.Mapped, CorrespondenceRow.NotBuilt, [MapEntries.CloudClearance.Locator]),
         new("civil-twilight-window", EntryStatus.Mapped, CorrespondenceRow.NotBuilt, [MapEntries.CivilTwilightWindow.Locator]),
-        new("speed-within-limit", EntryStatus.Mapped, CorrespondenceRow.NotBuilt, [MapEntries.SpeedWithinLimit.Locator]),
+        new("speed-within-limit", EntryStatus.Implemented, CorrespondenceRow.None, [MapEntries.SpeedWithinLimit.Locator]),
         new("altitude-within-limit", EntryStatus.Mapped, CorrespondenceRow.NotBuilt, [MapEntries.AltitudeWithinLimit.Locator]),
         new("weather-minimums-met", EntryStatus.Mapped, CorrespondenceRow.NotBuilt, [MapEntries.WeatherMinimumsMet.Locator]),
         new("operating-limitations", EntryStatus.Mapped, CorrespondenceRow.NotBuilt, [MapEntries.OperatingLimitations.Locator]),
