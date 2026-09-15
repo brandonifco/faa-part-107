@@ -8,7 +8,7 @@ The corpus is 14 CFR Part 107 as of 2026-01-01, fetched from the eCFR versioner 
 `corpus/part107.xml`, hashed on every validation run. Part 107 is a work of the United States
 Government and is in the public domain in the United States. The specification is the map in the
 package [`RulesFactory.Maps.FaaPart107`](https://www.nuget.org/packages/RulesFactory.Maps.FaaPart107)
-3.0.0: forty-seven entries over twelve sections of subpart B. It is referenced, never copied.
+4.0.0: forty-seven entries over twelve sections of subpart B. It is referenced, never copied.
 
 Citations are by section designation (`§ 107.51(a)`). The corpus declares `randomness: none`, so
 the engine never draws a random value, and the gate refuses `RulesKernel.Randomness`.
@@ -71,11 +71,11 @@ or project, `DeterminismTests` check that the engine assembly does not reference
 From a clean rules-factory checkout, with the SDK `global.json` pins:
 
 ```bash
-python3 tools/factory produce --package RulesFactory.Maps.FaaPart107@3.0.0 \
+python3 tools/factory produce --package RulesFactory.Maps.FaaPart107@4.0.0 \
   --corpus <this repository>/corpus/part107.xml --name FaaPart107 --out <this repository>
 ```
 
-`provenance.json` records the run: rules-factory 0.4.0 (tag `factory/v0.4.0`, commit `f0da05f`,
+`provenance.json` records the run: rules-factory 0.4.1 (tag `factory/v0.4.1`, commit `02ea62a`,
 clean). `produce` works in a staging copy and commits only after `factory verify` passes there,
 unless `--no-verify`, in which case CI is the verdict. After changing only the overlay, run
 `produce` again too: the generated correspondence tests read the merged statuses, and
