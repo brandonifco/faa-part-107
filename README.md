@@ -2,7 +2,7 @@
 
 A deterministic regulatory engine for 14 CFR Part 107 (Small Unmanned Aircraft Systems), produced
 by [rules-factory](https://github.com/brandonifco/rules-factory) from a corpus map, on
-[`RulesKernel`](https://www.nuget.org/packages/RulesKernel) 0.2.0.
+[`RulesKernel`](https://www.nuget.org/packages/RulesKernel) 0.3.0.
 
 The corpus is 14 CFR Part 107 as of 2026-01-01, fetched from the eCFR versioner API and pinned in
 `corpus/part107.xml`, hashed on every validation run. Part 107 is a work of the United States
@@ -75,7 +75,7 @@ python3 tools/factory produce --package RulesFactory.Maps.FaaPart107@4.0.0 \
   --corpus <this repository>/corpus/part107.xml --name FaaPart107 --out <this repository>
 ```
 
-`provenance.json` records the run: rules-factory 0.5.0 (tag `factory/v0.5.0`, commit `5bdd77f`,
+`provenance.json` records the run: rules-factory 0.7.0 (tag `factory/v0.7.0`, commit `0697808`,
 clean). `produce` works in a staging copy and commits only after `factory verify` passes there,
 unless `--no-verify`, in which case CI is the verdict. After changing only the overlay, run
 `produce` again too: the generated correspondence tests read the merged statuses, and
