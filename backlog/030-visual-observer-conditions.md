@@ -44,6 +44,12 @@ If a visual observer is used during the aircraft operation, all of the following
 
 - `waivable-regulations` -- no backlog item (scope: out -- the engine answers OutsideCurrentScope)
 
+## Cross-references
+
+`crossReferences` -- each pointer the evidence makes, and the entry or the recorded reason it resolves to:
+
+- `cites` "in the manner specified in § 107.31" -- `resolvedBy` [`visual-line-of-sight`](027-visual-line-of-sight.md)
+
 ## Acceptance criteria
 
 - [ ] The engine performs the operation the evidence states, observable through its public API, on each situation the required evidence names.

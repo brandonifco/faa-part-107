@@ -42,6 +42,13 @@ The certificates of waiver issued prior to March 16, 2021 under § 107.200 that 
 
 - none
 
+## Cross-references
+
+`crossReferences` -- each pointer the evidence makes, and the entry or the recorded reason it resolves to:
+
+- `cites` "under § 107.200" -- `resolvedBy` `waiver-policy` -- no backlog item (scope: out -- the engine answers OutsideCurrentScope)
+- `cites` "deviation from § 107.29" -- `unmapped`: "Identifies the terminated waivers by what they authorize deviation from. Whether a waiver does is a fact about the waiver the caller supplies, not a rule of this section evaluated through the pointer."
+
 ## Acceptance criteria
 
 - [ ] The engine performs the operation the evidence states, observable through its public API, on each situation the required evidence names.

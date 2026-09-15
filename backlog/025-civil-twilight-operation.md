@@ -44,6 +44,13 @@ Evidence, verbatim:
 
 - `waivable-regulations` -- no backlog item (scope: out -- the engine answers OutsideCurrentScope)
 
+## Cross-references
+
+`crossReferences` -- each pointer the evidence makes, and the entry or the recorded reason it resolves to:
+
+- `cites` "paragraph (b) of this section" -- `resolvedBy` [`anti-collision-lighting`](024-anti-collision-lighting.md)
+- `cites` "as defined in the Air Almanac" -- `resolvedBy` `civil-twilight-alaska` -- no backlog item (definedElsewhere -- the corpus does not supply the fact)
+
 ## Acceptance criteria
 
 - [ ] The engine performs the operation the evidence states, observable through its public API, on each situation the required evidence names.

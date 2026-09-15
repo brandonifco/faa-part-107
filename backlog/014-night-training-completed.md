@@ -50,6 +50,12 @@ Whether "initial" qualifies "training" as well as "knowledge test" is not settle
 
 - none
 
+## Cross-references
+
+`crossReferences` -- each pointer the evidence makes, and the entry or the recorded reason it resolves to:
+
+- `cites` "under § 107.65" -- `resolvedBy` `knowledge-recency` -- no backlog item (scope: out -- the engine answers OutsideCurrentScope)
+
 ## Acceptance criteria
 
 - [ ] The engine performs the operation the evidence states, observable through its public API, on each situation the required evidence names.

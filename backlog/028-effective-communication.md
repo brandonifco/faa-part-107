@@ -50,6 +50,12 @@ Part 107 does not define "effective", and the term carries the whole of § 107.3
 
 - `waivable-regulations` -- no backlog item (scope: out -- the engine answers OutsideCurrentScope)
 
+## Cross-references
+
+`crossReferences` -- each pointer the evidence makes, and the entry or the recorded reason it resolves to:
+
+- none
+
 ## Acceptance criteria
 
 - [ ] The engine performs the operation the evidence states, observable through its public API, on each situation the required evidence names.

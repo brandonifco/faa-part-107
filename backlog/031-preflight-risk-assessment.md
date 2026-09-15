@@ -42,6 +42,12 @@ Evidence, verbatim:
 
 - none
 
+## Cross-references
+
+`crossReferences` -- each pointer the evidence makes, and the entry or the recorded reason it resolves to:
+
+- none
+
 ## Acceptance criteria
 
 - [ ] The engine demands this fact of the caller rather than deciding it; what the caller states is what the engine evaluates.
