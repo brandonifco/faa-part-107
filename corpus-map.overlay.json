@@ -1,1 +1,64 @@
-{}
+{
+  "speed-limit": {
+    "status": "implemented",
+    "implementedIn": {
+      "ruleset": "faa-part-107",
+      "version": 1
+    },
+    "tests": [
+      {
+        "test": "SpeedLimitEntryPointTests.The_limit_resolves_as_printed_87_knots_and_100_miles_per_hour_citing_107_51_a",
+        "mutation": "GroundspeedLimit.Knots printed 88 knots (`Groundspeed.InKnots(88m)` for `InKnots(87m)`); this test went red. It went red too with GroundspeedLimit.Authority citing operating-limitations' `§ 107.51 introductory text` instead of speed-limit's locator."
+      },
+      {
+        "test": "SpeedLimitEntryPointTests.Asked_for_the_limit_as_one_figure_it_declines_RequiresInterpretation_citing_107_51_a",
+        "mutation": "Speed.Limit never took the one-figure branch (`asOneFigureIn is { } unit && unit == (SpeedUnit)99`), so a request for one figure resolved to the limit as printed instead of declining; this test went red for both units."
+      },
+      {
+        "test": "SpeedLimitEntryPointTests.While_a_waiver_of_107_51_is_stated_in_force_it_declines_OutsideCurrentScope_citing_107_205_and_records_the_statement",
+        "mutation": "Waivers.Suspension ignored the statement (`return false ? ... : null` for `return statement.InForce ? ...`), so a stated waiver was not honoured and the limit resolved; this test went red. It went red too with the decline citing waiver-policy's `§ 107.200` instead of waivable-regulations' `§ 107.205`."
+      },
+      {
+        "test": "SpeedLimitEntryPointTests.Without_a_waiver_statement_it_refuses_rather_than_infer_one",
+        "mutation": "Handlers.SpeedLimit defaulted a missing statement to none held (`request.Waiver ?? WaiverStatement.NoneHeld(Speed.Regulation, \"the engine\")` for `Demand(request.Waiver, ...)`); this test went red."
+      },
+      {
+        "test": "SpeedLimitEntryPointTests.A_waiver_statement_about_another_regulation_is_refused",
+        "mutation": "Waivers.Suspension compared the statement's regulation with itself (`statement.Regulation, statement.Regulation` for `statement.Regulation, regulation`), so a waiver of § 107.41 suspended § 107.51(a); this test went red."
+      }
+    ]
+  },
+  "speed-within-limit": {
+    "status": "implemented",
+    "implementedIn": {
+      "ruleset": "faa-part-107",
+      "version": 1
+    },
+    "tests": [
+      {
+        "test": "SpeedWithinLimitEntryPointTests.A_groundspeed_exceeding_neither_figure_resolves_within_the_limit_citing_107_51_a",
+        "mutation": "Groundspeed.Exceeds counted equality as exceeding (`>=` for `>`), so 100 mph was beyond the 100 mph figure and declined; this test went red. It went red too with GroundspeedFinding.Authority citing `§ 107.51` rather than the entry's `§ 107.51(a)`."
+      },
+      {
+        "test": "SpeedWithinLimitEntryPointTests.A_groundspeed_exceeding_both_figures_resolves_beyond_the_limit_citing_107_51_a",
+        "mutation": "Speed.Within reported every comparable groundspeed within the limit (`new GroundspeedFinding(groundspeed, true, limit)` for `!beyondKnots`); this test went red. It went red too with the knots figure printed as 88."
+      },
+      {
+        "test": "SpeedWithinLimitEntryPointTests.A_groundspeed_beyond_100_mph_and_not_beyond_87_knots_declines_RequiresInterpretation_citing_speed_limit_107_51_a",
+        "mutation": "Speed.Within let the knots figure govern (`beyondKnots == beyondKnots` for `beyondKnots == beyondMilesPerHour`), so 87 knots and 100.01 mph resolved within the limit instead of declining; this test went red. It went red too with the miles-per-hour figure governing, and with the decline citing operating-limitations' `§ 107.51 introductory text`. Citing speed-within-limit's own locator did NOT turn it red: both entries cite `§ 107.51(a)`, so the locator cannot tell them apart and only Attempted names speed-limit."
+      },
+      {
+        "test": "SpeedWithinLimitEntryPointTests.While_a_waiver_of_107_51_is_stated_in_force_it_declines_OutsideCurrentScope_citing_107_205_whatever_the_groundspeed",
+        "mutation": "Speed.Within skipped its own gate check (`is { } suspended && suspended.Reason == UnresolvedReason.UnsupportedRule`), so the decline came from speed-limit's gate and named speed-limit rather than speed-within-limit; this test went red. It went red too with Waivers.Suspension ignoring the statement (`return false ? ...`)."
+      },
+      {
+        "test": "SpeedWithinLimitEntryPointTests.Stated_that_no_waiver_is_in_force_the_rule_is_evaluated_and_the_statement_recorded",
+        "mutation": "Waivers.Suspension treated every statement as a waiver in force (`return true ? ...` for `return statement.InForce ? ...`), so a statement that none is held still declined OutsideCurrentScope; this test went red."
+      },
+      {
+        "test": "SpeedWithinLimitEntryPointTests.Without_a_waiver_statement_it_refuses_rather_than_infer_one",
+        "mutation": "Handlers.SpeedWithinLimit defaulted a missing statement to none held (`request.Waiver ?? WaiverStatement.NoneHeld(Speed.Regulation, \"the engine\")` for `Demand(request.Waiver, ...)`); this test went red."
+      }
+    ]
+  }
+}

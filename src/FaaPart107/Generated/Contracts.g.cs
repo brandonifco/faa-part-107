@@ -250,8 +250,8 @@ public static class EntryPoints
 /// </summary>
 internal static partial class Handlers
 {
-    /// <summary>Maximum groundspeed (<c>speed-limit</c>): optional.</summary>
-    static partial void SpeedLimit(global::FaaPart107.Requests.SpeedLimitRequest request, ref Resolution<object>? resolution);
+    /// <summary>Maximum groundspeed (<c>speed-limit</c>): required, the entry is implemented.</summary>
+    internal static partial Resolution<object> SpeedLimit(global::FaaPart107.Requests.SpeedLimitRequest request);
 
     /// <summary>Maximum altitude above ground level (<c>altitude-limit</c>): optional.</summary>
     static partial void AltitudeLimit(global::FaaPart107.Requests.AltitudeLimitRequest request, ref Resolution<object>? resolution);
@@ -265,8 +265,8 @@ internal static partial class Handlers
     /// <summary>Civil twilight, outside Alaska (<c>civil-twilight-window</c>): optional.</summary>
     static partial void CivilTwilightWindow(global::FaaPart107.Requests.CivilTwilightWindowRequest request, ref Resolution<object>? resolution);
 
-    /// <summary>Groundspeed is within the limit (<c>speed-within-limit</c>): optional.</summary>
-    static partial void SpeedWithinLimit(global::FaaPart107.Requests.SpeedWithinLimitRequest request, ref Resolution<object>? resolution);
+    /// <summary>Groundspeed is within the limit (<c>speed-within-limit</c>): required, the entry is implemented.</summary>
+    internal static partial Resolution<object> SpeedWithinLimit(global::FaaPart107.Requests.SpeedWithinLimitRequest request);
 
     /// <summary>Altitude is within the limit (<c>altitude-within-limit</c>): optional.</summary>
     static partial void AltitudeWithinLimit(global::FaaPart107.Requests.AltitudeWithinLimitRequest request, ref Resolution<object>? resolution);
@@ -399,7 +399,7 @@ internal static partial class Handlers
         switch (entryId)
         {
             case "speed-limit":
-                SpeedLimit(request as global::FaaPart107.Requests.SpeedLimitRequest ?? new(assertions), ref resolution);
+                resolution = SpeedLimit(request as global::FaaPart107.Requests.SpeedLimitRequest ?? new(assertions));
                 break;
             case "altitude-limit":
                 AltitudeLimit(request as global::FaaPart107.Requests.AltitudeLimitRequest ?? new(assertions), ref resolution);
@@ -414,7 +414,7 @@ internal static partial class Handlers
                 CivilTwilightWindow(request as global::FaaPart107.Requests.CivilTwilightWindowRequest ?? new(assertions), ref resolution);
                 break;
             case "speed-within-limit":
-                SpeedWithinLimit(request as global::FaaPart107.Requests.SpeedWithinLimitRequest ?? new(assertions), ref resolution);
+                resolution = SpeedWithinLimit(request as global::FaaPart107.Requests.SpeedWithinLimitRequest ?? new(assertions));
                 break;
             case "altitude-within-limit":
                 AltitudeWithinLimit(request as global::FaaPart107.Requests.AltitudeWithinLimitRequest ?? new(assertions), ref resolution);
@@ -545,12 +545,12 @@ internal static partial class Handlers
     /// optional hook when the engine implemented it (an unimplemented partial method is not compiled).</summary>
     internal static bool Has(string entryId) => entryId switch
     {
-        "speed-limit" => Hooked("SpeedLimit", typeof(global::FaaPart107.Requests.SpeedLimitRequest)),
+        "speed-limit" => true,
         "altitude-limit" => Hooked("AltitudeLimit", typeof(global::FaaPart107.Requests.AltitudeLimitRequest)),
         "visibility-minimum" => Hooked("VisibilityMinimum", typeof(global::FaaPart107.Requests.VisibilityMinimumRequest)),
         "cloud-clearance" => Hooked("CloudClearance", typeof(global::FaaPart107.Requests.CloudClearanceRequest)),
         "civil-twilight-window" => Hooked("CivilTwilightWindow", typeof(global::FaaPart107.Requests.CivilTwilightWindowRequest)),
-        "speed-within-limit" => Hooked("SpeedWithinLimit", typeof(global::FaaPart107.Requests.SpeedWithinLimitRequest)),
+        "speed-within-limit" => true,
         "altitude-within-limit" => Hooked("AltitudeWithinLimit", typeof(global::FaaPart107.Requests.AltitudeWithinLimitRequest)),
         "weather-minimums-met" => Hooked("WeatherMinimumsMet", typeof(global::FaaPart107.Requests.WeatherMinimumsMetRequest)),
         "operating-limitations" => Hooked("OperatingLimitations", typeof(global::FaaPart107.Requests.OperatingLimitationsRequest)),
