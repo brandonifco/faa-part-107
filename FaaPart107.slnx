@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="src/FaaPart107/FaaPart107.csproj" />
+  <Project Path="tests/FaaPart107.Tests/FaaPart107.Tests.csproj" />
+</Solution>

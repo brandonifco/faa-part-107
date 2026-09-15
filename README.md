@@ -1,0 +1,47 @@
+# FAA Part 107
+
+A deterministic regulatory engine for 14 CFR Part 107 (Small Unmanned Aircraft Systems), produced
+by [rules-factory](https://github.com/brandonifco/rules-factory) from a corpus map, on
+[`RulesKernel`](https://www.nuget.org/packages/RulesKernel) 0.2.0.
+
+The corpus is 14 CFR Part 107 as of 2026-01-01, fetched from the eCFR versioner API and pinned in
+`corpus/part107.xml`, hashed on every validation run. Part 107 is a work of the United States
+Government and is in the public domain in the United States. The specification is the map in the
+package [`RulesFactory.Maps.FaaPart107`](https://www.nuget.org/packages/RulesFactory.Maps.FaaPart107)
+2.0.0: forty-six entries over twelve sections of subpart B. It is referenced, never copied.
+
+Citations are by section designation (`§ 107.51(a)`). The corpus declares `randomness: none`, so
+the engine never draws a random value, and the gate refuses `RulesKernel.Randomness`.
+
+## State
+
+Produced, with no rule implemented yet: every in-scope entry declines through its generated entry
+point with the reason the map's correspondence table gives and its own citation. The rules still
+to build are listed in `backlog/`.
+
+## How this engine is produced
+
+From a clean rules-factory checkout, with the SDK `global.json` pins:
+
+```bash
+python3 tools/factory produce --package RulesFactory.Maps.FaaPart107@2.0.0 \
+  --corpus <this repository>/corpus/part107.xml --name FaaPart107 --out <this repository>
+```
+
+`provenance.json` records the run: rules-factory 0.2.1 (tag `factory/v0.2.1`, commit `b910e2f`,
+clean). To check the record against the tree, from a rules-factory checkout at that tag:
+
+```bash
+python3 tools/factory provenance --engine <this repository>
+```
+
+## Verify it
+
+```bash
+./scripts/validate.sh full
+```
+
+## Licence
+
+The engine is licensed under the Apache License 2.0 (`LICENSE`). The corpus, 14 CFR Part 107, is US
+public domain.
