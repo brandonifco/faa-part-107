@@ -75,7 +75,7 @@ python3 tools/factory produce --package RulesFactory.Maps.FaaPart107@4.0.0 \
   --corpus <this repository>/corpus/part107.xml --name FaaPart107 --out <this repository>
 ```
 
-`provenance.json` records the run: rules-factory 0.4.1 (tag `factory/v0.4.1`, commit `02ea62a`,
+`provenance.json` records the run: rules-factory 0.5.0 (tag `factory/v0.5.0`, commit `5bdd77f`,
 clean). `produce` works in a staging copy and commits only after `factory verify` passes there,
 unless `--no-verify`, in which case CI is the verdict. After changing only the overlay, run
 `produce` again too: the generated correspondence tests read the merged statuses, and
