@@ -7,7 +7,7 @@
 
   <ItemGroup>
     <!-- The kernel is referenced, never copied. -->
-    <PackageVersion Include="RulesKernel" Version="0.2.0" />
+    <PackageVersion Include="RulesKernel" Version="0.3.0" />
     <!-- The map is referenced, never copied (rules-factory decision 0015), at an exact
          version. The engine's own build facts live in corpus-map.overlay.json. -->
     <PackageVersion Include="RulesFactory.Maps.FaaPart107" Version="[4.0.0]" />

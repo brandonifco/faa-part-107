@@ -10,9 +10,9 @@
       },
       "RulesKernel": {
         "type": "Direct",
-        "requested": "[0.2.0, )",
-        "resolved": "0.2.0",
-        "contentHash": "rVF+Hib90mjqz/uhqg2xKa1RNtL7nK6UFNiCrWDBa+H+HgfBGmOUzXl2L4AZg4pp8azRR0OLDNZL9Cr5Ovlv6Q=="
+        "requested": "[0.3.0, )",
+        "resolved": "0.3.0",
+        "contentHash": "x52TbzXTrKKrq6dgQTqWayvO/NLsAEMMfPChdbaBeE4fP9hNVB4ILbIIwaBKQOKnA4FRODNJ2UIKSFFT8ByFGA=="
       }
     },
     "net8.0": {
@@ -24,9 +24,9 @@
       },
       "RulesKernel": {
         "type": "Direct",
-        "requested": "[0.2.0, )",
-        "resolved": "0.2.0",
-        "contentHash": "rVF+Hib90mjqz/uhqg2xKa1RNtL7nK6UFNiCrWDBa+H+HgfBGmOUzXl2L4AZg4pp8azRR0OLDNZL9Cr5Ovlv6Q=="
+        "requested": "[0.3.0, )",
+        "resolved": "0.3.0",
+        "contentHash": "x52TbzXTrKKrq6dgQTqWayvO/NLsAEMMfPChdbaBeE4fP9hNVB4ILbIIwaBKQOKnA4FRODNJ2UIKSFFT8ByFGA=="
       }
     }
   }

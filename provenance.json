@@ -4,8 +4,8 @@
     "name": "FaaPart107"
   },
   "factory": {
-    "version": "0.5.0",
-    "commit": "5bdd77f2b4b0a5e628c1f4b2dd5c476025785184",
+    "version": "0.7.0",
+    "commit": "069780809543a66d5556d713e337d850ef405b41",
     "dirty": false
   },
   "map": {
@@ -39,7 +39,7 @@
   },
   "kernel": {
     "packageId": "RulesKernel",
-    "version": "0.2.0"
+    "version": "0.3.0"
   },
   "packs": [],
   "recipes": {
@@ -50,19 +50,19 @@
       },
       {
         "path": "tools/factory/__main__.py",
-        "sha256": "c6f32f36f16d6ce5f7d747762fd74075c5555b33422c026a4f73eb13bf17f541"
+        "sha256": "e36697ae5b26a375f45c1c1dd6afab54f096162c7bb06003a257236a6a5db996"
       },
       {
         "path": "tools/factory/backlog.py",
-        "sha256": "700a2a23910c7cfd25f1f3dac64486beb48f4c173f600bdd5e08cbbb4bc27979"
+        "sha256": "43027c085a9dc027016118a81f0159d2e09b33340ee402fc26415b31d972ed7f"
       },
       {
         "path": "tools/factory/gate.py",
-        "sha256": "5780300022c373e69bd7c17c7ad89219cd9cb66e957572bedd57cd4da6c49ece"
+        "sha256": "3af31278d127048660d6f8ef9f4c9d7ad4ba136e87c7ebd4fd3d9d736cca326b"
       },
       {
         "path": "tools/factory/generate.py",
-        "sha256": "b29436046ecc4bf5cc99f28903f26b67ef77b12ef4b13cfa07b9ab6995a38471"
+        "sha256": "afcea250d2dbd23390f156ece985824714ac68c65e8f4551c51323397c2388bb"
       },
       {
         "path": "tools/factory/intake.py",
@@ -82,15 +82,15 @@
       },
       {
         "path": "tools/factory/provenance.py",
-        "sha256": "38dfa1883967854b3b19e2a4a888acbaead999cba92be70dbc083087da7b687c"
+        "sha256": "715ae6898c9e370589d32f38a32b8bb8ace2b144281b19bdbcac9b6eff403f98"
       },
       {
         "path": "tools/factory/recipe/engine-gate.py",
-        "sha256": "760665b2a05fbdaf720bddfd51e6bc3d1dfaf11568de3f8cbbff6f9a74e97181"
+        "sha256": "6bdfc491088584d5dbca128692e4d3fb7182655d24f9b24c2b45e641b605ffdb"
       },
       {
         "path": "tools/factory/recipe/map-overlay.py",
-        "sha256": "4e33b9c8369b4e41434c6f89fdc94f8a4877cd45acb4b8e0b81bd0cc8ff9fbfa"
+        "sha256": "11cb78f15f1e6a1ccc8a08542d5fd59beecb30bb8e0a6c903460d6b041129714"
       },
       {
         "path": "tools/factory/recipe/validate.sh",
@@ -101,16 +101,20 @@
         "sha256": "f7720e2d2a26d65bb738c77d6be6fb84a46960a3e7230a75ed27ab66ce1b0033"
       },
       {
+        "path": "tools/factory/rulings.py",
+        "sha256": "cd99fde18b6c9b031e6669d36d3d2af7030afbc686c3fdd8e7c40a0fc07e5fe2"
+      },
+      {
         "path": "tools/factory/transaction.py",
-        "sha256": "cddfd4be68e61cec11c1b9dbb6fd6c47d7fcd371215534c675ff5556322751ec"
+        "sha256": "554d2b30826cb5c828bd1bb3dfb5b2888846a8fa22aa0982f4f5c5576cfd1e1a"
       },
       {
         "path": "tools/factory/verify.py",
-        "sha256": "7c6920906be9ce16302440cfd7d834d0a39bbdfbc51981e78c8f054507061c3d"
+        "sha256": "ff188e0da339ed80599065ceaf81be45818590d4a91b1534aa709ce6dcf2c964"
       }
     ],
     "digestRule": "sha256 over UTF-8 lines '<sha256>  <path>\\n', one per recipe file, in ascending byte order of path",
-    "digest": "f9d455e2100a2351b77050cd683a0c8e10dc25e839847e3ab48ebb867e5a82c1"
+    "digest": "1ddbbfea919b4fde8f98fe7d7973a4d1e6472fc6825e425f57c15a7b7d17ed0a"
   },
   "generated": [
     {
@@ -119,7 +123,7 @@
     },
     {
       "path": "RulesFactory.Packages.g.props",
-      "sha256": "b32ecd75c8e8ac38f14fcfeb1334a812496d0307e61b3310d24c5109c56276c8"
+      "sha256": "6d7fe852b505fe1ae059d3b21eaf980374ef1cf54ec44d3be527ac0b927a9e06"
     },
     {
       "path": "backlog/001-altitude-limit.md",
@@ -279,11 +283,11 @@
     },
     {
       "path": "scripts/engine-gate.py",
-      "sha256": "760665b2a05fbdaf720bddfd51e6bc3d1dfaf11568de3f8cbbff6f9a74e97181"
+      "sha256": "6bdfc491088584d5dbca128692e4d3fb7182655d24f9b24c2b45e641b605ffdb"
     },
     {
       "path": "scripts/factory/generate.py",
-      "sha256": "b29436046ecc4bf5cc99f28903f26b67ef77b12ef4b13cfa07b9ab6995a38471"
+      "sha256": "afcea250d2dbd23390f156ece985824714ac68c65e8f4551c51323397c2388bb"
     },
     {
       "path": "scripts/factory/intake.py",
@@ -295,11 +299,15 @@
     },
     {
       "path": "scripts/factory/provenance.py",
-      "sha256": "38dfa1883967854b3b19e2a4a888acbaead999cba92be70dbc083087da7b687c"
+      "sha256": "715ae6898c9e370589d32f38a32b8bb8ace2b144281b19bdbcac9b6eff403f98"
+    },
+    {
+      "path": "scripts/factory/rulings.py",
+      "sha256": "cd99fde18b6c9b031e6669d36d3d2af7030afbc686c3fdd8e7c40a0fc07e5fe2"
     },
     {
       "path": "scripts/map-overlay.py",
-      "sha256": "4e33b9c8369b4e41434c6f89fdc94f8a4877cd45acb4b8e0b81bd0cc8ff9fbfa"
+      "sha256": "11cb78f15f1e6a1ccc8a08542d5fd59beecb30bb8e0a6c903460d6b041129714"
     },
     {
       "path": "scripts/validate.sh",
@@ -400,7 +408,7 @@
     },
     {
       "path": "src/FaaPart107/packages.lock.json",
-      "sha256": "4140220b420010fcc764c4460c9d650c254d37d8a796b0fb4e4a3a55973baa3b"
+      "sha256": "17ea685a72cdb8f80893c69db0d9a84b3a9ead25609d39d111ffe86716a81bed"
     },
     {
       "path": "tests/FaaPart107.Tests/FaaPart107.Tests.csproj",
@@ -408,7 +416,7 @@
     },
     {
       "path": "tests/FaaPart107.Tests/packages.lock.json",
-      "sha256": "91c75bf7d8b4b6caca3e2cf709d235e5fd8f92348744d149b817f781f8d85a51"
+      "sha256": "a949f7a2e04b195171adb44602dbf14028d44fd909579ed8869c289fd3586131"
     }
   ],
   "randomness": "none"
