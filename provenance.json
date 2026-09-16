@@ -4,8 +4,8 @@
     "name": "FaaPart107"
   },
   "factory": {
-    "version": "0.0.0-dev+9bbb6695e319",
-    "commit": "9bbb6695e319685662d7990311e994693197055b",
+    "version": "0.0.0-dev+d5fb62d49cb1",
+    "commit": "d5fb62d49cb18d0d7e34764e10722a988f548297",
     "dirty": false
   },
   "map": {
@@ -50,7 +50,7 @@
       },
       {
         "path": "tools/factory/__main__.py",
-        "sha256": "eae9ba811c77b50940d14aa0512745bab701603015ec6d44e35ae8dac0dfbb92"
+        "sha256": "959ac4e8dfea3dbbe7493e9b01d8857d876c8237d4229b3f0853a06be17ee511"
       },
       {
         "path": "tools/factory/backlog.py",
@@ -58,11 +58,11 @@
       },
       {
         "path": "tools/factory/gate.py",
-        "sha256": "3af31278d127048660d6f8ef9f4c9d7ad4ba136e87c7ebd4fd3d9d736cca326b"
+        "sha256": "2e0c3102f6ae7cd9bc140a02ee11893eee1f3f2222909aff377bc69cb3de2b83"
       },
       {
         "path": "tools/factory/generate.py",
-        "sha256": "63fbeecdae53392f76ceee5cca8b0022b05b9889d8d84a83a15444a91b8e9c90"
+        "sha256": "ed9ba72b85b859fdc6e200ec63afe2171dc2e16132379b66f4077307adc9c92a"
       },
       {
         "path": "tools/factory/intake.py",
@@ -70,7 +70,7 @@
       },
       {
         "path": "tools/factory/ownership.py",
-        "sha256": "84bf74ed0055568b7368a926019b4d11daa3465a99d7e3299c9d56100611b7c8"
+        "sha256": "dbfbe0b7953de90ed2b41b7f73967aa0da89b2064ccbdba382e87fbb240f7bea"
       },
       {
         "path": "tools/factory/provenance.py",
@@ -78,19 +78,19 @@
       },
       {
         "path": "tools/factory/rails.py",
-        "sha256": "68ec0f3d86ba6d2a585af0f44b3c642cdffd5c4159cd4ab7ce6e566fb36ae1f8"
+        "sha256": "62b5c1974774a1edad3ce29a7fc67e064a1ab5aa3fa8eb7b24fd9930735b40ca"
       },
       {
         "path": "tools/factory/recipe/engine-gate.py",
-        "sha256": "12b56736a4894507a8b732e847aafb590ed45bfd3ffa285a3fe6aca6e17f0870"
+        "sha256": "b34a81ac664465d9a84f34e99c221872c8d6d06b02fa2ad0656d23331d75223e"
       },
       {
         "path": "tools/factory/recipe/map-overlay.py",
-        "sha256": "11cb78f15f1e6a1ccc8a08542d5fd59beecb30bb8e0a6c903460d6b041129714"
+        "sha256": "dc675cb835e47effaa104c596857015a6963d205aa4666cc612add8bfdc8c70d"
       },
       {
         "path": "tools/factory/recipe/rails/AGENTS.md",
-        "sha256": "c3576d1cea769505a43794b8f2d42797f230f058b238eda09230f1fd3105ab50"
+        "sha256": "0bf3bb0f7519ac6cdccf4c03fd11bf65d8b3c0a4e5580917dd5bc7e8f81b1257"
       },
       {
         "path": "tools/factory/recipe/rails/CLAUDE.md",
@@ -98,11 +98,11 @@
       },
       {
         "path": "tools/factory/recipe/rails/agent-team.md",
-        "sha256": "ae9c54d7236adca8507e673d77b51e6431a48f4a3c29af40d7420ea2810e8521"
+        "sha256": "1806e2679578deb3f6b59c920e1c209fb5c5606f36a07d1b8b9a942994103379"
       },
       {
         "path": "tools/factory/recipe/rails/agents/engine-dev.md",
-        "sha256": "c8569477e58633f6e807a4b9be9a00b37a6f315d5b0f1fa8b0a7bc1f36b24b06"
+        "sha256": "f2b21c791a783f828f8d4dc3fa17407f6557a15923be9b0b67ce5a94ba69f926"
       },
       {
         "path": "tools/factory/recipe/rails/agents/repo-steward.md",
@@ -110,7 +110,7 @@
       },
       {
         "path": "tools/factory/recipe/rails/agents/rules-conformance.md",
-        "sha256": "034cc0af3ecb98e9af60a65931102c69546f22ddadfea9c82961bb71fbbf96c2"
+        "sha256": "7f91ed4187d6d87621873266741f972a5b9bc8a27e16a248e78eb4de69789a64"
       },
       {
         "path": "tools/factory/recipe/rails/editorconfig",
@@ -122,7 +122,7 @@
       },
       {
         "path": "tools/factory/recipe/rails/pull_request_template.md",
-        "sha256": "e2cebc6419d62e2df3b218d76462caf807d6637f2b305ac2aa11153f13304a92"
+        "sha256": "8b679be11d7a53d3df4ee29fa687bff03042da01efa46a639da1d70e5dfe4234"
       },
       {
         "path": "tools/factory/recipe/rails/settings.json",
@@ -130,11 +130,11 @@
       },
       {
         "path": "tools/factory/recipe/rails/tools/agent-doctor.py",
-        "sha256": "1b6fced99797d165ab0216523bddae183d6e7254f41d5d5f51cdb1d1c3b8913d"
+        "sha256": "340004575c29918f4dcbdacc7c1aef7f970e60bb270832901ae501bcb61b0b30"
       },
       {
         "path": "tools/factory/recipe/rails/tools/conformance-gate.py",
-        "sha256": "567972b60f16d1f86c661e97efa56fa2878c9a5aa92fb820c4aea07a402cbd24"
+        "sha256": "6e4a57468144caf4eaf74dce4d178a582322235ba37eb04d92bd72ddb929e58a"
       },
       {
         "path": "tools/factory/recipe/rails/tools/dispatch-agent.sh",
@@ -142,19 +142,27 @@
       },
       {
         "path": "tools/factory/recipe/rails/tools/entry-packet.py",
-        "sha256": "59f112154a77a8cf574bd8d1ee1e43d39399025308c8f4eb2371d99081e49b20"
+        "sha256": "58791e5a923a50c591ef35325a7f45ec8db652f1b09179f5fc28c874b44d230f"
       },
       {
         "path": "tools/factory/recipe/rails/tools/new-issue.sh",
-        "sha256": "382a2f516f81f593e74ed9e57262080c25edbac1a16d542ffb235eb772b10e88"
+        "sha256": "2830ba6458df4c34378538d73eadc4d522fb5f5cb7dbb945ef89097d66c9b9ee"
       },
       {
         "path": "tools/factory/recipe/rails/tools/pr-policy.py",
-        "sha256": "79a33c7fe1ea8d888e4d6912a43ac60afe285c7a8bf43fbe9f7be87d6947b76e"
+        "sha256": "4a0c6677913decb13c8e9499840d5da4935c1725559dd6514d67dd72c8d849bd"
+      },
+      {
+        "path": "tools/factory/recipe/rails/tools/re-produce.sh",
+        "sha256": "2a281f94f81ce141733494a94744caa96c88af3cd9fa848cec21c13e73739499"
       },
       {
         "path": "tools/factory/recipe/rails/tools/record-verdict.py",
         "sha256": "48f7b11f7fc829cdaebd776a3eb5db04e27cade97c427c6806b72f58805d83db"
+      },
+      {
+        "path": "tools/factory/recipe/rails/tools/requeue-gate.py",
+        "sha256": "a4315a5fa76a696ee616e5ef190d6bbec0d023c04e22086082d4031c460aec8d"
       },
       {
         "path": "tools/factory/recipe/rails/tools/review-packet.py",
@@ -162,15 +170,19 @@
       },
       {
         "path": "tools/factory/recipe/rails/workflows/conformance-gate.yml",
-        "sha256": "851d64e8705363b70711b74fe1b25306c3fac1c1e26c88a9805defc3a03042a8"
+        "sha256": "d66ae8a37a37874369ac962fbecbf9ac1b98cf0246541a61ea5089b23f8ea702"
       },
       {
         "path": "tools/factory/recipe/rails/workflows/pr-policy.yml",
         "sha256": "caa3394a473d5fdd45b274176d8e28c48d9f5425176318194ba68fbea8453fa2"
       },
       {
+        "path": "tools/factory/recipe/rails/workflows/verdict-requeue.yml",
+        "sha256": "b1a48c75587dcbcf15638f83a703025c08f5449d9e2611550c4f15a448fcb178"
+      },
+      {
         "path": "tools/factory/recipe/validate.sh",
-        "sha256": "d60c04be4ddc82a3453db5554d5ccb2c0b5f1d8c2f26caee1b1aa63b5399119c"
+        "sha256": "657c18bde4ec97d7c91e676dafea4bc1686b62d532b6d78947d757d285f0819d"
       },
       {
         "path": "tools/factory/recipe/validate.yml",
@@ -190,7 +202,7 @@
       }
     ],
     "digestRule": "sha256 over UTF-8 lines '<sha256>  <path>\\n', one per recipe file, in ascending byte order of path",
-    "digest": "f8bd4994b3d1173e541b5dfed56ef5fd6b71bddc22192f8743791eb183b11b19"
+    "digest": "f238796e82fd549863e871f2e9d27a467bb4d803f7c07249fc138ce51c26081d"
   },
   "generated": [
     {
@@ -355,11 +367,11 @@
     },
     {
       "path": "scripts/engine-gate.py",
-      "sha256": "12b56736a4894507a8b732e847aafb590ed45bfd3ffa285a3fe6aca6e17f0870"
+      "sha256": "b34a81ac664465d9a84f34e99c221872c8d6d06b02fa2ad0656d23331d75223e"
     },
     {
       "path": "scripts/factory/generate.py",
-      "sha256": "63fbeecdae53392f76ceee5cca8b0022b05b9889d8d84a83a15444a91b8e9c90"
+      "sha256": "ed9ba72b85b859fdc6e200ec63afe2171dc2e16132379b66f4077307adc9c92a"
     },
     {
       "path": "scripts/factory/intake.py",
@@ -367,7 +379,7 @@
     },
     {
       "path": "scripts/factory/ownership.py",
-      "sha256": "84bf74ed0055568b7368a926019b4d11daa3465a99d7e3299c9d56100611b7c8"
+      "sha256": "dbfbe0b7953de90ed2b41b7f73967aa0da89b2064ccbdba382e87fbb240f7bea"
     },
     {
       "path": "scripts/factory/provenance.py",
@@ -379,11 +391,11 @@
     },
     {
       "path": "scripts/map-overlay.py",
-      "sha256": "11cb78f15f1e6a1ccc8a08542d5fd59beecb30bb8e0a6c903460d6b041129714"
+      "sha256": "dc675cb835e47effaa104c596857015a6963d205aa4666cc612add8bfdc8c70d"
     },
     {
       "path": "scripts/validate.sh",
-      "sha256": "f8c087e28c0e9adc619d51fe08f62422cbe435abef93709241031d624ce145d7"
+      "sha256": "f015ff23c255471d7fa16fa6beef59eabf3c9342abd41b67c055adb4b8f1cc42"
     },
     {
       "path": "src/FaaPart107/Generated/Contracts.g.cs",
@@ -417,8 +429,8 @@
   "managed": [
     {
       "path": ".claude/agents/engine-dev.md",
-      "recipeVersion": 3,
-      "sha256": "c8569477e58633f6e807a4b9be9a00b37a6f315d5b0f1fa8b0a7bc1f36b24b06"
+      "recipeVersion": 4,
+      "sha256": "f2b21c791a783f828f8d4dc3fa17407f6557a15923be9b0b67ce5a94ba69f926"
     },
     {
       "path": ".claude/agents/repo-steward.md",
@@ -427,8 +439,8 @@
     },
     {
       "path": ".claude/agents/rules-conformance.md",
-      "recipeVersion": 2,
-      "sha256": "034cc0af3ecb98e9af60a65931102c69546f22ddadfea9c82961bb71fbbf96c2"
+      "recipeVersion": 3,
+      "sha256": "7f91ed4187d6d87621873266741f972a5b9bc8a27e16a248e78eb4de69789a64"
     },
     {
       "path": ".claude/hooks/primary-checkout-guard.py",
@@ -447,13 +459,13 @@
     },
     {
       "path": ".github/pull_request_template.md",
-      "recipeVersion": 1,
-      "sha256": "e2cebc6419d62e2df3b218d76462caf807d6637f2b305ac2aa11153f13304a92"
+      "recipeVersion": 2,
+      "sha256": "8b679be11d7a53d3df4ee29fa687bff03042da01efa46a639da1d70e5dfe4234"
     },
     {
       "path": ".github/workflows/conformance-gate.yml",
-      "recipeVersion": 1,
-      "sha256": "851d64e8705363b70711b74fe1b25306c3fac1c1e26c88a9805defc3a03042a8"
+      "recipeVersion": 2,
+      "sha256": "d66ae8a37a37874369ac962fbecbf9ac1b98cf0246541a61ea5089b23f8ea702"
     },
     {
       "path": ".github/workflows/pr-policy.yml",
@@ -461,9 +473,14 @@
       "sha256": "caa3394a473d5fdd45b274176d8e28c48d9f5425176318194ba68fbea8453fa2"
     },
     {
+      "path": ".github/workflows/verdict-requeue.yml",
+      "recipeVersion": 1,
+      "sha256": "b1a48c75587dcbcf15638f83a703025c08f5449d9e2611550c4f15a448fcb178"
+    },
+    {
       "path": "AGENTS.md",
-      "recipeVersion": 3,
-      "sha256": "c3576d1cea769505a43794b8f2d42797f230f058b238eda09230f1fd3105ab50"
+      "recipeVersion": 5,
+      "sha256": "0bf3bb0f7519ac6cdccf4c03fd11bf65d8b3c0a4e5580917dd5bc7e8f81b1257"
     },
     {
       "path": "CLAUDE.md",
@@ -482,8 +499,8 @@
     },
     {
       "path": "docs/agent-team.md",
-      "recipeVersion": 3,
-      "sha256": "ae9c54d7236adca8507e673d77b51e6431a48f4a3c29af40d7420ea2810e8521"
+      "recipeVersion": 4,
+      "sha256": "1806e2679578deb3f6b59c920e1c209fb5c5606f36a07d1b8b9a942994103379"
     },
     {
       "path": "global.json",
@@ -492,13 +509,13 @@
     },
     {
       "path": "tools/agent-doctor.py",
-      "recipeVersion": 1,
-      "sha256": "1b6fced99797d165ab0216523bddae183d6e7254f41d5d5f51cdb1d1c3b8913d"
+      "recipeVersion": 2,
+      "sha256": "340004575c29918f4dcbdacc7c1aef7f970e60bb270832901ae501bcb61b0b30"
     },
     {
       "path": "tools/conformance-gate.py",
-      "recipeVersion": 1,
-      "sha256": "567972b60f16d1f86c661e97efa56fa2878c9a5aa92fb820c4aea07a402cbd24"
+      "recipeVersion": 2,
+      "sha256": "6e4a57468144caf4eaf74dce4d178a582322235ba37eb04d92bd72ddb929e58a"
     },
     {
       "path": "tools/dispatch-agent.sh",
@@ -507,23 +524,33 @@
     },
     {
       "path": "tools/entry-packet.py",
-      "recipeVersion": 2,
-      "sha256": "59f112154a77a8cf574bd8d1ee1e43d39399025308c8f4eb2371d99081e49b20"
+      "recipeVersion": 3,
+      "sha256": "58791e5a923a50c591ef35325a7f45ec8db652f1b09179f5fc28c874b44d230f"
     },
     {
       "path": "tools/new-issue.sh",
-      "recipeVersion": 1,
-      "sha256": "382a2f516f81f593e74ed9e57262080c25edbac1a16d542ffb235eb772b10e88"
+      "recipeVersion": 2,
+      "sha256": "2830ba6458df4c34378538d73eadc4d522fb5f5cb7dbb945ef89097d66c9b9ee"
     },
     {
       "path": "tools/pr-policy.py",
+      "recipeVersion": 2,
+      "sha256": "4a0c6677913decb13c8e9499840d5da4935c1725559dd6514d67dd72c8d849bd"
+    },
+    {
+      "path": "tools/re-produce.sh",
       "recipeVersion": 1,
-      "sha256": "79a33c7fe1ea8d888e4d6912a43ac60afe285c7a8bf43fbe9f7be87d6947b76e"
+      "sha256": "2a281f94f81ce141733494a94744caa96c88af3cd9fa848cec21c13e73739499"
     },
     {
       "path": "tools/record-verdict.py",
       "recipeVersion": 1,
       "sha256": "48f7b11f7fc829cdaebd776a3eb5db04e27cade97c427c6806b72f58805d83db"
+    },
+    {
+      "path": "tools/requeue-gate.py",
+      "recipeVersion": 1,
+      "sha256": "a4315a5fa76a696ee616e5ef190d6bbec0d023c04e22086082d4031c460aec8d"
     },
     {
       "path": "tools/review-packet.py",

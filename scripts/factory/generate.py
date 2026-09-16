@@ -1094,13 +1094,16 @@ RAILS = {
     "tools/dispatch-agent.sh": "tools/dispatch-agent.sh",
     "tools/new-issue.sh": "tools/new-issue.sh",
     "tools/entry-packet.py": "tools/entry-packet.py",
+    "tools/re-produce.sh": "tools/re-produce.sh",
     "tools/review-packet.py": "tools/review-packet.py",
     "tools/pr-policy.py": "tools/pr-policy.py",
     "tools/record-verdict.py": "tools/record-verdict.py",
     "tools/conformance-gate.py": "tools/conformance-gate.py",
+    "tools/requeue-gate.py": "tools/requeue-gate.py",
     ".github/pull_request_template.md": "pull_request_template.md",
     ".github/workflows/pr-policy.yml": "workflows/pr-policy.yml",
     ".github/workflows/conformance-gate.yml": "workflows/conformance-gate.yml",
+    ".github/workflows/verdict-requeue.yml": "workflows/verdict-requeue.yml",
     "tools/agent-doctor.py": "tools/agent-doctor.py",
     # Named `editorconfig` in the recipe: a dotfile there would be invisible in a listing of the
     # rails, and the published path is what matters.
@@ -1108,10 +1111,12 @@ RAILS = {
 }
 # The rails an operator runs. `produce` writes with the default mode, so a script invoked by path
 # would not run; the hook is invoked through `python3` by .claude/settings.json instead and needs
-# no bit. The mode is not part of a recipe's bytes, so it plays no part in hand-edit detection.
+# no bit, and tools/requeue-gate.py is the same case -- .github/workflows/verdict-requeue.yml runs
+# it through `python3`, and nobody runs it by hand. The mode is not part of a recipe's bytes, so it
+# plays no part in hand-edit detection.
 EXECUTABLE = frozenset({"tools/dispatch-agent.sh", "tools/new-issue.sh", "tools/entry-packet.py",
                         "tools/review-packet.py", "tools/pr-policy.py", "tools/record-verdict.py",
-                        "tools/conformance-gate.py", "tools/agent-doctor.py"})
+                        "tools/conformance-gate.py", "tools/agent-doctor.py", "tools/re-produce.sh"})
 RAILS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "recipe", "rails")
 
 
