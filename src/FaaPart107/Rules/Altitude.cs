@@ -1,3 +1,4 @@
+using System.Globalization;
 using RulesKernel.Provenance;
 using RulesKernel.Resolution;
 
@@ -31,8 +32,9 @@ public sealed record AltitudeLimit(WaiverStatement Waiver)
 
     /// <inheritdoc/>
     public override string ToString() =>
-        $"{AboveGroundLevelFeet} feet above ground level; within a {StructureRadiusFeet}-foot radius of a structure, "
-        + $"{AboveStructureUppermostLimitFeet} feet above its immediate uppermost limit [{Authority}]";
+        string.Create(
+            CultureInfo.InvariantCulture,
+            $"{AboveGroundLevelFeet} feet above ground level; within a {StructureRadiusFeet}-foot radius of a structure, {AboveStructureUppermostLimitFeet} feet above its immediate uppermost limit [{Authority}]");
 }
 
 /// <summary>§ 107.51(b): the altitude limit.</summary>

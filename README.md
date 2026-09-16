@@ -18,9 +18,9 @@ the engine never draws a random value, and the gate refuses `RulesKernel.Randomn
 Three entries are implemented: the § 107.51(a) groundspeed rules, `speed-limit` and
 `speed-within-limit`, and the § 107.51(b) altitude limit as a value, `altitude-limit` (400 feet
 above ground level, a 400-foot structure radius and 400 feet above the structure's immediate
-uppermost limit, as printed; waiver gate as for § 107.51(a)). Every other in-scope entry declines through its generated entry point with
-the reason the map's correspondence table gives and its own citation. The rules still to build are
-listed in `backlog/`.
+uppermost limit, as printed; waiver gate as for § 107.51(a)). Every other in-scope entry declines
+through its generated entry point with the reason the map's correspondence table gives and its own
+citation. The rules still to build are listed in `backlog/`.
 
 ## What is here
 
