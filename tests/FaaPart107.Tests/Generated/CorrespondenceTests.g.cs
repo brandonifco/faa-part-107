@@ -302,8 +302,8 @@ public sealed class CorrespondenceTests
         AssertDeclines("participant-briefing", UnresolvedReason.UnsupportedRule, EntryPoints.ParticipantBriefing.Resolve(global::FaaPart107.Requests.ParticipantBriefingRequest.Empty), new SourceLocator("cfr-14-107", "§ 107.49(b)"));
 
     [Fact]
-    public void control_links_working__declines_UnsupportedRule_row_2() =>
-        AssertDeclines("control-links-working", UnresolvedReason.UnsupportedRule, EntryPoints.ControlLinksWorking.Resolve(global::FaaPart107.Requests.ControlLinksWorkingRequest.Empty), new SourceLocator("cfr-14-107", "§ 107.49(c)"));
+    public void control_links_working__is_implemented_so_a_hand_written_handler_answers_it() =>
+        Assert.True(Registry.HasImplementation("control-links-working"), "control-links-working is implemented in the overlay and has no [Implements] handler");
 
     [Fact]
     public void sufficient_available_power__declines_UnsupportedRule_row_2() =>

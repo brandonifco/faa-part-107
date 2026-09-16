@@ -377,8 +377,8 @@ internal static partial class Handlers
     /// <summary>The directly participating persons have been informed of the five stated matters (<c>participant-briefing</c>): optional.</summary>
     static partial void ParticipantBriefing(global::FaaPart107.Requests.ParticipantBriefingRequest request, ref Resolution<object>? resolution);
 
-    /// <summary>The control links are working properly (<c>control-links-working</c>): optional.</summary>
-    static partial void ControlLinksWorking(global::FaaPart107.Requests.ControlLinksWorkingRequest request, ref Resolution<object>? resolution);
+    /// <summary>The control links are working properly (<c>control-links-working</c>): required, the entry is implemented.</summary>
+    internal static partial Resolution<object> ControlLinksWorking(global::FaaPart107.Requests.ControlLinksWorkingRequest request);
 
     /// <summary>There is enough available power for the intended operational time (<c>sufficient-available-power</c>): optional.</summary>
     static partial void SufficientAvailablePower(global::FaaPart107.Requests.SufficientAvailablePowerRequest request, ref Resolution<object>? resolution);
@@ -529,7 +529,7 @@ internal static partial class Handlers
                 ParticipantBriefing(request as global::FaaPart107.Requests.ParticipantBriefingRequest ?? new(assertions), ref resolution);
                 break;
             case "control-links-working":
-                ControlLinksWorking(request as global::FaaPart107.Requests.ControlLinksWorkingRequest ?? new(assertions), ref resolution);
+                resolution = ControlLinksWorking(request as global::FaaPart107.Requests.ControlLinksWorkingRequest ?? new(assertions));
                 break;
             case "sufficient-available-power":
                 SufficientAvailablePower(request as global::FaaPart107.Requests.SufficientAvailablePowerRequest ?? new(assertions), ref resolution);
@@ -596,7 +596,7 @@ internal static partial class Handlers
         "preflight-actions" => Hooked("PreflightActions", typeof(global::FaaPart107.Requests.PreflightActionsRequest)),
         "preflight-risk-assessment" => Hooked("PreflightRiskAssessment", typeof(global::FaaPart107.Requests.PreflightRiskAssessmentRequest)),
         "participant-briefing" => Hooked("ParticipantBriefing", typeof(global::FaaPart107.Requests.ParticipantBriefingRequest)),
-        "control-links-working" => Hooked("ControlLinksWorking", typeof(global::FaaPart107.Requests.ControlLinksWorkingRequest)),
+        "control-links-working" => true,
         "sufficient-available-power" => Hooked("SufficientAvailablePower", typeof(global::FaaPart107.Requests.SufficientAvailablePowerRequest)),
         "attached-object-secure" => Hooked("AttachedObjectSecure", typeof(global::FaaPart107.Requests.AttachedObjectSecureRequest)),
         "attached-object-no-adverse-effect" => Hooked("AttachedObjectNoAdverseEffect", typeof(global::FaaPart107.Requests.AttachedObjectNoAdverseEffectRequest)),

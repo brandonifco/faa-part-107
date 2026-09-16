@@ -85,5 +85,26 @@
         "mutation": "Handlers.SpeedWithinLimit defaulted a missing statement to none held (`request.Waiver ?? WaiverStatement.NoneHeld(Speed.Regulation, \"the engine\")` for `Demand(request.Waiver, ...)`); this test went red."
       }
     ]
+  },
+  "control-links-working": {
+    "status": "implemented",
+    "implementedIn": {
+      "ruleset": "faa-part-107",
+      "version": 1
+    },
+    "tests": [
+      {
+        "test": "ControlLinksWorkingEntryPointTests.Resolving_it_declines_RequiresInterpretation_citing_107_49_c",
+        "mutation": "ControlLinks.Working cited participant-briefing's `§ 107.49(b)` (`MapEntries.ParticipantBriefing.Locator` for `MapEntries.ControlLinksWorking.Locator`), so the decline named the wrong constituent of § 107.49; this test went red. It went red too with the reason wrong (`UnresolvedReason.UnsupportedRule` for `UnresolvedReason.RequiresInterpretation`), and with Handlers.ControlLinksWorking answering the open question instead of declining (`Resolution<object>.FromValue(true)` for `ControlLinks.Working()`)."
+      },
+      {
+        "test": "ControlLinksWorkingEntryPointTests.The_decline_is_the_rules_own_and_names_the_term_the_corpus_leaves_undefined",
+        "mutation": "ControlLinks.Working declined with the correspondence row's bare wording, naming no reason (`$\"resolve the map entry '{MapEntries.ControlLinksWorking.Id}'\"` for the message naming \"working properly\" as undefined), so the decline cited where without saying why; this test went red. It went red too with Handlers.ControlLinksWorking answering the open question instead of delegating to the rule (`Resolution<object>.FromValue(true)` for `ControlLinks.Working()`), which broke the assertion that the entry point's resolution is exactly `ControlLinks.Working()`."
+      },
+      {
+        "test": "ControlLinksWorkingEntryPointTests.The_dictionary_dispatch_declines_the_same_way",
+        "mutation": "Handlers.ControlLinksWorking answered the open question instead of declining (`Resolution<object>.FromValue(true)` for `ControlLinks.Working()`), so the dictionary dispatch resolved to a value; this test went red. It went red too with ControlLinks.Working citing participant-briefing's `§ 107.49(b)` (`MapEntries.ParticipantBriefing.Locator` for `MapEntries.ControlLinksWorking.Locator`), with the reason wrong (`UnresolvedReason.UnsupportedRule` for `UnresolvedReason.RequiresInterpretation`), and with the message reduced to the row's bare wording."
+      }
+    ]
   }
 }
