@@ -28,6 +28,31 @@
       }
     ]
   },
+  "altitude-limit": {
+    "status": "implemented",
+    "implementedIn": {
+      "ruleset": "faa-part-107",
+      "version": 1
+    },
+    "tests": [
+      {
+        "test": "AltitudeLimitEntryPointTests.The_limit_resolves_as_printed_400_feet_above_ground_level_a_400_foot_structure_radius_and_400_feet_above_the_structure_citing_107_51_b",
+        "mutation": "AltitudeLimit.AboveGroundLevelFeet printed 401 feet (`= 401m` for `= 400m`); this test went red. It went red too with StructureRadiusFeet alone printed 401 (`= 401m` for `= 400m`), with AboveStructureUppermostLimitFeet alone printed 401 (`= 401m` for `= 400m`), so each of the three figures is asserted distinctly, and with AltitudeLimit.Authority citing operating-limitations' `§ 107.51 introductory text` instead of altitude-limit's locator (`MapEntries.OperatingLimitations.Locator` for `MapEntries.AltitudeLimit.Locator`)."
+      },
+      {
+        "test": "AltitudeLimitEntryPointTests.While_a_waiver_of_107_51_is_stated_in_force_it_declines_OutsideCurrentScope_citing_107_205_and_records_the_statement",
+        "mutation": "Altitude.Limit handed the gate a statement that no waiver is in force (`waiver with { InForce = false }` for `waiver`), so a stated waiver was not honoured and the limit resolved; this test went red. It went red too with Altitude.Limit naming speed-limit as the suspended entry (`MapEntries.SpeedLimit` for `MapEntries.AltitudeLimit`), so Attempted named speed-limit rather than altitude-limit."
+      },
+      {
+        "test": "AltitudeLimitEntryPointTests.Without_a_waiver_statement_it_refuses_rather_than_infer_one",
+        "mutation": "Handlers.AltitudeLimit defaulted a missing statement to none held (`request.Waiver ?? WaiverStatement.NoneHeld(Altitude.Regulation, \"the engine\")` for `Demand(request.Waiver, ...)`); this test went red."
+      },
+      {
+        "test": "AltitudeLimitEntryPointTests.A_waiver_statement_about_another_regulation_is_refused",
+        "mutation": "Altitude.Limit compared the statement's regulation with itself (`waiver.Regulation` for `Regulation` in the call to Waivers.Suspension), so a waiver of § 107.41 suspended § 107.51(b); this test went red."
+      }
+    ]
+  },
   "speed-within-limit": {
     "status": "implemented",
     "implementedIn": {

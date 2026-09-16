@@ -82,3 +82,10 @@ equal. `Attempted` names the entry whose question it is, and the test asserts th
 
 **The kernel's `UnresolvedResult` has no place for a caller's statement.** The waiver statement
 on a decline is recorded as text in `Attempted`. A resolved result records it as a typed field.
+
+**The waiver handling is not speed-specific.** It applies to every entry the map marks
+`suspendedBy: [waivable-regulations]`: the request demands a `WaiverStatement`, a waiver stated in
+force declines `OutsideCurrentScope` citing `§ 107.205` with the statement in `Attempted`, none in
+force evaluates the rule with the statement recorded, and a statement about another regulation is
+refused. `altitude-limit` (§ 107.51(b), #2) is the second entry to use it, through the same
+`Waivers.Suspension`.
