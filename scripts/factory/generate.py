@@ -21,6 +21,7 @@ Three kinds of output, one per ownership class (ownership.py holds the table, de
 version pins of RulesKernel and the map package, and the map's PackageReference (conditioned
 on the engine project, so the test project does not take it). When the corpus declares
 `randomness: seeded` (decision 0019) it also pins RulesKernel.Randomness at the kernel's version,
+RulesKernel.Analyzers always,
 and references nothing: whether and where to draw is the engine's to write, and the pin only
 means that when it does, the version is the kernel's. Under `none` there is no pin. Directory.Packages.props imports
 it, and keeps only the central-package-management switches and the test packages, which an
@@ -31,9 +32,8 @@ map package themselves, or whose Directory.Packages.props does not import the ge
 global.json's SDK version is the kernel's toolchain and is managed, not generated: the SDK is
 not a package the build restores, and an engine that must move it adopts the file.
 
-The corpus is copied to `corpus/` on every run; intake has already proved its bytes. A licensed
-`local-copy` corpus produced under the licensed-copy exception (decision 0022) is not: its bytes
-are never written into the engine, and an engine whose `corpus/` already holds files is refused.
+The corpus is copied to `corpus/` on every run; intake has already proved its bytes, and that its
+licence permits committing them (decision 0028).
 
 What the generated code states:
 
@@ -146,6 +146,10 @@ OVERLAY_NAME = "corpus-map.overlay.json"
 PACKAGES_PROPS = "RulesFactory.Packages.g.props"
 # Decision 0019: the corpus's `randomness`, carried from its manifest by intake.
 RANDOMNESS_PACKAGE = "RulesKernel.Randomness"
+# The kernel's compile-time determinism diagnostics (RK0001-RK0005, RK0007), pinned at the kernel's
+# version like everything else the kernel ships. Referenced by the engine project alone, the way the
+# map package is: a build asset, never a reference, and never part of the test project's graph.
+ANALYZERS_PACKAGE = "RulesKernel.Analyzers"
 RANDOMNESS = ("none", "seeded")
 OWNED = ("status", "implementedIn", "tests")
 
@@ -1073,11 +1077,64 @@ MANAGED_NOTE = ("Managed by rules-factory (recipe {version}): `factory produce` 
                 "       recipe changes and refuses to overwrite a hand edit; adopting it makes it the engine's own.")
 
 
+# The agent rails whose recipe is a file rather than a string (decision 0029): published path ->
+# template under recipe/rails/. They are documents and a hook, long enough that inlining them here
+# would bury the generator, and worth reading as what they are. Read lazily, inside managed_files:
+# this module is vendored into every engine as scripts/factory/generate.py, where recipe/ does not
+# exist and the engine's gate calls `generated` alone.
+RAILS = {
+    "AGENTS.md": "AGENTS.md",
+    "CLAUDE.md": "CLAUDE.md",
+    "docs/agent-team.md": "agent-team.md",
+    ".claude/agents/engine-dev.md": "agents/engine-dev.md",
+    ".claude/agents/repo-steward.md": "agents/repo-steward.md",
+    ".claude/agents/rules-conformance.md": "agents/rules-conformance.md",
+    ".claude/hooks/primary-checkout-guard.py": "hooks/primary-checkout-guard.py",
+    ".claude/settings.json": "settings.json",
+    "tools/dispatch-agent.sh": "tools/dispatch-agent.sh",
+    "tools/new-issue.sh": "tools/new-issue.sh",
+    "tools/entry-packet.py": "tools/entry-packet.py",
+    "tools/review-packet.py": "tools/review-packet.py",
+    "tools/pr-policy.py": "tools/pr-policy.py",
+    "tools/record-verdict.py": "tools/record-verdict.py",
+    "tools/conformance-gate.py": "tools/conformance-gate.py",
+    ".github/pull_request_template.md": "pull_request_template.md",
+    ".github/workflows/pr-policy.yml": "workflows/pr-policy.yml",
+    ".github/workflows/conformance-gate.yml": "workflows/conformance-gate.yml",
+    "tools/agent-doctor.py": "tools/agent-doctor.py",
+    # Named `editorconfig` in the recipe: a dotfile there would be invisible in a listing of the
+    # rails, and the published path is what matters.
+    ".editorconfig": "editorconfig",
+}
+# The rails an operator runs. `produce` writes with the default mode, so a script invoked by path
+# would not run; the hook is invoked through `python3` by .claude/settings.json instead and needs
+# no bit. The mode is not part of a recipe's bytes, so it plays no part in hand-edit detection.
+EXECUTABLE = frozenset({"tools/dispatch-agent.sh", "tools/new-issue.sh", "tools/entry-packet.py",
+                        "tools/review-packet.py", "tools/pr-policy.py", "tools/record-verdict.py",
+                        "tools/conformance-gate.py", "tools/agent-doctor.py"})
+RAILS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "recipe", "rails")
+
+
+def rails_files():
+    """The rails recipes: published path -> text, read from recipe/rails/.
+
+    Each is read in binary and decoded, so the bytes written are the bytes on disk: a recipe
+    version means one fixed sequence of bytes (ownership.py), and a newline translated on the way
+    through would silently make an engine's copy a hand edit.
+    """
+    out = {}
+    for relative, template in RAILS.items():
+        with open(os.path.join(RAILS_DIR, *template.split("/")), "rb") as handle:
+            out[relative] = handle.read().decode("utf-8")
+    return out
+
+
 def managed_files():
     """The managed recipes (ownership.py): path -> text. Independent of the engine and the map, so
     each recipe version is one fixed sequence of bytes."""
     versions = {row.pattern: row.recipe for row in ownership.managed_rows("")}
     return {
+        **rails_files(),
         "global.json": json.dumps({"sdk": {"version": SDK_VERSION, "rollForward": "disable"}}, indent=2) + "\n",
         "NuGet.config": (
             '<?xml version="1.0" encoding="utf-8"?>\n'
@@ -1120,6 +1177,43 @@ def managed_files():
             "  </PropertyGroup>\n\n"
             "</Project>\n"),
     }
+
+
+AGENT_POLICY = ".github/agent-policy.json"
+
+
+def agent_policy():
+    """The engine's rails configuration (decision 0029): every choice the rails read.
+
+    Engine-owned, so the factory writes it once and never again: a consumer changes the review
+    chain, the label vocabulary or the worktree variables by editing this file, and no emitted
+    script names a provider. The chain below is the default the factory ships, which is why it is
+    here and not in a script.
+    """
+    return json.dumps({
+        "schemaVersion": 1,
+        "labels": {
+            "ready": "state:ready",
+            "blocked": "state:blocked",
+            "needsDecision": "state:needs-decision",
+            "normalRisk": "risk:normal",
+            "independentRisk": "risk:independent-review",
+        },
+        "review": {
+            "semanticContext": "rules-verdict/semantic",
+            "semanticPaths": ["src/**", "tests/**", OVERLAY_NAME, PACKAGES_PROPS,
+                              "corpus/**", "docs/decisions/**"],
+            "independentFallback": [
+                {"id": "codex", "context": "rules-verdict/codex"},
+                {"id": "gemini", "context": "rules-verdict/gemini"},
+                {"id": "in-house-independent", "context": "rules-verdict/in-house-independent"},
+            ],
+        },
+        "worktrees": {
+            "rootEnvironmentVariable": "RULES_ENGINE_WORKTREE_ROOT",
+            "primaryMutationEscapeHatch": "RULES_ENGINE_ALLOW_PRIMARY_MUTATION",
+        },
+    }, indent=2) + "\n"
 
 
 def engine_owned(model):
@@ -1174,6 +1268,7 @@ def engine_owned(model):
             "  </ItemGroup>\n\n"
             "</Project>\n"),
         OVERLAY_NAME: "{}\n",
+        AGENT_POLICY: agent_policy(),
     }
 
 
@@ -1196,6 +1291,10 @@ def packages_props(model):
         "  <ItemGroup>\n"
         "    <!-- The kernel is referenced, never copied. -->\n"
         f'    <PackageVersion Include="RulesKernel" Version="{KERNEL_VERSION}" />\n'
+        "    <!-- The kernel's determinism analyzers, at the kernel's version. An engine that copied a\n"
+        "         list of forbidden constructs into itself would diverge from every other engine's copy,\n"
+        "         which is what the kernel exists to end (rules-factory decision 0029). -->\n"
+        f'    <PackageVersion Include="{ANALYZERS_PACKAGE}" Version="{KERNEL_VERSION}" />\n'
         f"{randomness}"
         "    <!-- The map is referenced, never copied (rules-factory decision 0015), at an exact\n"
         "         version. The engine's own build facts live in corpus-map.overlay.json. -->\n"
@@ -1206,6 +1305,10 @@ def packages_props(model):
         "       manifest and checker. -->\n"
         f"  <ItemGroup Condition=\"'$(MSBuildProjectName)' == '{model.name}'\">\n"
         f'    <PackageReference Include="{model.package_id}" PrivateAssets="all" />\n'
+        "    <!-- The analyzers, on the engine project only: a determinism defect in the rules is a build\n"
+        "         error, and a test that fakes a clock or iterates a set is not the engine doing it.\n"
+        "         .editorconfig states each severity rather than leaving it to the package's defaults. -->\n"
+        f'    <PackageReference Include="{ANALYZERS_PACKAGE}" PrivateAssets="all" />\n'
         "  </ItemGroup>\n\n"
         "</Project>\n")
 
@@ -1300,15 +1403,6 @@ def produce(intake, name, out, log=None, adopt=(), reset=()):
     except ownership.OwnershipError as error:
         raise GenerationError(str(error))
     corpus_file = os.path.basename(str(intake.corpus.get("committedPath") or intake.corpus_name))
-    # A licensed local-copy corpus (decision 0022) is never copied: its bytes may not be committed
-    # anywhere, and the engine's gate reads it from the manifest's envVar instead. corpus/ holding
-    # anything then is refused rather than left in place to be committed.
-    local_copy = getattr(intake, "licensed_copy_operator", None) is not None
-    corpus_dir = os.path.join(out, "corpus")
-    if local_copy and os.path.isdir(corpus_dir) and os.listdir(corpus_dir):
-        raise GenerationError(f"{intake.corpus.get('sourceId')} is a licensed local-copy corpus, and the engine has "
-                              f"files under corpus/ ({', '.join(sorted(os.listdir(corpus_dir)))}); corpus bytes of a "
-                              f"licensed corpus are never committed (0022), so remove them")
 
     written = []
     for relative, text in engine_owned(model).items():
@@ -1317,11 +1411,13 @@ def produce(intake, name, out, log=None, adopt=(), reset=()):
             _write(path, text.encode("utf-8"))
             written.append(relative)
     for relative, data in sorted(managed_writes.items()):
-        _write(os.path.join(out, *relative.split("/")), data)
+        path = os.path.join(out, *relative.split("/"))
+        _write(path, data)
+        if relative in EXECUTABLE:
+            os.chmod(path, 0o755)
         written.append(relative)
-    if not local_copy:
-        _write(os.path.join(out, "corpus", corpus_file), intake.corpus_bytes)
-        written.append(f"corpus/{corpus_file}")
+    _write(os.path.join(out, "corpus", corpus_file), intake.corpus_bytes)
+    written.append(f"corpus/{corpus_file}")
     for relative, text in generated(model).items():
         _write(os.path.join(out, *relative.split("/")), text.encode("utf-8"))
         written.append(relative)
