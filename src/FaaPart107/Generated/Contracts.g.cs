@@ -257,8 +257,8 @@ internal static partial class Handlers
     /// <summary>Maximum groundspeed (<c>speed-limit</c>): required, the entry is implemented.</summary>
     internal static partial Resolution<object> SpeedLimit(global::FaaPart107.Requests.SpeedLimitRequest request);
 
-    /// <summary>Maximum altitude above ground level (<c>altitude-limit</c>): optional.</summary>
-    static partial void AltitudeLimit(global::FaaPart107.Requests.AltitudeLimitRequest request, ref Resolution<object>? resolution);
+    /// <summary>Maximum altitude above ground level (<c>altitude-limit</c>): required, the entry is implemented.</summary>
+    internal static partial Resolution<object> AltitudeLimit(global::FaaPart107.Requests.AltitudeLimitRequest request);
 
     /// <summary>Minimum flight visibility (<c>visibility-minimum</c>): optional.</summary>
     static partial void VisibilityMinimum(global::FaaPart107.Requests.VisibilityMinimumRequest request, ref Resolution<object>? resolution);
@@ -409,7 +409,7 @@ internal static partial class Handlers
                 resolution = SpeedLimit(request as global::FaaPart107.Requests.SpeedLimitRequest ?? new(assertions));
                 break;
             case "altitude-limit":
-                AltitudeLimit(request as global::FaaPart107.Requests.AltitudeLimitRequest ?? new(assertions), ref resolution);
+                resolution = AltitudeLimit(request as global::FaaPart107.Requests.AltitudeLimitRequest ?? new(assertions));
                 break;
             case "visibility-minimum":
                 VisibilityMinimum(request as global::FaaPart107.Requests.VisibilityMinimumRequest ?? new(assertions), ref resolution);
@@ -556,7 +556,7 @@ internal static partial class Handlers
     internal static bool Has(string entryId) => entryId switch
     {
         "speed-limit" => true,
-        "altitude-limit" => Hooked("AltitudeLimit", typeof(global::FaaPart107.Requests.AltitudeLimitRequest)),
+        "altitude-limit" => true,
         "visibility-minimum" => Hooked("VisibilityMinimum", typeof(global::FaaPart107.Requests.VisibilityMinimumRequest)),
         "cloud-clearance" => Hooked("CloudClearance", typeof(global::FaaPart107.Requests.CloudClearanceRequest)),
         "civil-twilight-window" => Hooked("CivilTwilightWindow", typeof(global::FaaPart107.Requests.CivilTwilightWindowRequest)),

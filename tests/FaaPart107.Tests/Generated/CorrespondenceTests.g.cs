@@ -142,8 +142,8 @@ public sealed class CorrespondenceTests
         Assert.True(Registry.HasImplementation("speed-limit"), "speed-limit is implemented in the overlay and has no [Implements] handler");
 
     [Fact]
-    public void altitude_limit__declines_UnsupportedRule_row_2() =>
-        AssertDeclines("altitude-limit", UnresolvedReason.UnsupportedRule, EntryPoints.AltitudeLimit.Resolve(global::FaaPart107.Requests.AltitudeLimitRequest.Empty), new SourceLocator("cfr-14-107", "§ 107.51(b)"));
+    public void altitude_limit__is_implemented_so_a_hand_written_handler_answers_it() =>
+        Assert.True(Registry.HasImplementation("altitude-limit"), "altitude-limit is implemented in the overlay and has no [Implements] handler");
 
     [Fact]
     public void visibility_minimum__declines_UnsupportedRule_row_2() =>
