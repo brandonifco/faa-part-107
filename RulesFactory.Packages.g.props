@@ -8,6 +8,10 @@
   <ItemGroup>
     <!-- The kernel is referenced, never copied. -->
     <PackageVersion Include="RulesKernel" Version="0.3.0" />
+    <!-- The kernel's determinism analyzers, at the kernel's version. An engine that copied a
+         list of forbidden constructs into itself would diverge from every other engine's copy,
+         which is what the kernel exists to end (rules-factory decision 0029). -->
+    <PackageVersion Include="RulesKernel.Analyzers" Version="0.3.0" />
     <!-- The map is referenced, never copied (rules-factory decision 0015), at an exact
          version. The engine's own build facts live in corpus-map.overlay.json. -->
     <PackageVersion Include="RulesFactory.Maps.FaaPart107" Version="[4.0.0]" />
@@ -18,6 +22,10 @@
        manifest and checker. -->
   <ItemGroup Condition="'$(MSBuildProjectName)' == 'FaaPart107'">
     <PackageReference Include="RulesFactory.Maps.FaaPart107" PrivateAssets="all" />
+    <!-- The analyzers, on the engine project only: a determinism defect in the rules is a build
+         error, and a test that fakes a clock or iterates a set is not the engine doing it.
+         .editorconfig states each severity rather than leaving it to the package's defaults. -->
+    <PackageReference Include="RulesKernel.Analyzers" PrivateAssets="all" />
   </ItemGroup>
 
 </Project>

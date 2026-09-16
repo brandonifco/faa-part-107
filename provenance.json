@@ -4,8 +4,8 @@
     "name": "FaaPart107"
   },
   "factory": {
-    "version": "0.7.0",
-    "commit": "069780809543a66d5556d713e337d850ef405b41",
+    "version": "0.0.0-dev+9bbb6695e319",
+    "commit": "9bbb6695e319685662d7990311e994693197055b",
     "dirty": false
   },
   "map": {
@@ -50,11 +50,11 @@
       },
       {
         "path": "tools/factory/__main__.py",
-        "sha256": "e36697ae5b26a375f45c1c1dd6afab54f096162c7bb06003a257236a6a5db996"
+        "sha256": "eae9ba811c77b50940d14aa0512745bab701603015ec6d44e35ae8dac0dfbb92"
       },
       {
         "path": "tools/factory/backlog.py",
-        "sha256": "43027c085a9dc027016118a81f0159d2e09b33340ee402fc26415b31d972ed7f"
+        "sha256": "576c74e6f154187e4f9f8bd93bfdb29fd20ccba02b458e96232f307841fdb854"
       },
       {
         "path": "tools/factory/gate.py",
@@ -62,39 +62,115 @@
       },
       {
         "path": "tools/factory/generate.py",
-        "sha256": "afcea250d2dbd23390f156ece985824714ac68c65e8f4551c51323397c2388bb"
+        "sha256": "63fbeecdae53392f76ceee5cca8b0022b05b9889d8d84a83a15444a91b8e9c90"
       },
       {
         "path": "tools/factory/intake.py",
-        "sha256": "002730b82e965e2ef2d70d5cd51855e01e8052f940a40cb591f2c26a26a5a7b9"
-      },
-      {
-        "path": "tools/factory/licensed-copy-operators.json",
-        "sha256": "0559c7b769660eff9a23f03de6619b9084a6dc0e8ce4d0ca511d868da38bfff9"
-      },
-      {
-        "path": "tools/factory/licensed_copy.py",
-        "sha256": "020549331fc45f0d08817cb55ab628a20d02b3db00f35e91aef9a25fe56b0d23"
+        "sha256": "bc00d43b6cd0ed79bc884c7c3162c815d71bb116b7191c14271d36e28d0db6be"
       },
       {
         "path": "tools/factory/ownership.py",
-        "sha256": "799fd376c652954a4d371b329cc1bfdb8cd32c43e2eb3ed971ba028f6655240a"
+        "sha256": "84bf74ed0055568b7368a926019b4d11daa3465a99d7e3299c9d56100611b7c8"
       },
       {
         "path": "tools/factory/provenance.py",
-        "sha256": "715ae6898c9e370589d32f38a32b8bb8ace2b144281b19bdbcac9b6eff403f98"
+        "sha256": "7e9deae560ab4bd3edfa983be57eeedc8e90c87badf6d15bbe3c534a87c498e6"
+      },
+      {
+        "path": "tools/factory/rails.py",
+        "sha256": "68ec0f3d86ba6d2a585af0f44b3c642cdffd5c4159cd4ab7ce6e566fb36ae1f8"
       },
       {
         "path": "tools/factory/recipe/engine-gate.py",
-        "sha256": "6bdfc491088584d5dbca128692e4d3fb7182655d24f9b24c2b45e641b605ffdb"
+        "sha256": "12b56736a4894507a8b732e847aafb590ed45bfd3ffa285a3fe6aca6e17f0870"
       },
       {
         "path": "tools/factory/recipe/map-overlay.py",
         "sha256": "11cb78f15f1e6a1ccc8a08542d5fd59beecb30bb8e0a6c903460d6b041129714"
       },
       {
+        "path": "tools/factory/recipe/rails/AGENTS.md",
+        "sha256": "c3576d1cea769505a43794b8f2d42797f230f058b238eda09230f1fd3105ab50"
+      },
+      {
+        "path": "tools/factory/recipe/rails/CLAUDE.md",
+        "sha256": "04c07ad36e742fa60efafeca54d20bd96d16b6e338a44e46fad2b679ab8dfd9f"
+      },
+      {
+        "path": "tools/factory/recipe/rails/agent-team.md",
+        "sha256": "ae9c54d7236adca8507e673d77b51e6431a48f4a3c29af40d7420ea2810e8521"
+      },
+      {
+        "path": "tools/factory/recipe/rails/agents/engine-dev.md",
+        "sha256": "c8569477e58633f6e807a4b9be9a00b37a6f315d5b0f1fa8b0a7bc1f36b24b06"
+      },
+      {
+        "path": "tools/factory/recipe/rails/agents/repo-steward.md",
+        "sha256": "6a2662ac958da76bb02263914d4e3b293a8dc15837e8a6ffccb14177b013bde7"
+      },
+      {
+        "path": "tools/factory/recipe/rails/agents/rules-conformance.md",
+        "sha256": "034cc0af3ecb98e9af60a65931102c69546f22ddadfea9c82961bb71fbbf96c2"
+      },
+      {
+        "path": "tools/factory/recipe/rails/editorconfig",
+        "sha256": "4109d1ef55053ef656e536d7818934deb73016fbe950f153bae6b2a163591cb2"
+      },
+      {
+        "path": "tools/factory/recipe/rails/hooks/primary-checkout-guard.py",
+        "sha256": "a263531db502dfad98b38bf1dd90df7b1bec5f22133db016b6f30dc38509d16d"
+      },
+      {
+        "path": "tools/factory/recipe/rails/pull_request_template.md",
+        "sha256": "e2cebc6419d62e2df3b218d76462caf807d6637f2b305ac2aa11153f13304a92"
+      },
+      {
+        "path": "tools/factory/recipe/rails/settings.json",
+        "sha256": "4d410acd10ba5b6ed2d3c6a016cc2cfde1cf8e621da54424755376a80da30aa0"
+      },
+      {
+        "path": "tools/factory/recipe/rails/tools/agent-doctor.py",
+        "sha256": "1b6fced99797d165ab0216523bddae183d6e7254f41d5d5f51cdb1d1c3b8913d"
+      },
+      {
+        "path": "tools/factory/recipe/rails/tools/conformance-gate.py",
+        "sha256": "567972b60f16d1f86c661e97efa56fa2878c9a5aa92fb820c4aea07a402cbd24"
+      },
+      {
+        "path": "tools/factory/recipe/rails/tools/dispatch-agent.sh",
+        "sha256": "868ce983b51d784a83a6a0fcac7456608b31f0af025c75ac5eeac64a373dca2b"
+      },
+      {
+        "path": "tools/factory/recipe/rails/tools/entry-packet.py",
+        "sha256": "59f112154a77a8cf574bd8d1ee1e43d39399025308c8f4eb2371d99081e49b20"
+      },
+      {
+        "path": "tools/factory/recipe/rails/tools/new-issue.sh",
+        "sha256": "382a2f516f81f593e74ed9e57262080c25edbac1a16d542ffb235eb772b10e88"
+      },
+      {
+        "path": "tools/factory/recipe/rails/tools/pr-policy.py",
+        "sha256": "79a33c7fe1ea8d888e4d6912a43ac60afe285c7a8bf43fbe9f7be87d6947b76e"
+      },
+      {
+        "path": "tools/factory/recipe/rails/tools/record-verdict.py",
+        "sha256": "48f7b11f7fc829cdaebd776a3eb5db04e27cade97c427c6806b72f58805d83db"
+      },
+      {
+        "path": "tools/factory/recipe/rails/tools/review-packet.py",
+        "sha256": "2e989c02c1827bf6d3da8fce9a35874e25ea4baf14f62eeb64aab78c30b1f392"
+      },
+      {
+        "path": "tools/factory/recipe/rails/workflows/conformance-gate.yml",
+        "sha256": "851d64e8705363b70711b74fe1b25306c3fac1c1e26c88a9805defc3a03042a8"
+      },
+      {
+        "path": "tools/factory/recipe/rails/workflows/pr-policy.yml",
+        "sha256": "caa3394a473d5fdd45b274176d8e28c48d9f5425176318194ba68fbea8453fa2"
+      },
+      {
         "path": "tools/factory/recipe/validate.sh",
-        "sha256": "c28695c10c0b4e966b895d9cd7bb0ac36a1b02dd6a7778d57257093023d2cff1"
+        "sha256": "d60c04be4ddc82a3453db5554d5ccb2c0b5f1d8c2f26caee1b1aa63b5399119c"
       },
       {
         "path": "tools/factory/recipe/validate.yml",
@@ -106,15 +182,15 @@
       },
       {
         "path": "tools/factory/transaction.py",
-        "sha256": "554d2b30826cb5c828bd1bb3dfb5b2888846a8fa22aa0982f4f5c5576cfd1e1a"
+        "sha256": "6ff3ed93e22131ecc3e7125356e7cc1e5b9a25716985972d4057d15726a2eac8"
       },
       {
         "path": "tools/factory/verify.py",
-        "sha256": "ff188e0da339ed80599065ceaf81be45818590d4a91b1534aa709ce6dcf2c964"
+        "sha256": "bf9f4a32ae967b1b8a9aa9f6fbd0cb488b78bbaa2c94f83ac7a2d2685c67b47e"
       }
     ],
     "digestRule": "sha256 over UTF-8 lines '<sha256>  <path>\\n', one per recipe file, in ascending byte order of path",
-    "digest": "1ddbbfea919b4fde8f98fe7d7973a4d1e6472fc6825e425f57c15a7b7d17ed0a"
+    "digest": "f8bd4994b3d1173e541b5dfed56ef5fd6b71bddc22192f8743791eb183b11b19"
   },
   "generated": [
     {
@@ -123,155 +199,155 @@
     },
     {
       "path": "RulesFactory.Packages.g.props",
-      "sha256": "6d7fe852b505fe1ae059d3b21eaf980374ef1cf54ec44d3be527ac0b927a9e06"
+      "sha256": "6da95d24394881865c0153cef534c33a53702d28ca609c8b3712bd9a1191f1ef"
     },
     {
       "path": "backlog/001-altitude-limit.md",
-      "sha256": "16ddb392c877c6306be38cb980643b108feee9218f9e21944eaf75de2d76684d"
+      "sha256": "180c1cef3af787c9212c8676e26d93fb88f347d16e2ad3d40aea515e2d63655b"
     },
     {
       "path": "backlog/002-visibility-minimum.md",
-      "sha256": "bbf82c5d60c2c2e98f5d425b9d2fae0823127ab59b76bb75e74b5f7a001c883d"
+      "sha256": "e9b69fb13f69fe7a6b661a4a4297ca24fe465700284c76e082d7148fcbb39049"
     },
     {
       "path": "backlog/003-cloud-clearance.md",
-      "sha256": "51c30c93062fff135aa6940854c470c4d90fa919be79cba3605a98ab3f6983b7"
+      "sha256": "0e553ab3b9d070389c6c21ed1659aefaaacee8fb20986f949984d73308d25880"
     },
     {
       "path": "backlog/004-civil-twilight-window.md",
-      "sha256": "fe3c66f10c095c37e614a985daaf5f5da8bae3fde91b94f6d9bd9731cd4c85da"
+      "sha256": "4654c62f1345aa9301a4295a8ccdf0e3a64f30d10b836feef99d20e637c1323c"
     },
     {
       "path": "backlog/005-altitude-within-limit.md",
-      "sha256": "c31a85695968201ae0ec2b0626ef613788341063e2f38ecb5cce38dd36cb75a5"
+      "sha256": "a71833a3abc62a79bcbeefdde76b692438666e95ad735e01358a7e522e32126f"
     },
     {
       "path": "backlog/006-prominent-objects.md",
-      "sha256": "5a1cf8bcb5cdc218af26ff13977f018cf1d720387e6cdf48cb39200273e01de0"
+      "sha256": "5450aaa837cbb13cf4d395f37582f19f46aac5c5f763f7c1e9c5fd169da59400"
     },
     {
       "path": "backlog/007-weather-minimums-met.md",
-      "sha256": "f46fe180f0eb65bfa4652edeceefa21729a6e37ae59e5f332e5003d5712496d4"
+      "sha256": "2ce24362afb63b33745fdbec21ace5f9e014e8161d160524cb4d0794ea2cfeb1"
     },
     {
       "path": "backlog/008-operating-limitations.md",
-      "sha256": "952e9608483ba2d2601f2a2283b1e1477e468f79ffe591dc857b0501cb978b23"
+      "sha256": "f1593422abe472975cee65c60fe3468dfbd040553fc3a1a27fec4f4797246154"
     },
     {
       "path": "backlog/009-single-aircraft.md",
-      "sha256": "89e58088ff061004f108e1e294137d6a122ceba7f5f2959687eb863c778a245d"
+      "sha256": "9d25e2127942b88c8a6b56af166cc084d18a40146dc46bb3586bc349f8b025f1"
     },
     {
       "path": "backlog/010-airspace-authorized.md",
-      "sha256": "80439dafa87204985ba5a098f5bfedb254f68fbf3f1d66096f0e35b8b71448b1"
+      "sha256": "f83955783a6d4f14ec7cc9aced38057014e3824e8f1dca08d63db97370d334c4"
     },
     {
       "path": "backlog/011-restricted-area-permitted.md",
-      "sha256": "1c3bc4d608cf7f018f27d2981267172da1d0bab5d81b1126ee143aa0b4fc0595"
+      "sha256": "345d677ed114f961c54c566db1e8deca053526be5ee4ad9c0fb6c6237097572c"
     },
     {
       "path": "backlog/012-moving-vehicle-operation.md",
-      "sha256": "1393fb0c99e09f368c2bcca6a1f0e4dc060597d196ba5ffe57ad69a82d48e25f"
+      "sha256": "4f59f562690369a77b32945279524ad55ffd68583aef57e5c894089d78dd71f0"
     },
     {
       "path": "backlog/013-moving-aircraft-operation.md",
-      "sha256": "56f8a11ec8634323c8aecbbf7c31f1bdd13330637f63b01235aa5cfd736be629"
+      "sha256": "71157ab48b6c9fb8555228800c8f2923b0fe8422d2f8457e05923a618ced8076"
     },
     {
       "path": "backlog/014-night-training-completed.md",
-      "sha256": "70b7c8711b1398848cb532056d83d66a08281a6d81dd6c4b73e6b28e7703bd80"
+      "sha256": "342a9bf0868acb80a4e50ec845b220eb43972c613c363fb30ebff46db8b3f2c7"
     },
     {
       "path": "backlog/015-night-waiver-termination.md",
-      "sha256": "520d24a6aef4e1a9b7a8e679ad7f7c98634eea497cb6b82a9b7174f750ba63b1"
+      "sha256": "e7c8f6af0702e0fea29043f03bc3472b6d4e32893178e3dab8db2429fb8b86a7"
     },
     {
       "path": "backlog/016-well-clear.md",
-      "sha256": "0fbf3cf4993fcee9d80c20c054442fd9d3b6a7a6e928b05fcf415adf20a25ccd"
+      "sha256": "e61620f4f81f8197295d968d95dc95f2bf8d344d8ec0a150251f248c4093f787"
     },
     {
       "path": "backlog/017-right-of-way.md",
-      "sha256": "0bd2c5f5d0026ec57161477da4fca4f1aab09a91b1723ef0d5ad4264e467c64a"
+      "sha256": "3762a1cffb1799f3b25be5483a3561b8f2592f9adc621ecd8d20d4ad503cc335"
     },
     {
       "path": "backlog/018-collision-hazard-proximity.md",
-      "sha256": "6e23e4f5f5aa76ed3fb0b6b3e587d10bc2ff4c15fc679c8671b2c849b23f2773"
+      "sha256": "7b004928570755fb832ac73ebe71e86bd479c209937e4acfeeb7f0bca9c76b4f"
     },
     {
       "path": "backlog/019-reasonable-protection.md",
-      "sha256": "02af8bd84e5d32f583405a54d4aae19d9231ec0be557586defb189ab784c5018"
+      "sha256": "4cbdbca922c17eb641f09d395935eb3f859ad26823df30ba6820b8d87de75342"
     },
     {
       "path": "backlog/020-direct-participation.md",
-      "sha256": "520ccc9d04be57aedcb985c213b7e5b75a0c662d93321975dd5a10497029b960"
+      "sha256": "c20a36054ce112b794f2c442bf8c7fa4ca63e913a740303355027a7ba402ff6b"
     },
     {
       "path": "backlog/021-over-human-beings.md",
-      "sha256": "53d7049a796175e308c39b6c09a4618e5194be006ade4d00d3413f6fa53d377c"
+      "sha256": "c2cccf789ea98f5c7bcf3a7ef66bea5ea8fdc001f1be195061ebb5c1bc3b3faf"
     },
     {
       "path": "backlog/022-flash-rate-sufficient.md",
-      "sha256": "1d850af0224c4ebc61a5848949fb3925f9ef2832af37c7139c2501045d23b10d"
+      "sha256": "539fc09f8c61ec09b1c644272e76cd56017281a32340d181598e9540dc897a30"
     },
     {
       "path": "backlog/023-intensity-reduction-in-interest-of-safety.md",
-      "sha256": "ce4d9f3761d85fdbb01b467b0b6143ccdab9900b01594dcc51dc55443b5abc5b"
+      "sha256": "003a725941846e1edf744c5607f24b62899ab85d5359be993025a405f4cbc6d4"
     },
     {
       "path": "backlog/024-anti-collision-lighting.md",
-      "sha256": "1ead185256e5abbdee8fbad40e319f8de1e729d26eeead67233f591c948b4e5e"
+      "sha256": "62db12660acd62761b73a42891fd006df29e8a2d13c63e957df0bf6ddd1685c5"
     },
     {
       "path": "backlog/025-civil-twilight-operation.md",
-      "sha256": "7b9fed040aa2713dff81fa32d6f005bdfc082da42efd4c71907d6eee0177c12d"
+      "sha256": "fd19c0fe3b98b61ff379f16512ff5d9a14f36784cb3fd25f445ff9d745622140"
     },
     {
       "path": "backlog/026-unaided-visual-contact.md",
-      "sha256": "d0b39b363201360ec2fb6ff7b1869f1ce04fcb2b6176c0210656c354c8eac193"
+      "sha256": "e729fb530b8a89ff1f6b5c56895b83bd3d246a88c4085ce6079895aa995be9d9"
     },
     {
       "path": "backlog/027-visual-line-of-sight.md",
-      "sha256": "b92ad56cd304969b54745ea43806b613744edad70325b3b30d36784c8431ec03"
+      "sha256": "3fe3bf3c42ec8729fb97695a0208e752dff76882215aab5b22adb9721d454e2d"
     },
     {
       "path": "backlog/028-effective-communication.md",
-      "sha256": "2cecb64c5e226dca2b926faff4f9e6654dff0350127bf44560f377db02310489"
+      "sha256": "d89763a7f40e89324cc37b3622fe27521b00b131bef88a9d31ca14cf04f688ab"
     },
     {
       "path": "backlog/029-observer-coordination.md",
-      "sha256": "6ff2c5612051741c4b5ecd80018b40517b4e61678594ab931d74737446d74974"
+      "sha256": "d2b3c39c6dd529980a8737c1089e513ece7c90c61cebc5c6339c0d1636b9465e"
     },
     {
       "path": "backlog/030-visual-observer-conditions.md",
-      "sha256": "6f4287a4b3f7c64152f91c07b7ba951d7fea4f8f89455d36959440047508f765"
+      "sha256": "70547452e90b61cf12f8dcf1bc1ea0064bfcfc92c8ead16dbe87e46f4dc8c5d8"
     },
     {
       "path": "backlog/031-preflight-risk-assessment.md",
-      "sha256": "1700d2c4531f7454471cb8da2dea445f759284f280504e455f38258ca33f0671"
+      "sha256": "f01955adea596583c6c240ddfa2e3c8b9068382fe09b76e9c6d709ff11edcfcb"
     },
     {
       "path": "backlog/032-participant-briefing.md",
-      "sha256": "f9416dfb0314dc61ae9f3c8172746559ae0123d6a7d294ac96b1d3d83e00066b"
+      "sha256": "2b76fae4021dcb5b5e1d3860d030a6a42f76732ec379b96bb89624d8b44ac560"
     },
     {
       "path": "backlog/033-control-links-working.md",
-      "sha256": "1c30a062269c2c60a4c93c1d17efcbbbf02189591cec0d906ec7e7d911e49860"
+      "sha256": "d91fdc4ad16968a7c5beabcb2f0f063d54c37b319f66817670f3b01eb273a39c"
     },
     {
       "path": "backlog/034-sufficient-available-power.md",
-      "sha256": "c18ab6337742ad1a4509716550ce28dbe42e69ebaf1e0811276a9cab5a3e4b90"
+      "sha256": "a7bca81562b33fc555609187e8bae70ccbe1466cabec4a4b448c8e266d4d36b3"
     },
     {
       "path": "backlog/035-attached-object-secure.md",
-      "sha256": "fed87b028fb7a8d0410d240591f60ceeec899183b97d7b4aa0203b94fa87d153"
+      "sha256": "325c71bb64b1dac8fe3174fe360947540bcef30b032965207fc0cc9bb3813ef0"
     },
     {
       "path": "backlog/036-attached-object-no-adverse-effect.md",
-      "sha256": "4eaad2fe12d1d5bc076674381bea77b4e7a5859232903216b2153a9f68e3ba35"
+      "sha256": "3c6919ed721e156b1e3114cdf0af3a7974044c149bf8a50feddaaf455c206834"
     },
     {
       "path": "backlog/037-preflight-actions.md",
-      "sha256": "91c3981b7f1af70352db6dbde6b93892fef02c5afcf2a90b23a9e09b6e2940c5"
+      "sha256": "1688b8696c7eed51d2a1423f8147d20df1e1900c941e4874f0e29eb08059a5a8"
     },
     {
       "path": "backlog/README.md",
@@ -283,23 +359,23 @@
     },
     {
       "path": "scripts/engine-gate.py",
-      "sha256": "6bdfc491088584d5dbca128692e4d3fb7182655d24f9b24c2b45e641b605ffdb"
+      "sha256": "12b56736a4894507a8b732e847aafb590ed45bfd3ffa285a3fe6aca6e17f0870"
     },
     {
       "path": "scripts/factory/generate.py",
-      "sha256": "afcea250d2dbd23390f156ece985824714ac68c65e8f4551c51323397c2388bb"
+      "sha256": "63fbeecdae53392f76ceee5cca8b0022b05b9889d8d84a83a15444a91b8e9c90"
     },
     {
       "path": "scripts/factory/intake.py",
-      "sha256": "002730b82e965e2ef2d70d5cd51855e01e8052f940a40cb591f2c26a26a5a7b9"
+      "sha256": "bc00d43b6cd0ed79bc884c7c3162c815d71bb116b7191c14271d36e28d0db6be"
     },
     {
       "path": "scripts/factory/ownership.py",
-      "sha256": "799fd376c652954a4d371b329cc1bfdb8cd32c43e2eb3ed971ba028f6655240a"
+      "sha256": "84bf74ed0055568b7368a926019b4d11daa3465a99d7e3299c9d56100611b7c8"
     },
     {
       "path": "scripts/factory/provenance.py",
-      "sha256": "715ae6898c9e370589d32f38a32b8bb8ace2b144281b19bdbcac9b6eff403f98"
+      "sha256": "7e9deae560ab4bd3edfa983be57eeedc8e90c87badf6d15bbe3c534a87c498e6"
     },
     {
       "path": "scripts/factory/rulings.py",
@@ -311,7 +387,7 @@
     },
     {
       "path": "scripts/validate.sh",
-      "sha256": "8ec5b592bce485e6fc310c75a4c1cc131757435ebd2bb8fa25af5e907c604350"
+      "sha256": "f8c087e28c0e9adc619d51fe08f62422cbe435abef93709241031d624ce145d7"
     },
     {
       "path": "src/FaaPart107/Generated/Contracts.g.cs",
@@ -344,6 +420,61 @@
   ],
   "managed": [
     {
+      "path": ".claude/agents/engine-dev.md",
+      "recipeVersion": 3,
+      "sha256": "c8569477e58633f6e807a4b9be9a00b37a6f315d5b0f1fa8b0a7bc1f36b24b06"
+    },
+    {
+      "path": ".claude/agents/repo-steward.md",
+      "recipeVersion": 1,
+      "sha256": "6a2662ac958da76bb02263914d4e3b293a8dc15837e8a6ffccb14177b013bde7"
+    },
+    {
+      "path": ".claude/agents/rules-conformance.md",
+      "recipeVersion": 2,
+      "sha256": "034cc0af3ecb98e9af60a65931102c69546f22ddadfea9c82961bb71fbbf96c2"
+    },
+    {
+      "path": ".claude/hooks/primary-checkout-guard.py",
+      "recipeVersion": 1,
+      "sha256": "a263531db502dfad98b38bf1dd90df7b1bec5f22133db016b6f30dc38509d16d"
+    },
+    {
+      "path": ".claude/settings.json",
+      "recipeVersion": 1,
+      "sha256": "4d410acd10ba5b6ed2d3c6a016cc2cfde1cf8e621da54424755376a80da30aa0"
+    },
+    {
+      "path": ".editorconfig",
+      "recipeVersion": 1,
+      "sha256": "4109d1ef55053ef656e536d7818934deb73016fbe950f153bae6b2a163591cb2"
+    },
+    {
+      "path": ".github/pull_request_template.md",
+      "recipeVersion": 1,
+      "sha256": "e2cebc6419d62e2df3b218d76462caf807d6637f2b305ac2aa11153f13304a92"
+    },
+    {
+      "path": ".github/workflows/conformance-gate.yml",
+      "recipeVersion": 1,
+      "sha256": "851d64e8705363b70711b74fe1b25306c3fac1c1e26c88a9805defc3a03042a8"
+    },
+    {
+      "path": ".github/workflows/pr-policy.yml",
+      "recipeVersion": 1,
+      "sha256": "caa3394a473d5fdd45b274176d8e28c48d9f5425176318194ba68fbea8453fa2"
+    },
+    {
+      "path": "AGENTS.md",
+      "recipeVersion": 3,
+      "sha256": "c3576d1cea769505a43794b8f2d42797f230f058b238eda09230f1fd3105ab50"
+    },
+    {
+      "path": "CLAUDE.md",
+      "recipeVersion": 1,
+      "sha256": "04c07ad36e742fa60efafeca54d20bd96d16b6e338a44e46fad2b679ab8dfd9f"
+    },
+    {
       "path": "Directory.Build.props",
       "recipeVersion": 2,
       "sha256": "73c373b1457e4149eb7ab7da1aed49314536ca8945dea8022c1efbd49c7a1a8f"
@@ -354,12 +485,61 @@
       "sha256": "e53f00efe0e550fb452b2e1d8d3b1e2f0cdd1de86628eff7d60a813ebfa1818f"
     },
     {
+      "path": "docs/agent-team.md",
+      "recipeVersion": 3,
+      "sha256": "ae9c54d7236adca8507e673d77b51e6431a48f4a3c29af40d7420ea2810e8521"
+    },
+    {
       "path": "global.json",
       "recipeVersion": 1,
       "sha256": "12f1cf1c3eef038f55de570dc8f5e321f4ff5306a9281106c43cc60a1f78a371"
+    },
+    {
+      "path": "tools/agent-doctor.py",
+      "recipeVersion": 1,
+      "sha256": "1b6fced99797d165ab0216523bddae183d6e7254f41d5d5f51cdb1d1c3b8913d"
+    },
+    {
+      "path": "tools/conformance-gate.py",
+      "recipeVersion": 1,
+      "sha256": "567972b60f16d1f86c661e97efa56fa2878c9a5aa92fb820c4aea07a402cbd24"
+    },
+    {
+      "path": "tools/dispatch-agent.sh",
+      "recipeVersion": 1,
+      "sha256": "868ce983b51d784a83a6a0fcac7456608b31f0af025c75ac5eeac64a373dca2b"
+    },
+    {
+      "path": "tools/entry-packet.py",
+      "recipeVersion": 2,
+      "sha256": "59f112154a77a8cf574bd8d1ee1e43d39399025308c8f4eb2371d99081e49b20"
+    },
+    {
+      "path": "tools/new-issue.sh",
+      "recipeVersion": 1,
+      "sha256": "382a2f516f81f593e74ed9e57262080c25edbac1a16d542ffb235eb772b10e88"
+    },
+    {
+      "path": "tools/pr-policy.py",
+      "recipeVersion": 1,
+      "sha256": "79a33c7fe1ea8d888e4d6912a43ac60afe285c7a8bf43fbe9f7be87d6947b76e"
+    },
+    {
+      "path": "tools/record-verdict.py",
+      "recipeVersion": 1,
+      "sha256": "48f7b11f7fc829cdaebd776a3eb5db04e27cade97c427c6806b72f58805d83db"
+    },
+    {
+      "path": "tools/review-packet.py",
+      "recipeVersion": 1,
+      "sha256": "2e989c02c1827bf6d3da8fce9a35874e25ea4baf14f62eeb64aab78c30b1f392"
     }
   ],
   "engineOwned": [
+    {
+      "path": ".github/agent-policy.json",
+      "adopted": false
+    },
     {
       "path": "Directory.Packages.props",
       "adopted": false
@@ -391,6 +571,10 @@
   ],
   "buildInputs": [
     {
+      "path": ".github/agent-policy.json",
+      "sha256": "614bbc3452e677e06ae07fa7f2d512d3b38ecfb4436d228f429e9ebd29fd7dd7"
+    },
+    {
       "path": "Directory.Packages.props",
       "sha256": "cc050d75bad8c3d1f39a4ee0db912e2bdc9beef763c6bbbf39ec70777c112989"
     },
@@ -408,7 +592,7 @@
     },
     {
       "path": "src/FaaPart107/packages.lock.json",
-      "sha256": "17ea685a72cdb8f80893c69db0d9a84b3a9ead25609d39d111ffe86716a81bed"
+      "sha256": "b5ef1af8b7a095461df48aeffaccbdd6ecfbee36dfce17c89b0a4bf3e4e0890f"
     },
     {
       "path": "tests/FaaPart107.Tests/FaaPart107.Tests.csproj",

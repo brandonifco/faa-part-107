@@ -13,6 +13,12 @@
         "requested": "[0.3.0, )",
         "resolved": "0.3.0",
         "contentHash": "x52TbzXTrKKrq6dgQTqWayvO/NLsAEMMfPChdbaBeE4fP9hNVB4ILbIIwaBKQOKnA4FRODNJ2UIKSFFT8ByFGA=="
+      },
+      "RulesKernel.Analyzers": {
+        "type": "Direct",
+        "requested": "[0.3.0, )",
+        "resolved": "0.3.0",
+        "contentHash": "vReVuCsY5OXRQplsRoiVkj+Q90iINC+oIkQnMoTtsc2xDZsSot6liaPQ8iqZ7orLksytB7eIv9yVfEq5PYTBgw=="
       }
     },
     "net8.0": {
@@ -27,6 +33,12 @@
         "requested": "[0.3.0, )",
         "resolved": "0.3.0",
         "contentHash": "x52TbzXTrKKrq6dgQTqWayvO/NLsAEMMfPChdbaBeE4fP9hNVB4ILbIIwaBKQOKnA4FRODNJ2UIKSFFT8ByFGA=="
+      },
+      "RulesKernel.Analyzers": {
+        "type": "Direct",
+        "requested": "[0.3.0, )",
+        "resolved": "0.3.0",
+        "contentHash": "vReVuCsY5OXRQplsRoiVkj+Q90iINC+oIkQnMoTtsc2xDZsSot6liaPQ8iqZ7orLksytB7eIv9yVfEq5PYTBgw=="
       }
     }
   }
