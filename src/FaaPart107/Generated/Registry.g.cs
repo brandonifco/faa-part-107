@@ -151,7 +151,7 @@ public static class Registry
         new("airspace-authorized", EntryStatus.Implemented, CorrespondenceRow.None, [MapEntries.AirspaceAuthorized.Locator]),
         new("restricted-area-permitted", EntryStatus.Implemented, CorrespondenceRow.None, [MapEntries.RestrictedAreaPermitted.Locator]),
         new("moving-vehicle-operation", EntryStatus.Mapped, CorrespondenceRow.NotBuilt, [MapEntries.MovingVehicleOperation.Locator]),
-        new("moving-aircraft-operation", EntryStatus.Mapped, CorrespondenceRow.NotBuilt, [MapEntries.MovingAircraftOperation.Locator]),
+        new("moving-aircraft-operation", EntryStatus.Implemented, CorrespondenceRow.None, [MapEntries.MovingAircraftOperation.Locator]),
         new("night-operation", EntryStatus.Declined, CorrespondenceRow.DefinedElsewhere, [MapEntries.NightOperation.Locator]),
         new("night-training-completed", EntryStatus.Mapped, CorrespondenceRow.NotBuilt, [MapEntries.NightTrainingCompleted.Locator]),
         new("knowledge-recency", EntryStatus.Declined, CorrespondenceRow.ScopeOut, [MapEntries.KnowledgeRecency.Locator]),

@@ -296,8 +296,8 @@ internal static partial class Handlers
     /// <summary>Operation from a moving land or water-borne vehicle (<c>moving-vehicle-operation</c>): optional.</summary>
     static partial void MovingVehicleOperation(global::FaaPart107.Requests.MovingVehicleOperationRequest request, ref Resolution<object>? resolution);
 
-    /// <summary>Operation from a moving aircraft (<c>moving-aircraft-operation</c>): optional.</summary>
-    static partial void MovingAircraftOperation(global::FaaPart107.Requests.MovingAircraftOperationRequest request, ref Resolution<object>? resolution);
+    /// <summary>Operation from a moving aircraft (<c>moving-aircraft-operation</c>): required, the entry is implemented.</summary>
+    internal static partial Resolution<object> MovingAircraftOperation(global::FaaPart107.Requests.MovingAircraftOperationRequest request);
 
     /// <summary>Operation at night (<c>night-operation</c>): optional.</summary>
     static partial void NightOperation(global::FaaPart107.Requests.NightOperationRequest request, ref Resolution<object>? resolution);
@@ -448,7 +448,7 @@ internal static partial class Handlers
                 MovingVehicleOperation(request as global::FaaPart107.Requests.MovingVehicleOperationRequest ?? new(assertions), ref resolution);
                 break;
             case "moving-aircraft-operation":
-                MovingAircraftOperation(request as global::FaaPart107.Requests.MovingAircraftOperationRequest ?? new(assertions), ref resolution);
+                resolution = MovingAircraftOperation(request as global::FaaPart107.Requests.MovingAircraftOperationRequest ?? new(assertions));
                 break;
             case "night-operation":
                 NightOperation(request as global::FaaPart107.Requests.NightOperationRequest ?? new(assertions), ref resolution);
@@ -569,7 +569,7 @@ internal static partial class Handlers
         "airspace-authorized" => true,
         "restricted-area-permitted" => true,
         "moving-vehicle-operation" => Hooked("MovingVehicleOperation", typeof(global::FaaPart107.Requests.MovingVehicleOperationRequest)),
-        "moving-aircraft-operation" => Hooked("MovingAircraftOperation", typeof(global::FaaPart107.Requests.MovingAircraftOperationRequest)),
+        "moving-aircraft-operation" => true,
         "night-operation" => Hooked("NightOperation", typeof(global::FaaPart107.Requests.NightOperationRequest)),
         "night-training-completed" => Hooked("NightTrainingCompleted", typeof(global::FaaPart107.Requests.NightTrainingCompletedRequest)),
         "knowledge-recency" => Hooked("KnowledgeRecency", typeof(global::FaaPart107.Requests.KnowledgeRecencyRequest)),

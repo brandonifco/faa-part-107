@@ -194,8 +194,8 @@ public sealed class CorrespondenceTests
         AssertDeclines("moving-vehicle-operation", UnresolvedReason.UnsupportedRule, EntryPoints.MovingVehicleOperation.Resolve(global::FaaPart107.Requests.MovingVehicleOperationRequest.Empty), new SourceLocator("cfr-14-107", "§ 107.25"));
 
     [Fact]
-    public void moving_aircraft_operation__declines_UnsupportedRule_row_2() =>
-        AssertDeclines("moving-aircraft-operation", UnresolvedReason.UnsupportedRule, EntryPoints.MovingAircraftOperation.Resolve(global::FaaPart107.Requests.MovingAircraftOperationRequest.Empty), new SourceLocator("cfr-14-107", "§ 107.25"));
+    public void moving_aircraft_operation__is_implemented_so_a_hand_written_handler_answers_it() =>
+        Assert.True(Registry.HasImplementation("moving-aircraft-operation"), "moving-aircraft-operation is implemented in the overlay and has no [Implements] handler");
 
     [Fact]
     public void night_operation__declines_MissingRulesData_row_3() =>
