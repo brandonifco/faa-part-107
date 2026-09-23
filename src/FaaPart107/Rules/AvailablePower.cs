@@ -135,7 +135,13 @@ public sealed record SufficientAvailablePowerFinding : IConditionalAssertion
 /// reverse of the one those two entries' notes are often read as drawing.
 /// <see cref="MapEntries.PreflightActions"/>' evidence quotes § 107.49 entire, lead-in and (a)
 /// through (f), so "If the small unmanned aircraft is powered" stands in the composite's evidence as
-/// well as this constituent's: it is the only antecedent in this map that appears in two entries.
+/// well as this constituent's: it is the only antecedent <em>of that kind</em> in this map that
+/// appears in two entries. The qualifier is doing work and is not hedging. Two other protases do
+/// appear in more than one entry's evidence — "the visual observer (if one is used)", in
+/// <c>visual-line-of-sight</c> and <c>unaided-visual-contact</c>, and "if he or she determines
+/// that … it would be in the interest of safety to do so", in four entries — but neither gates
+/// whether its paragraph reaches the operation at all, which is what this kind of antecedent does
+/// and what makes it the constituent's to implement.
 /// § 107.49(f)'s runs the other way — <see cref="SubpartDOperation"/>'s condition is in the
 /// composite's evidence and in no constituent's, <c>subpart-d-categories</c>' evidence being
 /// subpart D's own scope sentence, which does not carry it — which is why the composite takes that
