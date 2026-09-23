@@ -1164,5 +1164,58 @@
         "mutation": "Assertions.Stated answered with the caller's own object (`Resolution<Assertion>.FromValue(assertion)` for `FromValue(new Assertion(entry, assertion.Holds, assertion.AssertedBy))`) — the defect the semantic review of PR #59 recorded a fail for. MapEntry and SourceLocator are publicly constructible, so an assertion carrying this entry's id under `§ 107.49(d)` and a name of the caller's choosing passed all three checks and § 107.29(a)(2), (b) was answered citing § 107.49(d). This test went red with the matching tests of the other assertion entries (`Failed!  - Failed:     7, Passed:   378, Skipped:     0, Total:   385`). It went red too with no hand-written handler at all — the implementing partial method deleted so `Handlers.Has` finds no hook and correspondence row 8's bare default answers — which reddened eleven of the twelve, this one among them (`Failed!  - Failed:    11, Passed:   374, Skipped:     0, Total:   385`)."
       }
     ]
+  },
+  "visual-line-of-sight": {
+    "status": "implemented",
+    "implementedIn": {
+      "ruleset": "faa-part-107",
+      "version": 1
+    },
+    "tests": [
+      {
+        "test": "VisualLineOfSightEntryPointTests.The_two_permitted_combinations_are_107_31_b_s_own_two_rows_verbatim_and_keep_its_plural_flight_controls",
+        "mutation": "LineOfSight.Combinations normalised row (1) into § 107.31(a)'s singular (`\"(1) The remote pilot in command and the person manipulating the flight control of the small unmanned aircraft system; or\"` for `\"... the person manipulating the flight controls of the small unmanned aircraft system; or\"`), so § 107.31(b)(1) stopped being quoted as the corpus prints it and the difference between the two paragraphs -- (a) \"flight control\", (b)(1) \"flight controls\" -- was smoothed away. This test went red alone with `Assert.Equal() Failure: Collections differ` (`Failed!  - Failed:     1, Passed:   315, Skipped:     0, Total:   316` on net8.0 and net10.0)."
+      },
+      {
+        "test": "VisualLineOfSightEntryPointTests.Each_of_107_31_b_s_two_rows_exercised_maintains_visual_line_of_sight_citing_107_31",
+        "mutation": "VisualLineOfSightFinding.Authority cited the dependency's paragraph instead of this entry's section (`MapEntries.UnaidedVisualContact.Locator` for `MapEntries.VisualLineOfSight.Locator`), so § 107.31 as a whole was answered under § 107.31(a) and the two entries' findings stopped being tellable apart by their citations. This test went red with `Assert.Equal() Failure: Strings differ`, together with the citation test and the dictionary-dispatch test (`Failed!  - Failed:     3, Passed:   313, Skipped:     0, Total:   316` on net8.0 and net10.0). It went red too with the caller's waiver statement replaced by one the engine made up (`Failed!  - Failed:     3, Passed:   313, Skipped:     0, Total:   316`)."
+      },
+      {
+        "test": "VisualLineOfSightEntryPointTests.Every_way_the_three_persons_can_exercise_the_ability_is_membership_tested_against_both_rows_and_neither",
+        "mutation": "VisualLineOfSightFinding.ExercisedByTheRemotePilotInCommandAndThePersonManipulatingTheFlightControls read § 107.31(b)(1) as a disjunction of the two persons it names (`Exercise.RemotePilotInCommand || Exercise.PersonManipulatingTheFlightControls` for `&&`), so either one of them alone satisfied a row that says \"The remote pilot in command **and** the person manipulating the flight controls\". The four cases of the theory where exactly one of the two exercised the ability went red with `Assert.Equal() Failure: Values differ` (`Failed!  - Failed:     4, Passed:   312, Skipped:     0, Total:   316` on net8.0 and net10.0)."
+      },
+      {
+        "test": "VisualLineOfSightEntryPointTests.A_negative_assertion_of_the_ability_leaves_it_not_maintained_whichever_row_is_stated",
+        "mutation": "VisualLineOfSightFinding.Maintained dropped the dependency's half (`Exercised` for `Ability.Holds && Exercised`), so § 107.31 came out maintained on an assertion that the aircraft could not be seen unaided at all -- (b) requires \"the ability described in paragraph (a)\" to be exercised, and there was no such ability. This test went red alone with `Assert.False() Failure` (`Failed!  - Failed:     1, Passed:   315, Skipped:     0, Total:   316` on net8.0 and net10.0)."
+      },
+      {
+        "test": "VisualLineOfSightEntryPointTests.The_ability_is_demanded_under_its_own_entry_id_and_asserting_it_under_this_one_does_not_answer_it",
+        "mutation": "LineOfSight.Maintained caught the dependency's demand and invented an answer for it (the `UnaidedVision.SeenThroughoutTheFlight(waiver, assertions)` call wrapped in `try`/`catch (AssertionRequiredException)` yielding `Resolution<UnaidedVisualContactFinding>.FromValue(new UnaidedVisualContactFinding(new Assertion(MapEntries.UnaidedVisualContact, true, \"remote pilot in command\"), waiver))`), so a caller who asserted nothing -- or asserted under this entry's own id, which the map gives no assertedBy -- had § 107.31(a) answered yes on the engine's word. This test went red alone with `Assert.Throws() Failure: No exception was thrown` (`Failed!  - Failed:     1, Passed:   315, Skipped:     0, Total:   316` on net8.0 and net10.0)."
+      },
+      {
+        "test": "VisualLineOfSightEntryPointTests.While_a_waiver_of_107_31_is_stated_in_force_it_declines_OutsideCurrentScope_citing_107_205_naming_this_entry_without_demanding_the_assertion",
+        "mutation": "LineOfSight.Maintained demanded the dependency's assertion above its own gate (`var stated = Assertions.Stated(MapEntries.UnaidedVisualContact, assertions);` hoisted above the `Waivers.Suspension` check), so a caller stating a waiver of § 107.31 in force and asserting nothing -- which is the whole of the case -- was asked for a fact the waiver had made irrelevant instead of being told the entry is out of reach. This test went red alone with `FaaPart107.AssertionRequiredException : the map entry 'unaided-visual-contact' is an assertion; the caller must supply its value` (`Failed!  - Failed:     1, Passed:   315, Skipped:     0, Total:   316` on net8.0 and net10.0). It went red too with the gate consulted against the dependency's entry rather than this one, which made the decline name unaided-visual-contact and § 107.31(a) (`Failed!  - Failed:     3, Passed:   313, Skipped:     0, Total:   316`)."
+      },
+      {
+        "test": "VisualLineOfSightEntryPointTests.Stated_that_no_waiver_is_in_force_the_rule_is_evaluated_and_the_callers_statement_is_recorded",
+        "mutation": "LineOfSight.Maintained handed the dependency a statement the engine made up rather than the caller's (`UnaidedVision.SeenThroughoutTheFlight(WaiverStatement.NoneHeld(Regulation, \"the engine\"), assertions)` for `(waiver, assertions)`), so the finding carried § 107.31 waived by nobody on the engine's own word and lost who was answerable for saying so -- the defect PRs #70 and #74 failed review for. This test went red with `Assert.Same() Failure: Values are not the same instance`, together with the two-rows test and the dictionary-dispatch test (`Failed!  - Failed:     3, Passed:   313, Skipped:     0, Total:   316` on net8.0 and net10.0)."
+      },
+      {
+        "test": "VisualLineOfSightEntryPointTests.Without_a_waiver_statement_or_without_the_exercise_it_refuses_rather_than_infer_either",
+        "mutation": "Handlers.VisualLineOfSight defaulted a missing statement to none held (`request.Waiver ?? WaiverStatement.NoneHeld(LineOfSight.Regulation, \"the engine\")` for `Demand(request.Waiver, request.EntryId, nameof(request.Waiver))`), so a caller who said nothing about § 107.205(c) had the engine say it for them -- and defaulting to \"no waiver\" convicts a holder. This test went red alone with `Assert.Throws() Failure: No exception was thrown` (`Failed!  - Failed:     1, Passed:   315, Skipped:     0, Total:   316` on net8.0 and net10.0). It went red too with a missing exercise defaulted to a visual observer (`Failed!  - Failed:     2, Passed:   314, Skipped:     0, Total:   316`)."
+      },
+      {
+        "test": "VisualLineOfSightEntryPointTests.A_waiver_statement_about_another_regulation_is_refused_naming_this_entry",
+        "mutation": "LineOfSight.Maintained compared the statement's regulation with itself (`Waivers.Suspension(MapEntries.VisualLineOfSight, waiver.Regulation, waiver)` for `(..., Regulation, waiver)`), so a stated waiver of § 107.33 suspended § 107.31 and the entry declined under a certificate that does not reach it. This test went red alone with `Assert.Throws() Failure: No exception was thrown` (`Failed!  - Failed:     1, Passed:   315, Skipped:     0, Total:   316` on net8.0 and net10.0). It went red too with the gate consulted against the dependency's entry, which made the refusal name unaided-visual-contact (`Assert.Contains() Failure: Sub-string not found`, `Failed!  - Failed:     3, Passed:   313, Skipped:     0, Total:   316`)."
+      },
+      {
+        "test": "VisualLineOfSightEntryPointTests.The_finding_cites_107_31_where_its_dependency_cites_107_31_a_and_the_two_declines_are_told_apart_by_what_was_attempted",
+        "mutation": "LineOfSight.Maintained consulted the gate against the dependency's entry instead of its own (`Waivers.Suspension(MapEntries.UnaidedVisualContact, Regulation, waiver)` for `Waivers.Suspension(MapEntries.VisualLineOfSight, Regulation, waiver)`), so this entry's decline became its dependency's word for word -- and since § 107.205(c) lists the whole of § 107.31 both declines already cite § 107.205 and carry OutsideCurrentScope, what was attempted is the only thing left that tells them apart. This test went red with `Assert.NotEqual() Failure: Strings are equal`, together with the waiver-in-force test and the wrong-regulation test (`Failed!  - Failed:     3, Passed:   313, Skipped:     0, Total:   316` on net8.0 and net10.0). It went red too with VisualLineOfSightFinding.Authority citing the dependency's § 107.31(a) (`Failed!  - Failed:     3, Passed:   313, Skipped:     0, Total:   316`)."
+      },
+      {
+        "test": "VisualLineOfSightEntryPointTests.The_dictionary_dispatch_answers_and_refuses_the_same_way",
+        "mutation": "Handlers.VisualLineOfSight defaulted a missing exercise to a visual observer (`request.Exercise ?? new ExerciseOfTheAbility(false, false, true)` for `Demand(request.Exercise, request.EntryId, nameof(request.Exercise))`), so `Registry.Resolve(id, RuleRequest)` -- which builds the request from the assertions alone and can carry no exercise -- answered § 107.31 maintained under § 107.31(b)(2) instead of refusing, and the typed and untyped paths stopped behaving alike. This test went red with `Assert.Equal() Failure: Strings differ`, together with the refuses-rather-than-infer test (`Failed!  - Failed:     2, Passed:   314, Skipped:     0, Total:   316` on net8.0 and net10.0). It went red too with VisualLineOfSightFinding.Authority citing the dependency's § 107.31(a), and with the caller's waiver statement replaced by one the engine made up (each `Failed!  - Failed:     3, Passed:   313, Skipped:     0, Total:   316`)."
+      }
+    ]
   }
 }

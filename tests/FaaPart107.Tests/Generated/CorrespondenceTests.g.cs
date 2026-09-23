@@ -294,8 +294,8 @@ public sealed class CorrespondenceTests
         AssertDeclines("anti-collision-lighting", UnresolvedReason.UnsupportedRule, EntryPoints.AntiCollisionLighting.Resolve(global::FaaPart107.Requests.AntiCollisionLightingRequest.Empty), new SourceLocator("cfr-14-107", "§ 107.29(a)(2), (b)"));
 
     [Fact]
-    public void visual_line_of_sight__declines_UnsupportedRule_row_2() =>
-        AssertDeclines("visual-line-of-sight", UnresolvedReason.UnsupportedRule, EntryPoints.VisualLineOfSight.Resolve(global::FaaPart107.Requests.VisualLineOfSightRequest.Empty), new SourceLocator("cfr-14-107", "§ 107.31"));
+    public void visual_line_of_sight__is_implemented_so_a_hand_written_handler_answers_it() =>
+        Assert.True(Registry.HasImplementation("visual-line-of-sight"), "visual-line-of-sight is implemented in the overlay and has no [Implements] handler");
 
     [Fact]
     public void unaided_visual_contact__is_implemented_and_answers_or_demands_the_assertion()

@@ -353,8 +353,8 @@ internal static partial class Handlers
     /// <summary>Anti-collision lighting is fitted and visible for 3 statute miles (<c>anti-collision-lighting</c>): optional.</summary>
     static partial void AntiCollisionLighting(global::FaaPart107.Requests.AntiCollisionLightingRequest request, ref Resolution<object>? resolution);
 
-    /// <summary>Visual line of sight is maintained (<c>visual-line-of-sight</c>): optional.</summary>
-    static partial void VisualLineOfSight(global::FaaPart107.Requests.VisualLineOfSightRequest request, ref Resolution<object>? resolution);
+    /// <summary>Visual line of sight is maintained (<c>visual-line-of-sight</c>): required, the entry is implemented.</summary>
+    internal static partial Resolution<object> VisualLineOfSight(global::FaaPart107.Requests.VisualLineOfSightRequest request);
 
     /// <summary>The aircraft can be seen unaided throughout the entire flight, for the four stated purposes (<c>unaided-visual-contact</c>): optional.</summary>
     static partial void UnaidedVisualContact(global::FaaPart107.Requests.UnaidedVisualContactRequest request, ref Resolution<object>? resolution);
@@ -505,7 +505,7 @@ internal static partial class Handlers
                 AntiCollisionLighting(request as global::FaaPart107.Requests.AntiCollisionLightingRequest ?? new(assertions), ref resolution);
                 break;
             case "visual-line-of-sight":
-                VisualLineOfSight(request as global::FaaPart107.Requests.VisualLineOfSightRequest ?? new(assertions), ref resolution);
+                resolution = VisualLineOfSight(request as global::FaaPart107.Requests.VisualLineOfSightRequest ?? new(assertions));
                 break;
             case "unaided-visual-contact":
                 UnaidedVisualContact(request as global::FaaPart107.Requests.UnaidedVisualContactRequest ?? new(assertions), ref resolution);
@@ -588,7 +588,7 @@ internal static partial class Handlers
         "flash-rate-sufficient" => Hooked("FlashRateSufficient", typeof(global::FaaPart107.Requests.FlashRateSufficientRequest)),
         "intensity-reduction-in-interest-of-safety" => Hooked("IntensityReductionInInterestOfSafety", typeof(global::FaaPart107.Requests.IntensityReductionInInterestOfSafetyRequest)),
         "anti-collision-lighting" => Hooked("AntiCollisionLighting", typeof(global::FaaPart107.Requests.AntiCollisionLightingRequest)),
-        "visual-line-of-sight" => Hooked("VisualLineOfSight", typeof(global::FaaPart107.Requests.VisualLineOfSightRequest)),
+        "visual-line-of-sight" => true,
         "unaided-visual-contact" => Hooked("UnaidedVisualContact", typeof(global::FaaPart107.Requests.UnaidedVisualContactRequest)),
         "visual-observer-conditions" => Hooked("VisualObserverConditions", typeof(global::FaaPart107.Requests.VisualObserverConditionsRequest)),
         "effective-communication" => true,
