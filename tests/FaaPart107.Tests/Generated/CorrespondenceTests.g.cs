@@ -338,8 +338,20 @@ public sealed class CorrespondenceTests
         Assert.True(Registry.HasImplementation("attached-object-secure"), "attached-object-secure is implemented in the overlay and has no [Implements] handler");
 
     [Fact]
-    public void attached_object_no_adverse_effect__declines_UnsupportedRule_row_2() =>
-        AssertDeclines("attached-object-no-adverse-effect", UnresolvedReason.UnsupportedRule, EntryPoints.AttachedObjectNoAdverseEffect.Resolve(global::FaaPart107.Requests.AttachedObjectNoAdverseEffectRequest.Empty), new SourceLocator("cfr-14-107", "§ 107.49(e)"));
+    public void attached_object_no_adverse_effect__is_implemented_and_answers_or_demands_the_assertion()
+    {
+        if (Registry.HasImplementation("attached-object-no-adverse-effect"))
+        {
+            return;
+        }
+
+        var value = new object();
+        var resolved = Registry.Resolve("attached-object-no-adverse-effect", RuleRequest.Empty.Assert("attached-object-no-adverse-effect", value)).Match<object?>(v => v, _ => null);
+        Assert.Same(value, resolved);
+        var typed = EntryPoints.AttachedObjectNoAdverseEffect.Resolve(global::FaaPart107.Requests.AttachedObjectNoAdverseEffectRequest.Asserting(value)).Match<object?>(v => v, _ => null);
+        Assert.Same(value, typed);
+        Assert.Throws<AssertionRequiredException>(() => Registry.Resolve("attached-object-no-adverse-effect", RuleRequest.Empty));
+    }
 
     [Fact]
     public void waiver_policy__declines_OutsideCurrentScope_row_1() =>

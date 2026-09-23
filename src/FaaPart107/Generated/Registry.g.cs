@@ -181,7 +181,7 @@ public static class Registry
         new("control-links-working", EntryStatus.Implemented, CorrespondenceRow.UnresolvedAmbiguity, [MapEntries.ControlLinksWorking.Locator]),
         new("sufficient-available-power", EntryStatus.Implemented, CorrespondenceRow.Assertion, [MapEntries.SufficientAvailablePower.Locator]) { AssertedBy = ["remote pilot in command"] },
         new("attached-object-secure", EntryStatus.Implemented, CorrespondenceRow.UnresolvedAmbiguity, [MapEntries.AttachedObjectSecure.Locator]),
-        new("attached-object-no-adverse-effect", EntryStatus.Mapped, CorrespondenceRow.NotBuilt, [MapEntries.AttachedObjectNoAdverseEffect.Locator]) { AssertedBy = ["remote pilot in command"] },
+        new("attached-object-no-adverse-effect", EntryStatus.Implemented, CorrespondenceRow.Assertion, [MapEntries.AttachedObjectNoAdverseEffect.Locator]) { AssertedBy = ["remote pilot in command"] },
         new("waiver-policy", EntryStatus.Declined, CorrespondenceRow.ScopeOut, [MapEntries.WaiverPolicy.Locator]),
         new("waivable-regulations", EntryStatus.Declined, CorrespondenceRow.ScopeOut, [MapEntries.WaivableRegulations.Locator]),
     ];

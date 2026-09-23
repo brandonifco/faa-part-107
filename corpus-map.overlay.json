@@ -764,5 +764,46 @@
         "mutation": "The engine started taking the enumeration as input: `public bool? LocalWeatherConditions { get; init; }` added to the `PreflightRiskAssessmentRequest` partial for § 107.49(a)(1), which is the first step of the engine doing the assessing § 107.49(a) gives to the remote pilot in command. This test went red alone with `Assert.Equal() Failure: Collections differ / Expected: [\"Assertions\", \"EntryId\"] / Actual: [\"Assertions\", \"EntryId\", \"LocalWeatherConditions\"]` (`Failed!  - Failed:     1, Passed:   166, Skipped:     0, Total:   167`). It went red too with Handlers.PreflightRiskAssessment resolving another entry's assertion, which answered under § 107.49(b)'s name."
       }
     ]
+  },
+  "attached-object-no-adverse-effect": {
+    "status": "implemented",
+    "implementedIn": {
+      "ruleset": "faa-part-107",
+      "version": 1
+    },
+    "tests": [
+      {
+        "test": "AttachedObjectNoAdverseEffectEntryPointTests.An_assertion_that_an_attached_object_does_not_adversely_affect_the_aircraft_resolves_to_what_was_asserted_citing_107_49_e",
+        "mutation": "Handlers.AttachedObjectNoAdverseEffect resolved the other constituent of the same sentence (`Assertions.Stated(MapEntries.AttachedObjectSecure, request.Assertions)` for `MapEntries.AttachedObjectNoAdverseEffect`) — the two entries split one sentence of § 107.49(e) and carry the identical locator, so every citation this suite checks would still have been § 107.49(e) and only the id and the name give the swap away. The engine then demanded `attached-object-secure` of a caller who had asserted `attached-object-no-adverse-effect`, and answered nothing at all: all eight of this entry's tests went red and nothing else did (`Failed!  - Failed:     8, Passed:   158, Skipped:     0, Total:   166`)."
+      },
+      {
+        "test": "AttachedObjectNoAdverseEffectEntryPointTests.An_assertion_that_an_attached_object_does_adversely_affect_the_aircraft_resolves_to_that_and_is_not_turned_into_a_decline",
+        "mutation": "Assertions.Stated overrode a negative assertion (`new Assertion(entry, Holds: true, assertion.AssertedBy)` for `new Assertion(entry, assertion.Holds, assertion.AssertedBy)`), so the engine decided the fact § 107.49(e) gives to the remote pilot in command and an object reported as adversely affecting controllability was answered as not doing so; this test went red with sufficient-available-power's equivalent (`Failed!  - Failed:     2, Passed:   164, Skipped:     0, Total:   166`)."
+      },
+      {
+        "test": "AttachedObjectNoAdverseEffectEntryPointTests.Asserting_nothing_demands_the_value_rather_than_declining_the_entry",
+        "mutation": "Handlers.AttachedObjectNoAdverseEffect turned the demand into a decline: the call to `Assertions.Stated` wrapped in `try`/`catch (AssertionRequiredException)` resolving `Resolution<object>.FromUnresolved(new UnresolvedResult(UnresolvedReason.MissingRulesData, $\"resolve the map entry '{MapEntries.AttachedObjectNoAdverseEffect.Id}'\", MapEntries.AttachedObjectNoAdverseEffect.Locator))` for the exception, which is row 8's whole point inverted — a fact nobody supplied became an unresolved result instead of a demand on the caller, and silence was made to read as the decline the neighbouring constituent gives. This test went red with the dictionary-dispatch test (`Failed!  - Failed:     2, Passed:   164, Skipped:     0, Total:   166`)."
+      },
+      {
+        "test": "AttachedObjectNoAdverseEffectEntryPointTests.The_dictionary_dispatch_answers_and_demands_the_same_way",
+        "mutation": "Handlers.AttachedObjectNoAdverseEffect turned the demand into a decline (the call to `Assertions.Stated` wrapped in `try`/`catch (AssertionRequiredException)` resolving a `MissingRulesData` `UnresolvedResult`), so `Registry.Resolve` with nothing asserted returned an unresolved result instead of demanding the value and the two dispatches stopped agreeing; this test went red with the demand test (`Failed!  - Failed:     2, Passed:   164, Skipped:     0, Total:   166`). It went red too with the handler resolving MapEntries.AttachedObjectSecure, the constituent that shares this entry's locator, which reddened all eight (`Failed!  - Failed:     8, Passed:   158, Skipped:     0, Total:   166`)."
+      },
+      {
+        "test": "AttachedObjectNoAdverseEffectEntryPointTests.An_assertion_attributed_to_someone_107_49_does_not_name_is_refused",
+        "mutation": "Assertions.Stated compared each name the map allows with itself (`string.Equals(who, who, StringComparison.Ordinal)` for `string.Equals(who, assertion.AssertedBy, StringComparison.Ordinal)`), so an assertion attributed to a visual observer was accepted for an entry § 107.49's lead-in gives to the remote pilot in command; this test went red with sufficient-available-power's equivalent (`Failed!  - Failed:     2, Passed:   164, Skipped:     0, Total:   166`). It went red too with no hand-written handler at all — `Handlers/AttachedObjectNoAdverseEffect.cs` removed from the compilation so `Registry.HasImplementation` is false and correspondence row 8's bare default hands back the caller's object unchecked — which reddened exactly the four tests of what the handler adds over that default (`Failed!  - Failed:     4, Passed:   162, Skipped:     0, Total:   166`)."
+      },
+      {
+        "test": "AttachedObjectNoAdverseEffectEntryPointTests.An_assertion_about_the_other_constituent_of_107_49_e_is_refused_though_its_locator_is_identical",
+        "mutation": "Assertions.Stated separated the entries by citation rather than by id (`string.Equals(assertion.Entry.Locator.Citation, entry.Locator.Citation, StringComparison.Ordinal)` for `string.Equals(assertion.Entry.Id, entry.Id, StringComparison.Ordinal)`), which is the mistake this entry is most exposed to: attached-object-secure's locator is § 107.49(e) too, so an assertion made about the \"is secure\" conjunct passed the check and was answered as this one. This test went red, and so did both citation tests, whose forged § 107.51(b) entry was then refused instead of rebuilt (`Failed!  - Failed:     3, Passed:   163, Skipped:     0, Total:   166`). sufficient-available-power's own \"another entry\" test stayed green, because the entry it asserts about is under a different citation — only this pair shares one. It went red too with no hand-written handler at all (`Failed!  - Failed:     4, Passed:   162, Skipped:     0, Total:   166`)."
+      },
+      {
+        "test": "AttachedObjectNoAdverseEffectEntryPointTests.A_value_that_is_not_an_assertion_is_refused",
+        "mutation": "Assertions.Stated made up the assertion the caller did not make (`var assertion = asserted as Assertion ?? new Assertion(entry, Holds: true, \"remote pilot in command\")`, with the refusal branch made unreachable), so a bare `true` became a fact the engine attributed to the remote pilot in command; this test went red with sufficient-available-power's equivalent (`Failed!  - Failed:     2, Passed:   164, Skipped:     0, Total:   166`). It went red too with no hand-written handler at all, the row's bare default answering an unattributed value (`Failed!  - Failed:     4, Passed:   162, Skipped:     0, Total:   166`)."
+      },
+      {
+        "test": "AttachedObjectNoAdverseEffectEntryPointTests.The_citation_is_the_maps_and_a_caller_supplied_entry_does_not_become_it",
+        "mutation": "Assertions.Stated answered with the caller's own object (`Resolution<Assertion>.FromValue(assertion)` for `FromValue(new Assertion(entry, assertion.Holds, assertion.AssertedBy))`) — the defect the semantic review of PR #59 recorded a fail for. MapEntry and SourceLocator are publicly constructible, so an assertion carrying this entry's id under `§ 107.51(b)` and a name of the caller's choosing passed all three checks and § 107.49(e) was answered citing § 107.51(b); this test went red with sufficient-available-power's equivalent (`Failed!  - Failed:     2, Passed:   164, Skipped:     0, Total:   166`). It went red too with no hand-written handler at all, the row's bare default answering the caller's object unchecked (`Failed!  - Failed:     4, Passed:   162, Skipped:     0, Total:   166`), and with Assertions.Stated separating the entries by citation rather than by id."
+      }
+    ]
   }
 }
