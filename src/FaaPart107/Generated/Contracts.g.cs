@@ -284,8 +284,8 @@ internal static partial class Handlers
     /// <summary>Which objects are prominent, for flight visibility (<c>prominent-objects</c>): optional.</summary>
     static partial void ProminentObjects(global::FaaPart107.Requests.ProminentObjectsRequest request, ref Resolution<object>? resolution);
 
-    /// <summary>Only one aircraft is operated at a time (<c>single-aircraft</c>): optional.</summary>
-    static partial void SingleAircraft(global::FaaPart107.Requests.SingleAircraftRequest request, ref Resolution<object>? resolution);
+    /// <summary>Only one aircraft is operated at a time (<c>single-aircraft</c>): required, the entry is implemented.</summary>
+    internal static partial Resolution<object> SingleAircraft(global::FaaPart107.Requests.SingleAircraftRequest request);
 
     /// <summary>Controlled airspace requires prior ATC authorization (<c>airspace-authorized</c>): optional.</summary>
     static partial void AirspaceAuthorized(global::FaaPart107.Requests.AirspaceAuthorizedRequest request, ref Resolution<object>? resolution);
@@ -436,7 +436,7 @@ internal static partial class Handlers
                 ProminentObjects(request as global::FaaPart107.Requests.ProminentObjectsRequest ?? new(assertions), ref resolution);
                 break;
             case "single-aircraft":
-                SingleAircraft(request as global::FaaPart107.Requests.SingleAircraftRequest ?? new(assertions), ref resolution);
+                resolution = SingleAircraft(request as global::FaaPart107.Requests.SingleAircraftRequest ?? new(assertions));
                 break;
             case "airspace-authorized":
                 AirspaceAuthorized(request as global::FaaPart107.Requests.AirspaceAuthorizedRequest ?? new(assertions), ref resolution);
@@ -565,7 +565,7 @@ internal static partial class Handlers
         "weather-minimums-met" => Hooked("WeatherMinimumsMet", typeof(global::FaaPart107.Requests.WeatherMinimumsMetRequest)),
         "operating-limitations" => Hooked("OperatingLimitations", typeof(global::FaaPart107.Requests.OperatingLimitationsRequest)),
         "prominent-objects" => Hooked("ProminentObjects", typeof(global::FaaPart107.Requests.ProminentObjectsRequest)),
-        "single-aircraft" => Hooked("SingleAircraft", typeof(global::FaaPart107.Requests.SingleAircraftRequest)),
+        "single-aircraft" => true,
         "airspace-authorized" => Hooked("AirspaceAuthorized", typeof(global::FaaPart107.Requests.AirspaceAuthorizedRequest)),
         "restricted-area-permitted" => Hooked("RestrictedAreaPermitted", typeof(global::FaaPart107.Requests.RestrictedAreaPermittedRequest)),
         "moving-vehicle-operation" => Hooked("MovingVehicleOperation", typeof(global::FaaPart107.Requests.MovingVehicleOperationRequest)),
