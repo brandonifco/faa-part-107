@@ -106,5 +106,30 @@
         "mutation": "Handlers.ControlLinksWorking answered the open question instead of declining (`Resolution<object>.FromValue(true)` for `ControlLinks.Working()`), so the dictionary dispatch resolved to a value; this test went red. It went red too with ControlLinks.Working citing participant-briefing's `§ 107.49(b)` (`MapEntries.ParticipantBriefing.Locator` for `MapEntries.ControlLinksWorking.Locator`), with the reason wrong (`UnresolvedReason.UnsupportedRule` for `UnresolvedReason.RequiresInterpretation`), and with the message reduced to the row's bare wording."
       }
     ]
+  },
+  "visibility-minimum": {
+    "status": "implemented",
+    "implementedIn": {
+      "ruleset": "faa-part-107",
+      "version": 1
+    },
+    "tests": [
+      {
+        "test": "VisibilityMinimumEntryPointTests.The_minimum_resolves_as_printed_3_statute_miles_citing_107_51_c",
+        "mutation": "VisibilityMinimum.StatuteMiles printed 4 statute miles (`= 4m` for `= 3m`); this test went red. It went red too with VisibilityMinimum.Authority citing operating-limitations' `§ 107.51 introductory text` instead of visibility-minimum's locator (`MapEntries.OperatingLimitations.Locator` for `MapEntries.VisibilityMinimum.Locator`)."
+      },
+      {
+        "test": "VisibilityMinimumEntryPointTests.While_a_waiver_of_107_51_is_stated_in_force_it_declines_OutsideCurrentScope_citing_107_205_and_records_the_statement",
+        "mutation": "Visibility.Minimum handed the gate a statement that no waiver is in force (`waiver with { InForce = false }` for `waiver`), so a stated waiver was not honoured and the minimum resolved; this test went red."
+      },
+      {
+        "test": "VisibilityMinimumEntryPointTests.Without_a_waiver_statement_it_refuses_rather_than_infer_one",
+        "mutation": "Handlers.VisibilityMinimum defaulted a missing statement to none held (`request.Waiver ?? WaiverStatement.NoneHeld(Visibility.Regulation, \"the engine\")` for `Demand(request.Waiver, ...)`); this test went red."
+      },
+      {
+        "test": "VisibilityMinimumEntryPointTests.A_waiver_statement_about_another_regulation_is_refused",
+        "mutation": "Visibility.Minimum compared the statement's regulation with itself (`waiver.Regulation` for `Regulation` in the call to Waivers.Suspension), so a waiver of § 107.41 suspended § 107.51(c); this test went red."
+      }
+    ]
   }
 }
