@@ -110,9 +110,11 @@ public class OperatingLimitationsEntryPointTests
     /// It is not the whole finding, and the omissions are deliberate rather than an oversight:
     /// <see cref="OperatingLimitationsFinding.Person"/> is the thing being varied and so cannot be
     /// compared, and <c>Waiver</c> and <c>Authority</c> are the same on both sides by construction —
-    /// one statement about one regulation, and this entry's own locator. What is compared is
-    /// everything that could differ between the two people, which is what makes the comparison a
-    /// test rather than a restatement.
+    /// one statement about one regulation, and this entry's own locator.
+    /// <see cref="LimitationOutcome.Reason"/> is omitted too, and that omission is a real gap rather
+    /// than a safe one: where a constituent declines, <c>Reason</c> is populated and is not derivable
+    /// from the verdict or the account, so a defect that made a constituent's reason turn on which
+    /// person asked while leaving its account alone would pass this comparison unreddened.
     /// </remarks>
     private static IEnumerable<string> Answer(OperatingLimitationsFinding finding) =>
         finding.Limitations
