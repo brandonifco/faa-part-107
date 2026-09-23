@@ -177,7 +177,7 @@ public static class Registry
         new("observer-coordination", EntryStatus.Mapped, CorrespondenceRow.NotBuilt, [MapEntries.ObserverCoordination.Locator]) { AssertedBy = ["remote pilot in command", "person manipulating the flight controls", "visual observer"] },
         new("preflight-actions", EntryStatus.Mapped, CorrespondenceRow.NotBuilt, [MapEntries.PreflightActions.Locator]),
         new("preflight-risk-assessment", EntryStatus.Implemented, CorrespondenceRow.Assertion, [MapEntries.PreflightRiskAssessment.Locator]) { AssertedBy = ["remote pilot in command"] },
-        new("participant-briefing", EntryStatus.Mapped, CorrespondenceRow.NotBuilt, [MapEntries.ParticipantBriefing.Locator]) { AssertedBy = ["remote pilot in command"] },
+        new("participant-briefing", EntryStatus.Implemented, CorrespondenceRow.Assertion, [MapEntries.ParticipantBriefing.Locator]) { AssertedBy = ["remote pilot in command"] },
         new("control-links-working", EntryStatus.Implemented, CorrespondenceRow.UnresolvedAmbiguity, [MapEntries.ControlLinksWorking.Locator]),
         new("sufficient-available-power", EntryStatus.Implemented, CorrespondenceRow.Assertion, [MapEntries.SufficientAvailablePower.Locator]) { AssertedBy = ["remote pilot in command"] },
         new("attached-object-secure", EntryStatus.Implemented, CorrespondenceRow.UnresolvedAmbiguity, [MapEntries.AttachedObjectSecure.Locator]),

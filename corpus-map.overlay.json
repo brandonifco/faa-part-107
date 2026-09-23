@@ -858,5 +858,50 @@
         "mutation": "Handlers.UnaidedVisualContact defaulted a missing statement to none held (`request.Waiver ?? WaiverStatement.NoneHeld(UnaidedVision.Regulation, \"the engine\")` for `Demand(request.Waiver, request.EntryId, nameof(request.Waiver))`), so `Registry.Resolve(id, RuleRequest)` -- which builds the request from the assertions alone and can carry no waiver statement -- answered the entry instead of refusing, and the typed and untyped paths stopped behaving alike; this test went red, together with the waiver-statement test (`Failed!  - Failed:     2, Passed:   167, Skipped:     0, Total:   169`). It went red too with the finding citing § 107.31 instead of § 107.31(a) (`Failed!  - Failed:     4, Passed:   165, Skipped:     0, Total:   169`), with the caller's waiver statement replaced by one the engine made up (`Failed!  - Failed:     3, Passed:   166, Skipped:     0, Total:   169`), and with no hand-written handler at all -- the partial method renamed so `Registry.HasImplementation` is false and correspondence row 8's bare default answers, which neither consults the waiver gate nor checks who asserted what, and hands back the caller's own object, under which the dispatch resolved to the caller's raw object with no gate and no checks (`Failed!  - Failed:    10, Passed:   159, Skipped:     0, Total:   169`)."
       }
     ]
+  },
+  "participant-briefing": {
+    "status": "implemented",
+    "implementedIn": {
+      "ruleset": "faa-part-107",
+      "version": 1
+    },
+    "tests": [
+      {
+        "test": "ParticipantBriefingEntryPointTests.An_assertion_that_the_directly_participating_persons_were_informed_resolves_to_what_was_asserted_citing_107_49_b",
+        "mutation": "Assertion.Authority cited sufficient-available-power's § 107.49(d) (`MapEntries.SufficientAvailablePower.Locator` for `Entry.Locator`), so the answered fact named the wrong constituent of § 107.49; this test went red, with the dictionary-dispatch test, the citation test and the row-8-although-the-dependency-declines test (`Failed!  - Failed:     4, Passed:   255, Skipped:     0, Total:   259` on net8.0 and net10.0, `Assert.Equal() Failure: Strings differ`). It went red too with Handlers.ParticipantBriefing resolving another entry's assertion (`MapEntries.SufficientAvailablePower` for `MapEntries.ParticipantBriefing`), which reddened all nine."
+      },
+      {
+        "test": "ParticipantBriefingEntryPointTests.An_assertion_that_they_were_not_informed_resolves_to_that_and_is_not_turned_into_a_decline",
+        "mutation": "Assertions.Stated overrode a negative assertion (`new Assertion(entry, Holds: true, assertion.AssertedBy)` for `new Assertion(entry, assertion.Holds, assertion.AssertedBy)`), so the engine decided the fact § 107.49(b) gives to the remote pilot in command — a briefing that did not happen was answered as one that did. This test went red with `Assert.False() Failure`, together with sufficient-available-power's negative-assertion test, which the same shared mechanism answers (`Failed!  - Failed:     2, Passed:   257, Skipped:     0, Total:   259` on net8.0 and net10.0)."
+      },
+      {
+        "test": "ParticipantBriefingEntryPointTests.Asserting_nothing_demands_the_value_rather_than_declining_the_entry",
+        "mutation": "Assertions.Stated declined instead of demanding: `assertions.Asserted(entry.Id)` wrapped in `try`/`catch (AssertionRequiredException)` returning `Resolution<Assertion>.FromUnresolved(new UnresolvedResult(UnresolvedReason.MissingRulesData, ..., entry.Locator))`, which is row 8's whole point inverted — an assertion nobody supplied became an unresolved result instead of a demand on the caller. This test went red with `Assert.Throws() Failure: No exception was thrown`, together with the dictionary-dispatch test, the row-8-although-the-dependency-declines test and the two sufficient-available-power tests of the same half of the row (`Failed!  - Failed:     5, Passed:   254, Skipped:     0, Total:   259` on net8.0 and net10.0)."
+      },
+      {
+        "test": "ParticipantBriefingEntryPointTests.The_dictionary_dispatch_answers_and_demands_the_same_way",
+        "mutation": "Handlers.ParticipantBriefing resolved another entry's assertion (`Assertions.Stated(MapEntries.SufficientAvailablePower, request.Assertions)` for `MapEntries.ParticipantBriefing`), so the dispatch demanded a value for § 107.49(d) and never answered § 107.49(b); this test went red, and so did all nine (`Failed!  - Failed:     9, Passed:   250, Skipped:     0, Total:   259` on net8.0 and net10.0, `Assert.Throws() Failure: Exception type was not an exact match`). It went red too with Assertion.Authority citing sufficient-available-power's locator, and with Assertions.Stated declining rather than demanding when nothing was asserted."
+      },
+      {
+        "test": "ParticipantBriefingEntryPointTests.An_assertion_attributed_to_someone_107_49_does_not_name_is_refused",
+        "mutation": "Assertions.Stated compared each name the map allows with itself (`string.Equals(who, who, StringComparison.Ordinal)` for `string.Equals(who, assertion.AssertedBy, StringComparison.Ordinal)`), so an assertion attributed to a visual observer was accepted for an entry § 107.49's lead-in gives to the remote pilot in command; this test went red with `Assert.Throws() Failure: No exception was thrown`, together with sufficient-available-power's attribution test (`Failed!  - Failed:     2, Passed:   257, Skipped:     0, Total:   259` on net8.0 and net10.0). It went red too with no hand-written handler at all — the partial method replaced by a private method of another name, so `Registry.HasImplementation(\"participant-briefing\")` is false and correspondence row 8's bare default answers — which reddened exactly the four tests of what the handler adds over that default (`Failed!  - Failed:     4, Passed:   255, Skipped:     0, Total:   259`)."
+      },
+      {
+        "test": "ParticipantBriefingEntryPointTests.An_assertion_about_another_entry_is_refused",
+        "mutation": "Assertions.Stated compared the assertion's entry with itself (`string.Equals(assertion.Entry.Id, assertion.Entry.Id, StringComparison.Ordinal)` for `string.Equals(assertion.Entry.Id, entry.Id, ...)`), so an assertion about sufficient-available-power answered participant-briefing; this test went red with `Assert.Throws() Failure: No exception was thrown`, together with sufficient-available-power's mirror of it (`Failed!  - Failed:     2, Passed:   257, Skipped:     0, Total:   259` on net8.0 and net10.0). It went red too with no hand-written handler at all, the row's bare default accepting any value whatever (`Failed!  - Failed:     4, Passed:   255, Skipped:     0, Total:   259`)."
+      },
+      {
+        "test": "ParticipantBriefingEntryPointTests.A_value_that_is_not_an_assertion_is_refused",
+        "mutation": "Assertions.Stated made up the assertion the caller did not make (`asserted = asserted is Assertion ? asserted : new Assertion(entry, true, entry.AssertedBy[0]);` inserted before the refusal), so a bare `true` became a briefing the engine attributed to the remote pilot in command; this test went red with `Assert.Throws() Failure: No exception was thrown`, together with sufficient-available-power's mirror of it (`Failed!  - Failed:     2, Passed:   257, Skipped:     0, Total:   259` on net8.0 and net10.0). It went red too with no hand-written handler at all, the row's bare default answering an unattributed value (`Failed!  - Failed:     4, Passed:   255, Skipped:     0, Total:   259`)."
+      },
+      {
+        "test": "ParticipantBriefingEntryPointTests.The_citation_is_the_maps_and_a_caller_supplied_entry_does_not_become_it",
+        "mutation": "Assertions.Stated answered with the caller's own object (`Resolution<Assertion>.FromValue(assertion)` for `FromValue(new Assertion(entry, assertion.Holds, assertion.AssertedBy))`) — the defect the semantic review of PR #59 recorded a fail for. MapEntry and SourceLocator are publicly constructible, so an assertion carrying this entry's id under `§ 107.51(b)` and a name of the caller's choosing then passed all three checks and § 107.49(b) was answered citing § 107.51(b). This test went red with `Assert.Equal() Failure: Values differ`, together with sufficient-available-power's mirror of it (`Failed!  - Failed:     2, Passed:   257, Skipped:     0, Total:   259` on net8.0 and net10.0). It went red too with Assertion.Authority citing sufficient-available-power's locator, and with no hand-written handler at all, the row's bare default answering the caller's object unchecked (`Failed!  - Failed:     4, Passed:   255, Skipped:     0, Total:   259`)."
+      },
+      {
+        "test": "ParticipantBriefingEntryPointTests.The_entry_answers_on_row_8_although_the_dependency_that_holds_its_audience_term_open_declines",
+        "mutation": "Handlers.ParticipantBriefing borrowed its dependency's decline instead of demanding the assertion (`resolution = Participation.Direct(WaiverStatement.NoneHeld(Participation.Regulation, \"the engine\"))` for `resolution = Answer(Assertions.Stated(MapEntries.ParticipantBriefing, request.Assertions))`) — the reading on which § 107.49(b) is unanswerable because \"all persons directly participating\" is undefined. § 107.49(b) then declined RequiresInterpretation citing § 107.39(a), the remote pilot in command's assertion was discarded, and asserting nothing stopped being a demand on the caller. This test went red with `Assert.IsType() Failure: Value is not the exact type`, and so did all nine (`Failed!  - Failed:     9, Passed:   250, Skipped:     0, Total:   259` on net8.0 and net10.0). It went red too with Assertion.Authority citing sufficient-available-power's locator (4 red), and with Assertions.Stated declining rather than demanding when nothing was asserted (5 red)."
+      }
+    ]
   }
 }
