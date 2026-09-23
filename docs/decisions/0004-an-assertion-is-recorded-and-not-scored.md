@@ -27,7 +27,7 @@ verdicts and say which direction is compliance in the finding type's own documen
 prose states.
 
 **One family of entries does not work that way**, and that is what this record is about. Ten entries
-of `RulesFactory.Maps.FaaPart107` 4.0.0 are `kind: assertion`; eight of them are implemented today.
+of `RulesFactory.Maps.FaaPart107` 4.0.0 are `kind: assertion`, and all ten are implemented today.
 Each answers with an `Assertion`, whose `Holds` is documented as *"True when the entry's
 proposition is so, as the asserter reports it"* — and nothing anywhere says whether the proposition
 being so is compliance or is the breach.
@@ -75,13 +75,15 @@ Three consequences of that sentence, and each is deliberate:
   no" distinction the issue exists to protect, at the one place it is easiest to lose.
 - **The test is the map's, not a list of types this engine keeps.** An entry whose first
   correspondence row is row 8 (`RegisteredEntry.Row == CorrespondenceRow.Assertion`) is
-  `kind: assertion`, and a value it resolved to is recorded. Three rules today wrap the `Assertion`
-  in a finding of their own so that the § 107.205 waiver statement travels beside it —
-  `UnaidedVisualContactFinding.Contact`, `ObserverCoordinationFinding.Coordination`,
-  `IntensityReductionFinding.Determination` — and the row test covers all three without naming any
-  of them, so the next assertion entry built is covered the day it lands rather than the day
-  somebody remembers this record. The gate decides whether the entry is reachable; it does not add
-  a polarity the corpus did not state.
+  `kind: assertion`, and a value it resolved to is recorded. Five of the ten answer with a bare
+  `Assertion`; the other five wrap it in a finding of their own so that the § 107.205 waiver
+  statement travels beside it — `UnaidedVisualContactFinding.Contact`,
+  `ObserverCoordinationFinding.Coordination`, `IntensityReductionFinding.Determination`,
+  `FlashRateSufficientFinding.Sufficiency`, `ReasonableProtectionFinding.Protection`. The row test
+  covers all ten without naming any of them or any of their types, so an assertion entry a later
+  map version adds is covered the day it is built rather than the day somebody remembers this
+  record. The gate decides whether the entry is reachable; it does not add a polarity the corpus
+  did not state.
 - **It is not `Informational`.** `Informational` is what the *rule* says — a printed figure, or a
   finding whose own documentation disclaims a verdict. An assertion is what a *person* said. Those
   are different sources and the result type keeps them apart.
@@ -116,9 +118,21 @@ answer is worth (`Assertion`'s own remarks, and rules-factory decision 0025).
 **Ask the map for a polarity field, and block issue #51 on it.** A map is corrected where maps are
 corrected — a new, checked, published version — and the evaluator is faithful without one. The
 missing field is worth an upstream question; it is not worth an engine that either guesses or does
-not ship. If the map ever records polarity, this engine reads it from generated `MapEntries` the
-way `Assertions.Stated` reads `assertedBy`, and this record is superseded rather than worked
+not ship. The question is filed as **rules-factory#453**, *"An assertion records who asserts it but
+not which way it points, so an engine cannot tell a satisfied assertion from a breached one"*, so a
+later reader can find out whether it was ever answered rather than taking this record's word that
+it was asked. If the map ever records polarity, this engine reads it from generated `MapEntries`
+the way `Assertions.Stated` reads `assertedBy`, and this record is superseded rather than worked
 around.
+
+**Note that a polarity field may not be the right fix, and this record does not assume it is.** One
+defensible answer to #453 is that the map needs no such field at all: an assertion is a *fact*, and
+its consequence is always some consuming entry's to compute — § 107.31(b) is what makes
+§ 107.31(a)'s ability into a requirement, and nothing in § 107.31(a) alone says which way it
+points. On that reading the defect is not a missing schema field but an assertion entry with no
+consumer, and the question becomes one of map completeness. This engine behaves identically either
+way: it records the fact and lets a consumer, when the map has one, do the computing. Which reading
+upstream takes is upstream's to decide, and #453 carries both.
 
 **Escalate under `AGENTS.md` §6 and stop.** §6 is for an ambiguity the engine cannot answer
 faithfully. This one it can: reporting the asserted fact, its asserter and its citation, without a
@@ -133,14 +147,24 @@ is the engine working, not the engine failing — the same posture §6 records f
   checks that by reflection over every public member of both types, so a later `bool` added in
   good faith fails the gate. The aggregate a caller can read is a count per state, plus
   `Unanswered`, which is the engine naming its own holes.
-- **Eight entries are bound by this today** — `collision-hazard-proximity`,
-  `unaided-visual-contact`, `observer-coordination`,
-  `intensity-reduction-in-interest-of-safety`, `preflight-risk-assessment`,
-  `participant-briefing`, `sufficient-available-power` and `attached-object-no-adverse-effect` —
-  and the two `kind: assertion` entries still to be built inherit it from their row, with no
-  per-entry decision to make and none to re-make.
+- **All ten `kind: assertion` entries are bound by this**, and every one of them is now built:
+  `collision-hazard-proximity`, `reasonable-protection`, `flash-rate-sufficient`,
+  `intensity-reduction-in-interest-of-safety`, `unaided-visual-contact`, `observer-coordination`,
+  `preflight-risk-assessment`, `participant-briefing`, `sufficient-available-power` and
+  `attached-object-no-adverse-effect`. An entry a later map version adds inherits this from its
+  row, with no per-entry decision to make and none to re-make.
   `OperationEvaluatorTests.No_assertion_entry_is_ever_reported_as_satisfied_or_violated` walks the
   registry rather than a list, so it covers them as they land.
+- **What this costs a caller, measured rather than asserted.** A consuming entry supplies the
+  polarity by using the fact: `visual-line-of-sight` consumes `unaided-visual-contact` through
+  `VisualLineOfSightFinding.Maintained`, which requires `Ability.Holds`, so for that one entry a
+  product can read compliance off § 107.31's own finding. Of the ten implemented row-8 entries,
+  **exactly one** has such a consumer built. `collision-hazard-proximity` has no consumer in the
+  map at all. So today a product that wants to know whether an asserted
+  `collision-hazard-proximity = true` is good news or bad has nowhere in this engine to read it,
+  and would have to go to the CFR itself — which is the second unreviewed reading `AGENTS.md` §5
+  exists to prevent, relocated to outside the engine. That is the map's gap and not this engine's
+  to close, and it is named here so that nobody has to rediscover it.
 - **Nothing in any handler or rule changes.** This record is about how the orchestrator reads what
   the handlers already return; every regulatory answer in the output is still a handler's.
 - **`docs/decisions/**` is on this engine's semantic surface** (`.github/agent-policy.json`), so

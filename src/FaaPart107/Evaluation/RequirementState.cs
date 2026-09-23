@@ -48,13 +48,27 @@ public enum RequirementState
     Violated = 2,
 
     /// <summary>
-    /// The entry's rule names something obtainable — a prior authorization from Air Traffic
-    /// Control (<see cref="AirspaceFinding.AuthorizationRequired"/>), a permission from a using or
-    /// controlling agency (<see cref="AreaPermissionFinding.PermissionRequired"/>) — that the rule
-    /// requires here and the caller has not stated is held. It is distinct from
-    /// <see cref="Violated"/> because the rule itself draws the distinction, in a field of its own;
-    /// it is never inferred for an entry whose rule does not draw it.
+    /// The entry's rule names something obtainable that the caller has not stated, and says in a
+    /// verdict of its own that the requirement is outstanding rather than broken.
     /// </summary>
+    /// <remarks>
+    /// <b>No rule this engine has built reports this today, and that is deliberate.</b> Every rule
+    /// here that names an obtainable thing — prior ATC authorization under § 107.41, permission
+    /// from a using or controlling agency under § 107.45 — also demands the caller's statement
+    /// about it, so the caller has either not spoken (<see cref="FactRequired"/>) or has stated a
+    /// non-possession the rule then reads as the section prohibiting the operation
+    /// (<see cref="Violated"/>). Reporting that middle case here instead would read more favourably
+    /// than the rule's own verdict property, which is not this orchestrator's to do;
+    /// <c>docs/decisions/0005-the-rules-verdict-is-the-verdict.md</c> is that decision, and says
+    /// what a rule would have to state for this state to be produced. It is kept in this
+    /// enumeration rather than removed because issue #51 requires the state to be distinct from
+    /// <see cref="Violated"/> and from <see cref="FactRequired"/>, and because a rule that draws
+    /// the distinction should land in a state of its own rather than change what
+    /// <see cref="Violated"/> means. The obtainability a caller wants to render is on the finding —
+    /// <see cref="AirspaceFinding.AuthorizationRequired"/>,
+    /// <see cref="AreaPermissionFinding.PermissionRequired"/> — which travels on
+    /// <see cref="RequirementOutcome.Finding"/>.
+    /// </remarks>
     ActionRequired = 3,
 
     /// <summary>

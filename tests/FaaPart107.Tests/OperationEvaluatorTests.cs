@@ -43,6 +43,8 @@ public class OperationEvaluatorTests
         FlightVisibilityStatuteMiles = 5m,
         FeetBelowCloud = 100m,
         FeetHorizontallyFromCloud = 100m,
+        BoundPerson = BoundPerson.RemotePilotInCommand,
+        Shelter = Shelter.CoveredStructure,
         Airspace = AirspaceClass.ClassG,
         AtcAuthorization = AtcAuthorization.None(Caller),
         Area = AreaDesignation.NeitherProhibitedNorRestricted,
@@ -78,7 +80,8 @@ public class OperationEvaluatorTests
         .Asserting(new Assertion(MapEntries.AttachedObjectNoAdverseEffect, true, RemotePilotInCommand))
         .Asserting(new Assertion(MapEntries.ObserverCoordination, true, RemotePilotInCommand))
         .Asserting(new Assertion(MapEntries.IntensityReductionInInterestOfSafety, true, RemotePilotInCommand))
-        .Asserting(new Assertion(MapEntries.FlashRateSufficient, true, RemotePilotInCommand));
+        .Asserting(new Assertion(MapEntries.FlashRateSufficient, true, RemotePilotInCommand))
+        .Asserting(new Assertion(MapEntries.ReasonableProtection, true, RemotePilotInCommand));
 
     private static RequirementOutcome Outcome(string entryId, OperationFacts facts) =>
         OperationEvaluator.Evaluate(facts).Requirement(entryId);
@@ -301,20 +304,125 @@ public class OperationEvaluatorTests
     public void An_entry_this_engine_has_not_built_is_not_a_finding_about_the_operation()
     {
         var facts = Complete();
+        var entry = Registry.Entries
+            .First(candidate => candidate.Status != EntryStatus.Implemented && candidate.Row == CorrespondenceRow.NotBuilt);
 
-        // Its three dependencies all answer, and the composite still says the engine has not built
-        // it: the evaluator resolves operating-limitations through its own entry and never derives
-        // it from the leaves.
+        var outcome = Outcome(entry.Id, facts);
+
+        Assert.Equal(RequirementState.NotBuilt, outcome.State);
+        Assert.Equal(UnresolvedReason.UnsupportedRule, outcome.Reason);
+        Assert.Equal(EntryStatus.Mapped, outcome.Status);
+        Assert.Null(outcome.Finding);
+
+        // Nothing whatever follows about the operation from a hole in the engine.
+        Assert.NotEqual(RequirementState.Satisfied, outcome.State);
+        Assert.NotEqual(RequirementState.Violated, outcome.State);
+    }
+
+    [Fact]
+    public void A_composite_is_resolved_through_its_own_entry_and_never_rebuilt_from_its_leaves()
+    {
+        var facts = Complete();
+
+        // Its three constituents answer, and they do not agree with each other.
         Assert.Equal(RequirementState.Satisfied, State("speed-within-limit", facts));
         Assert.Equal(RequirementState.Satisfied, State("altitude-within-limit", facts));
         Assert.Equal(RequirementState.Violated, State("weather-minimums-met", facts));
 
         var composite = Outcome("operating-limitations", facts);
+        var finding = Assert.IsType<OperatingLimitationsFinding>(composite.Finding);
 
-        Assert.Equal(RequirementState.NotBuilt, composite.State);
-        Assert.Equal(UnresolvedReason.UnsupportedRule, composite.Reason);
-        Assert.Equal(EntryStatus.Mapped, composite.Status);
-        Assert.Null(composite.Finding);
+        // The answer is § 107.51's introductory text's own, made by its own rule from what its
+        // constituents said, and cited to its own locator — not a conjunction this orchestrator
+        // computed from the three outcomes above.
+        Assert.Equal(RequirementState.Violated, composite.State);
+        Assert.False(finding.CompliedWith);
+        Assert.Equal(MapEntries.OperatingLimitations.Locator, composite.Locator);
+        Assert.Equal(3, finding.Limitations.Count);
+        Assert.NotEqual(MapEntries.SpeedWithinLimit.Locator, composite.Locator);
+    }
+
+    [Fact]
+    public void A_stated_absence_of_an_authorization_is_an_answer_and_not_a_question()
+    {
+        var facts = Complete();
+
+        // § 107.41, the headline case: Class B, and the caller has stated they hold no prior ATC
+        // authorization. The rule says the section prohibits the operation, and so does this.
+        var none = Outcome(
+            "airspace-authorized",
+            facts with { Airspace = AirspaceClass.ClassB, AtcAuthorization = AtcAuthorization.None(Caller) });
+        var noneFinding = Assert.IsType<AirspaceFinding>(none.Finding);
+
+        Assert.Equal(RequirementState.Violated, none.State);
+        Assert.NotEqual(RequirementState.ActionRequired, none.State);
+        Assert.False(noneFinding.MayOperate);
+
+        // What the caller could still obtain is not lost: it is on the rule's own finding, where
+        // the rule put it, and so is the fact that the caller answered.
+        Assert.True(noneFinding.AuthorizationRequired);
+        Assert.False(noneFinding.Authorization.Held);
+
+        // An authorization held but not obtained before the operation is a different fact, and the
+        // finding still says which — the distinction AtcAuthorization keeps is not flattened here.
+        var notPrior = Outcome(
+            "airspace-authorized",
+            facts with { Airspace = AirspaceClass.ClassB, AtcAuthorization = AtcAuthorization.NotPrior(Caller, "ATC 2026-0002") });
+        var notPriorFinding = Assert.IsType<AirspaceFinding>(notPrior.Finding);
+
+        Assert.Equal(RequirementState.Violated, notPrior.State);
+        Assert.True(notPriorFinding.Authorization.Held);
+        Assert.False(notPriorFinding.Authorization.ObtainedBeforeTheOperation);
+
+        // § 107.45 has the identical shape and is answered the identical way.
+        var noPermission = Outcome(
+            "restricted-area-permitted",
+            facts with { Area = AreaDesignation.Prohibited, AreaPermission = PermissionStatement.NotGranted(Caller) });
+        var permissionFinding = Assert.IsType<AreaPermissionFinding>(noPermission.Finding);
+
+        Assert.Equal(RequirementState.Violated, noPermission.State);
+        Assert.True(permissionFinding.PermissionRequired);
+
+        // And saying nothing at all is still a third answer, distinct from both.
+        Assert.Equal(
+            RequirementState.FactRequired,
+            State("airspace-authorized", facts with { Airspace = AirspaceClass.ClassB, AtcAuthorization = null }));
+    }
+
+    [Fact]
+    public void No_rule_this_engine_has_built_reports_that_an_action_is_required()
+    {
+        // docs/decisions/0005: every rule here that names an obtainable thing also demands the
+        // caller's statement about it, so the caller has either not spoken (FactRequired) or has
+        // been answered (Violated). The state stays in the enumeration for a rule that draws the
+        // distinction itself; nothing produces it today, and this says so out loud.
+        foreach (var facts in new[]
+        {
+            OperationFacts.Nothing,
+            Complete(),
+            Complete() with { Airspace = AirspaceClass.ClassB, AtcAuthorization = AtcAuthorization.None(Caller) },
+            Complete() with { Area = AreaDesignation.Restricted, AreaPermission = PermissionStatement.NotGranted(Caller) },
+        })
+        {
+            var evaluation = OperationEvaluator.Evaluate(facts);
+
+            Assert.Empty(evaluation.InState(RequirementState.ActionRequired));
+            Assert.DoesNotContain(evaluation.Outstanding, outcome => outcome.State == RequirementState.ActionRequired);
+        }
+    }
+
+    [Fact]
+    public void A_value_a_rule_refuses_is_a_fault_and_is_not_dressed_as_a_fact_the_caller_owes()
+    {
+        // § 107.51(d)'s rule refuses a negative distance with ArgumentOutOfRangeException. That is
+        // a malformed value, not an input the caller failed to supply, and reporting it as
+        // FactRequired would tell a product to go and ask somebody for something it already has.
+        var facts = Complete() with { FeetBelowCloud = -1m };
+
+        Assert.Throws<ArgumentOutOfRangeException>(() => OperationEvaluator.Evaluate(facts));
+
+        // The same fact supplied properly is answered, so this is about the value and not the field.
+        Assert.Equal(RequirementState.Violated, State("weather-minimums-met", Complete()));
     }
 
     [Fact]
@@ -435,16 +543,27 @@ public class OperationEvaluatorTests
             { "moving-aircraft-operation", RequirementState.Satisfied, f => f with { FromAMovingAircraft = false } },
             { "moving-aircraft-operation", RequirementState.Violated, f => f with { FromAMovingAircraft = true } },
 
-            // § 107.41: the airspace the section does not name, the one it names without prior
-            // authorization, and the one it names with it.
+            // § 107.51 as a whole, through its own entry: the conjunction the rule makes from what
+            // its three constituents answered. It cannot resolve met, because weather-minimums-met
+            // cannot; that is that entry's limit and not this one's.
+            { "operating-limitations", RequirementState.Violated, f => f },
+
+            // § 107.41: the airspace the section does not name; the one it names with a prior ATC
+            // authorization; and the two ways the section prohibits it — a stated absence, and an
+            // authorization held but not obtained before the operation. Both of the last two are
+            // the rule saying no (docs/decisions/0005), not a question put back to the caller.
             { "airspace-authorized", RequirementState.Satisfied, f => f with { Airspace = AirspaceClass.ClassG } },
-            {
-                "airspace-authorized", RequirementState.ActionRequired,
-                f => f with { Airspace = AirspaceClass.ClassB, AtcAuthorization = AtcAuthorization.None(Caller) }
-            },
             {
                 "airspace-authorized", RequirementState.Satisfied,
                 f => f with { Airspace = AirspaceClass.ClassB, AtcAuthorization = AtcAuthorization.Prior(Caller, "ATC 2026-0001") }
+            },
+            {
+                "airspace-authorized", RequirementState.Violated,
+                f => f with { Airspace = AirspaceClass.ClassB, AtcAuthorization = AtcAuthorization.None(Caller) }
+            },
+            {
+                "airspace-authorized", RequirementState.Violated,
+                f => f with { Airspace = AirspaceClass.ClassB, AtcAuthorization = AtcAuthorization.NotPrior(Caller, "ATC 2026-0002") }
             },
 
             // § 107.45: the same shape, with the permission the section names.
@@ -453,7 +572,7 @@ public class OperationEvaluatorTests
                 f => f with { Area = AreaDesignation.NeitherProhibitedNorRestricted }
             },
             {
-                "restricted-area-permitted", RequirementState.ActionRequired,
+                "restricted-area-permitted", RequirementState.Violated,
                 f => f with { Area = AreaDesignation.Prohibited, AreaPermission = PermissionStatement.NotGranted(Caller) }
             },
             {
@@ -611,8 +730,32 @@ public class OperationEvaluatorTests
             .Select(pair => pair.first.EntryId)
             .ToArray();
 
-        Assert.Equal(["speed-within-limit"], changed);
+        // The entries that may move are exactly the ones whose own request declares a groundspeed:
+        // § 107.51(a) and § 107.51's composite, which reads the same fact through its own entry.
+        // Read from the generated request types, so an entry that declares it later is allowed for
+        // and an entry that does not is still refused.
+        var readers = Registry.Entries
+            .Where(entry => RequestTypeOf(entry.Id).GetProperty(nameof(OperationFacts.Groundspeed)) is not null)
+            .Select(entry => entry.Id)
+            .ToArray();
+
+        Assert.Contains("speed-within-limit", changed);
+        Assert.All(changed, entryId => Assert.Contains(entryId, readers));
+        Assert.DoesNotContain("altitude-within-limit", changed);
+        Assert.DoesNotContain("airspace-authorized", changed);
     }
+
+    /// <summary>The generated request type of <paramref name="entryId"/>, from its own entry point.</summary>
+    private static Type RequestTypeOf(string entryId) =>
+        typeof(EntryPoints).GetProperties(BindingFlags.Public | BindingFlags.Static)
+            .Select(property => property.GetValue(null))
+            .OfType<object>()
+            .Single(entry => string.Equals(
+                (string)entry.GetType().GetProperty("Id")!.GetValue(entry)!,
+                entryId,
+                StringComparison.Ordinal))
+            .GetType()
+            .GetGenericArguments()[0];
 
     [Fact]
     public void Nothing_stated_is_a_meaningful_question_and_never_an_answer_the_engine_invented()

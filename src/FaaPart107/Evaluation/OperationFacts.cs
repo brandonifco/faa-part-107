@@ -91,6 +91,18 @@ public sealed record OperationFacts
     /// </summary>
     public decimal? FeetHorizontallyFromCloud { get; init; }
 
+    /// <summary>
+    /// Which of the two people § 107.51's introductory text binds the caller is asking about
+    /// (<c>operating-limitations</c>). Required by that entry, and never inferred.
+    /// </summary>
+    public BoundPerson? BoundPerson { get; init; }
+
+    /// <summary>
+    /// Which of § 107.39(b)'s two the caller's assertion is about — a covered structure, or a
+    /// stationary vehicle (<c>reasonable-protection</c>).
+    /// </summary>
+    public Shelter? Shelter { get; init; }
+
     /// <summary>The airspace the operation is in (<c>airspace-authorized</c>, § 107.41).</summary>
     public AirspaceClass? Airspace { get; init; }
 

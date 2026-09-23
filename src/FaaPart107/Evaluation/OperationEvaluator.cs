@@ -21,20 +21,27 @@ namespace FaaPart107.Evaluation;
 /// </para>
 /// <para>
 /// <b>The map is enumerated, never listed.</b> <see cref="Registry.Entries"/> is walked in the
-/// map's order, so an entry this engine builds next is covered here the day it lands, and an entry
-/// this evaluator can build no request for is still evaluated and reports whatever its
-/// correspondence row gives — which is the right answer for an entry this engine has not built.
+/// map's order, so every entry of the map is in the answer and no hard-coded list decides which.
+/// What an entry with no arm of its own in <c>ThroughItsEntryPoint</c> reports depends on the
+/// entry, and it is worth being exact about it: one this engine has not built, or one it has built
+/// whose request declares no inputs, answers correctly — from its correspondence row, or from its
+/// handler. One this engine <em>has</em> built whose request <em>does</em> declare inputs reports
+/// <see cref="RequirementState.FactRequired"/> naming the first input it demanded, because nothing
+/// supplied it. That is a demand on the caller rather than a wrong answer, so the failure mode of a
+/// missing arm is safe and legible — but it is a missing arm, and the entry needs one here before
+/// this API can put an operation's facts to it.
 /// </para>
 /// <para>
-/// <b>Reading a verdict is one property of the rule's own finding.</b> Each arm of
+/// <b>Reading a verdict is one property of the rule's own finding, and only one.</b> Each arm of
 /// <c>Verdict</c> reads a single property the rule already computed, whose own documentation says
 /// which direction is compliance — <c>WithinLimit</c>, <c>MinimumsMet</c>, <c>MayPass</c>,
-/// <c>MayOperate</c>, <c>Permitted</c>, <c>Prohibited</c> — and nothing is combined, computed or
-/// defaulted. Where a rule models an obtainable authorization in a field of its own
-/// (<see cref="AirspaceFinding.AuthorizationRequired"/>,
-/// <see cref="AreaPermissionFinding.PermissionRequired"/>) an unmet requirement is
-/// <see cref="RequirementState.ActionRequired"/>; that distinction is the rule's, and it is not
-/// invented for a rule that does not draw it.
+/// <c>MayOperate</c>, <c>Permitted</c>, <c>Prohibited</c>, <c>CompliedWith</c>, <c>Maintained</c>
+/// — and nothing is combined, computed, softened or defaulted. Where the rule's verdict says the
+/// section is not met, this reports <see cref="RequirementState.Violated"/>, including where the
+/// rule also records that what would have met it is an authorization or a permission: a caller who
+/// has stated they hold none has been answered, not asked
+/// (<c>docs/decisions/0005-the-rules-verdict-is-the-verdict.md</c>). What the caller could obtain
+/// is on the finding, which travels on <see cref="RequirementOutcome.Finding"/>.
 /// </para>
 /// </remarks>
 public static class OperationEvaluator
@@ -73,11 +80,17 @@ public static class OperationEvaluator
             // caller the corpus is silent where in fact the caller is.
             return new RequirementOutcome(entry, RequirementState.HumanAssertionRequired, required.Message);
         }
-        catch (ArgumentException refused)
+        catch (ArgumentException refused) when (refused.GetType() == typeof(ArgumentException))
         {
             // A fact the entry demands and did not get. It is the caller's error, not a gap in the
             // corpus, so it is reported as a demand on the caller and never as a decline — and
             // never quietly answered from a default.
+            //
+            // Exactly ArgumentException, and not a derived one. `Handlers.Missing` throws exactly
+            // this type; a rule that fails on its own terms throws something more specific
+            // (ArgumentNullException, ArgumentOutOfRangeException), and that is a fault inside the
+            // engine or a malformed value, not a fact the caller owes. Reporting one of those as
+            // FactRequired would tell a product to go and ask somebody for something.
             return new RequirementOutcome(entry, RequirementState.FactRequired, refused.Message)
             {
                 MissingInput = refused.ParamName,
@@ -125,6 +138,24 @@ public static class OperationEvaluator
                 FeetBelowCloud = facts.FeetBelowCloud,
                 FeetHorizontallyFromCloud = facts.FeetHorizontallyFromCloud,
                 Waiver = facts.WaiverOf(Weather.Regulation),
+            }),
+        "operating-limitations" => EntryPoints.OperatingLimitations.Resolve(
+            new Requests.OperatingLimitationsRequest(facts.Assertions)
+            {
+                Person = facts.BoundPerson,
+                Groundspeed = facts.Groundspeed,
+                AltitudeAboveGroundLevelFeet = facts.AltitudeAboveGroundLevelFeet,
+                Structure = facts.Structure,
+                FlightVisibilityStatuteMiles = facts.FlightVisibilityStatuteMiles,
+                FeetBelowCloud = facts.FeetBelowCloud,
+                FeetHorizontallyFromCloud = facts.FeetHorizontallyFromCloud,
+                Waiver = facts.WaiverOf(Compliance.Regulation),
+            }),
+        "reasonable-protection" => EntryPoints.ReasonableProtection.Resolve(
+            new Requests.ReasonableProtectionRequest(facts.Assertions)
+            {
+                Shelter = facts.Shelter,
+                Waiver = facts.WaiverOf(Protection.Regulation),
             }),
         "prominent-objects" => EntryPoints.ProminentObjects.Resolve(
             new Requests.ProminentObjectsRequest(facts.Assertions) { Waiver = facts.WaiverOf(Prominence.Regulation) }),
@@ -241,6 +272,10 @@ public static class OperationEvaluator
         // § 107.51(c)-(d): true when both paragraphs are met.
         WeatherMinimumsFinding finding => Met(finding.MinimumsMet),
 
+        // § 107.51 as a whole: the conjunction of its constituent limitations, as the rule made
+        // it from what each constituent entry answered. This orchestrator does not re-derive it.
+        OperatingLimitationsFinding finding => Met(finding.CompliedWith),
+
         // § 107.31 as a whole: true when paragraph (a)'s ability is there and paragraph (b)'s
         // requirement that it be exercised is satisfied. The rule makes that conjunction, not
         // this orchestrator, and this arm reads the one property it named.
@@ -263,16 +298,13 @@ public static class OperationEvaluator
             ? RequirementState.Violated
             : RequirementState.Satisfied,
 
-        // § 107.41: prior ATC authorization is what lifts the prohibition, and the rule says in a
-        // field of its own when the section asks for it.
-        AirspaceFinding finding => finding.MayOperate
-            ? RequirementState.Satisfied
-            : Obtainable(finding.AuthorizationRequired),
+        // § 107.41: true when the section does not prohibit the operation. A stated absence of
+        // prior ATC authorization is the section prohibiting it, and is reported as such
+        // (docs/decisions/0005-the-rules-verdict-is-the-verdict.md).
+        AirspaceFinding finding => Met(finding.MayOperate),
 
-        // § 107.45: permission from the using or controlling agency, the same shape.
-        AreaPermissionFinding finding => finding.Permitted
-            ? RequirementState.Satisfied
-            : Obtainable(finding.PermissionRequired),
+        // § 107.45: true when the section does not bar the operation.
+        AreaPermissionFinding finding => Met(finding.Permitted),
 
         // What the rule says, not whether an operation complies: the printed figures, and a
         // finding whose own documentation disclaims a verdict.
@@ -281,7 +313,4 @@ public static class OperationEvaluator
 
     private static RequirementState Met(bool met) =>
         met ? RequirementState.Satisfied : RequirementState.Violated;
-
-    private static RequirementState Obtainable(bool required) =>
-        required ? RequirementState.ActionRequired : RequirementState.Violated;
 }

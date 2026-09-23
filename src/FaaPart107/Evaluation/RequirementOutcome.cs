@@ -96,14 +96,29 @@ public sealed record RequirementOutcome
     /// <inheritdoc/>
     public override string ToString() => $"{EntryId} [{Locator}]: {State} — {Explanation}";
 
-    /// <summary>Whether this outcome is the same as <paramref name="other"/>, comparing the citations by element.</summary>
+    /// <summary>Whether this outcome is the same as <paramref name="other"/>: everything this engine said about the entry.</summary>
     /// <param name="other">The other outcome.</param>
     /// <returns>True when both say the same thing about the same entry.</returns>
     /// <remarks>
+    /// <para>
     /// A record's generated equality would compare the two <see cref="ImmutableArray{T}"/> members
     /// by the identity of the array behind them, so two evaluations of the same facts would differ.
-    /// Determinism is about what the engine says (<c>AGENTS.md</c> §8), so equality is by element —
-    /// the same reason <see cref="MultipleAircraftFinding"/> gives.
+    /// Determinism is about what the engine says (<c>AGENTS.md</c> §8), so the citations and the
+    /// attributions are compared by element — the same reason
+    /// <see cref="MultipleAircraftFinding"/> gives for overriding its own.
+    /// </para>
+    /// <para>
+    /// <b><see cref="Finding"/> is deliberately not compared, and <see cref="Explanation"/> stands
+    /// for it.</b> The finding is the rule's own object, carried through untouched for a caller who
+    /// wants the detail, and its equality is that rule's contract rather than this API's: most
+    /// finding types in this engine are records of values and compare structurally, but at least
+    /// one holds an <c>IReadOnlyList</c> and so compares by the identity of the list
+    /// (<see cref="OperatingLimitationsFinding"/>), which would make two evaluations of identical
+    /// facts unequal for a reason that is not about what either of them says. What the engine
+    /// <em>says</em> about the finding is <see cref="Explanation"/>, which is the rule's own
+    /// <c>ToString()</c> and is compared ordinally — so a finding whose reported content differs
+    /// still makes the outcomes differ.
+    /// </para>
     /// </remarks>
     public bool Equals(RequirementOutcome? other) =>
         other is not null
@@ -114,7 +129,6 @@ public sealed record RequirementOutcome
         && Reason == other.Reason
         && string.Equals(Explanation, other.Explanation, StringComparison.Ordinal)
         && string.Equals(MissingInput, other.MissingInput, StringComparison.Ordinal)
-        && Equals(Finding, other.Finding)
         && citations.SequenceEqual(other.citations)
         && assertedBy.SequenceEqual(other.assertedBy, StringComparer.Ordinal);
 
