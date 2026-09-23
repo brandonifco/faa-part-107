@@ -270,8 +270,20 @@ public sealed class CorrespondenceTests
         AssertDeclines("subpart-d-categories", UnresolvedReason.OutsideCurrentScope, EntryPoints.SubpartDCategories.Resolve(global::FaaPart107.Requests.SubpartDCategoriesRequest.Empty), new SourceLocator("cfr-14-107", "subpart D"));
 
     [Fact]
-    public void flash_rate_sufficient__declines_UnsupportedRule_row_2() =>
-        AssertDeclines("flash-rate-sufficient", UnresolvedReason.UnsupportedRule, EntryPoints.FlashRateSufficient.Resolve(global::FaaPart107.Requests.FlashRateSufficientRequest.Empty), new SourceLocator("cfr-14-107", "§ 107.29(a)(2), (b)"));
+    public void flash_rate_sufficient__is_implemented_and_answers_or_demands_the_assertion()
+    {
+        if (Registry.HasImplementation("flash-rate-sufficient"))
+        {
+            return;
+        }
+
+        var value = new object();
+        var resolved = Registry.Resolve("flash-rate-sufficient", RuleRequest.Empty.Assert("flash-rate-sufficient", value)).Match<object?>(v => v, _ => null);
+        Assert.Same(value, resolved);
+        var typed = EntryPoints.FlashRateSufficient.Resolve(global::FaaPart107.Requests.FlashRateSufficientRequest.Asserting(value)).Match<object?>(v => v, _ => null);
+        Assert.Same(value, typed);
+        Assert.Throws<AssertionRequiredException>(() => Registry.Resolve("flash-rate-sufficient", RuleRequest.Empty));
+    }
 
     [Fact]
     public void intensity_reduction_in_interest_of_safety__is_implemented_and_answers_or_demands_the_assertion()

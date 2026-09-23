@@ -167,7 +167,7 @@ public static class Registry
         new("over-human-beings", EntryStatus.Mapped, CorrespondenceRow.NotBuilt, [MapEntries.OverHumanBeings.Locator]),
         new("direct-participation", EntryStatus.Implemented, CorrespondenceRow.UnresolvedAmbiguity, [MapEntries.DirectParticipation.Locator]),
         new("subpart-d-categories", EntryStatus.Declined, CorrespondenceRow.ScopeOut, [MapEntries.SubpartDCategories.Locator]),
-        new("flash-rate-sufficient", EntryStatus.Mapped, CorrespondenceRow.NotBuilt, [MapEntries.FlashRateSufficient.Locator]) { AssertedBy = ["caller"] },
+        new("flash-rate-sufficient", EntryStatus.Implemented, CorrespondenceRow.Assertion, [MapEntries.FlashRateSufficient.Locator]) { AssertedBy = ["caller"] },
         new("intensity-reduction-in-interest-of-safety", EntryStatus.Implemented, CorrespondenceRow.Assertion, [MapEntries.IntensityReductionInInterestOfSafety.Locator]) { AssertedBy = ["remote pilot in command"] },
         new("anti-collision-lighting", EntryStatus.Mapped, CorrespondenceRow.NotBuilt, [MapEntries.AntiCollisionLighting.Locator]),
         new("visual-line-of-sight", EntryStatus.Implemented, CorrespondenceRow.None, [MapEntries.VisualLineOfSight.Locator]),
