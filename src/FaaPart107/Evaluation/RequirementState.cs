@@ -75,7 +75,11 @@ public enum RequirementState
     /// The entry is <c>kind: assertion</c> and the caller asserted nothing for it
     /// (<see cref="AssertionRequiredException"/>). This is <b>not</b> an unresolved result: the
     /// corpus gave the engine the means to proceed and the caller owes the value.
-    /// <see cref="EvaluatedRequirement.AssertedBy"/> names who the corpus lets assert it.
+    /// <see cref="EvaluatedRequirement.AssertionOwed"/> names which assertion,
+    /// <see cref="EvaluatedRequirement.AssertionCites"/> where it is stated, and
+    /// <see cref="EvaluatedRequirement.AssertedBy"/> who the corpus lets make it — all three of the
+    /// demanded entry, which is not the evaluated one when a composite asks for a constituent's
+    /// assertion.
     /// </summary>
     HumanAssertionRequired = 4,
 

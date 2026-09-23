@@ -103,7 +103,17 @@ public static class OperationEvaluator
             // Row 8, and never an unresolved result: the corpus gave the engine the means to
             // proceed and the caller owes the value. Folding this into a decline would tell a
             // caller the corpus is silent where in fact the caller is.
-            return new EvaluatedRequirement(entry, RequirementState.HumanAssertionRequired, required.Message);
+            //
+            // The exception names the entry that was demanded, which is not always the entry being
+            // evaluated: a composite asks for a constituent's assertion — § 107.39 for
+            // reasonable-protection, § 107.31 as a whole for unaided-visual-contact. Carrying it
+            // is what makes AssertedBy the demanded entry's rather than empty, and what lets a
+            // caller name the assertion without reading the message.
+            return new EvaluatedRequirement(
+                entry,
+                RequirementState.HumanAssertionRequired,
+                required.Message,
+                Registry.Entry(required.EntryId));
         }
         catch (ArgumentException refused) when (refused.GetType() == typeof(ArgumentException))
         {
@@ -344,6 +354,12 @@ public static class OperationEvaluator
         // operation at all — which its own documentation is explicit is neither "the lighting
         // requirement is met" nor "the operation is prohibited", and is never "undetermined".
         // DuringCivilTwilight, on the finding, says which case a null is.
+        //
+        // Worth being exact about what that null covers, because it is easy to misread: an
+        // operation during neither period includes one at night, which § 107.29(a) governs and
+        // which this engine answers separately on `night-operation` — MissingRulesData, because the
+        // map puts the definition elsewhere. So Informational here means § 107.29(b) says nothing
+        // about this operation, never that the time of day is settled.
         CivilTwilightOperationFinding finding => finding.Permitted switch
         {
             true => RequirementState.Satisfied,

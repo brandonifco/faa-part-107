@@ -35,7 +35,18 @@ public class OperationEvaluatorTests
     /// and <c>Communication</c> are both § 107.33, so one statement answers both entries — which is
     /// the point of filing a statement under the regulation it names rather than under an entry.
     /// </remarks>
-    private static OperationFacts Complete() => new OperationFacts
+    private static OperationFacts Complete() =>
+        Registry.Entries
+            .Where(entry => entry.Row == CorrespondenceRow.Assertion && entry.Status == EntryStatus.Implemented)
+            .Aggregate(Stated(), (facts, entry) => facts.Asserting(new Assertion(MapEntry(entry.Id), true, entry.AssertedBy[0])))
+            .Asserting(new Assertion(MapEntries.CollisionHazardProximity, false, RemotePilotInCommand));
+
+    /// <summary>
+    /// Every input and every waiver statement, and not one assertion. This is the realistic case a
+    /// caller reaches first — the facts are known, the attestations are not yet made — and it is the
+    /// case that reaches every composite's demand for a constituent's assertion.
+    /// </summary>
+    private static OperationFacts Stated() => new OperationFacts
     {
         Groundspeed = Groundspeed.InKnots(50m),
         AltitudeAboveGroundLevelFeet = 300m,
@@ -76,17 +87,7 @@ public class OperationEvaluatorTests
         .Stating(WaiverStatement.NoneHeld(Participation.Regulation, Caller))
         .Stating(WaiverStatement.NoneHeld(Communication.Regulation, Caller))
         .Stating(WaiverStatement.NoneHeld(Lighting.Regulation, Caller))
-        .Stating(WaiverStatement.NoneHeld(UnaidedVision.Regulation, Caller))
-        .Asserting(new Assertion(MapEntries.CollisionHazardProximity, false, RemotePilotInCommand))
-        .Asserting(new Assertion(MapEntries.UnaidedVisualContact, true, RemotePilotInCommand))
-        .Asserting(new Assertion(MapEntries.PreflightRiskAssessment, true, RemotePilotInCommand))
-        .Asserting(new Assertion(MapEntries.ParticipantBriefing, true, RemotePilotInCommand))
-        .Asserting(new Assertion(MapEntries.SufficientAvailablePower, true, RemotePilotInCommand))
-        .Asserting(new Assertion(MapEntries.AttachedObjectNoAdverseEffect, true, RemotePilotInCommand))
-        .Asserting(new Assertion(MapEntries.ObserverCoordination, true, RemotePilotInCommand))
-        .Asserting(new Assertion(MapEntries.IntensityReductionInInterestOfSafety, true, RemotePilotInCommand))
-        .Asserting(new Assertion(MapEntries.FlashRateSufficient, true, RemotePilotInCommand))
-        .Asserting(new Assertion(MapEntries.ReasonableProtection, true, RemotePilotInCommand));
+        .Stating(WaiverStatement.NoneHeld(UnaidedVision.Regulation, Caller));
 
     private static EvaluatedRequirement Outcome(string entryId, OperationFacts facts) =>
         OperationEvaluator.Evaluate(facts).Requirement(entryId);
@@ -592,6 +593,15 @@ public class OperationEvaluatorTests
         Assert.Equal(RequirementState.HumanAssertionRequired, unasserted.State);
         Assert.Null(unasserted.Reason);
 
+        // What is owed is reasonable-protection's assertion at § 107.39(b), not this entry's, and
+        // a product can name it without reading the message.
+        Assert.Equal("over-human-beings", unasserted.EntryId);
+        Assert.Equal("reasonable-protection", unasserted.AssertionOwed);
+        Assert.Equal(MapEntries.ReasonableProtection.Locator, unasserted.AssertionCites);
+        Assert.NotEqual(unasserted.Locator, unasserted.AssertionCites);
+        Assert.NotEmpty(unasserted.AssertedBy);
+        Assert.Equal(Registry.Entry("reasonable-protection").AssertedBy, unasserted.AssertedBy);
+
         // Both facts stated, and about different places. The caller has spoken twice and the rule
         // will not read the one as the other, so it is still owed the value for the place in hand —
         // reported with the rule's own words, which name both places.
@@ -612,6 +622,89 @@ public class OperationEvaluatorTests
         var answered = Outcome("over-human-beings", facts);
         Assert.Equal(RequirementState.Satisfied, answered.State);
         Assert.IsType<OverHumanBeingsFinding>(answered.Finding);
+    }
+
+    [Fact]
+    public void Every_outcome_carries_the_identity_its_state_promises()
+    {
+        // The audit, mechanised. Everything the evaluator reads has some identity of its own —
+        // UnresolvedResult's reason and locator, AssertionRequiredException's entry id,
+        // ArgumentException's parameter name, the rule's finding — and each was dropped once in
+        // favour of the evaluated entry's. This asserts the invariants across fact sets, so the
+        // next one that goes missing is caught here rather than by a reviewer reading the diff.
+        foreach (var facts in new[]
+        {
+            OperationFacts.Nothing,
+            Stated(),
+            Complete(),
+            Complete() with { OperationPlace = OperationPlace.InAlaska },
+            Complete().Stating(WaiverStatement.Held(Speed.Regulation, Caller)),
+        })
+        {
+            foreach (var outcome in OperationEvaluator.Evaluate(facts).Requirements)
+            {
+                var what = $"{outcome.EntryId} in {outcome.State}";
+
+                // A decline names why and where the real rule lives; nothing else does.
+                Assert.True((outcome.Reason is not null) == (outcome.DeclineCites is not null), what);
+                Assert.Equal(outcome.Reason is not null, outcome.State is RequirementState.RequiresInterpretation
+                    or RequirementState.OutsideCurrentScope or RequirementState.NotBuilt
+                    or RequirementState.MissingRulesData or RequirementState.UnresolvedInteraction);
+
+                // An assertion owed names which, where, and who may make it; nothing else does.
+                Assert.Equal(outcome.State == RequirementState.HumanAssertionRequired, outcome.AssertionOwed is not null);
+                Assert.True((outcome.AssertionOwed is not null) == (outcome.AssertionCites is not null), what);
+                if (outcome.State == RequirementState.HumanAssertionRequired)
+                {
+                    Assert.NotEmpty(outcome.AssertedBy);
+                }
+
+                // A fact owed names which input.
+                if (outcome.State == RequirementState.FactRequired)
+                {
+                    Assert.False(string.IsNullOrWhiteSpace(outcome.MissingInput), what);
+                }
+
+                // An answer carries the rule's own finding, and the engine's own words always.
+                Assert.Equal(
+                    outcome.State is RequirementState.Satisfied or RequirementState.Violated
+                        or RequirementState.ActionRequired or RequirementState.Informational
+                        or RequirementState.HumanAssertionRecorded,
+                    outcome.Finding is not null);
+                Assert.NotEmpty(outcome.Explanation);
+            }
+        }
+    }
+
+    [Fact]
+    public void Every_assertion_the_engine_demands_is_named_with_where_it_is_stated_and_who_may_make_it()
+    {
+        // Waivers stated, attestations not: the case a caller reaches first, and the one that
+        // reaches every composite's demand for a constituent's assertion. Registry-driven, so a
+        // composite built later is covered.
+        var owed = OperationEvaluator.Evaluate(Stated()).InState(RequirementState.HumanAssertionRequired);
+
+        Assert.NotEmpty(owed);
+
+        foreach (var outcome in owed)
+        {
+            Assert.False(string.IsNullOrEmpty(outcome.AssertionOwed), $"{outcome.EntryId} owes an assertion it does not name");
+
+            var demanded = Registry.Entry(outcome.AssertionOwed!);
+
+            Assert.Equal(CorrespondenceRow.Assertion, demanded.Row);
+            Assert.Equal(demanded.Locator, outcome.AssertionCites);
+            Assert.Equal(demanded.AssertedBy, outcome.AssertedBy);
+            Assert.NotEmpty(outcome.AssertedBy);
+            Assert.Null(outcome.Reason);
+        }
+
+        // And at least one is a composite owing another entry's assertion, which is the case that
+        // was empty: the promise on AssertedBy is kept where the evaluated entry is not itself
+        // kind: assertion.
+        var composites = owed.Where(outcome => !string.Equals(outcome.AssertionOwed, outcome.EntryId, StringComparison.Ordinal)).ToArray();
+        Assert.NotEmpty(composites);
+        Assert.All(composites, outcome => Assert.NotEqual(CorrespondenceRow.Assertion, outcome.Row));
     }
 
     [Fact]

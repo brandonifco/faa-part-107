@@ -33,13 +33,34 @@ public sealed record EvaluatedRequirement
     private readonly ImmutableArray<SourceLocator> citations;
     private readonly ImmutableArray<string> assertedBy;
 
-    internal EvaluatedRequirement(RegisteredEntry entry, RequirementState state, string explanation)
+    /// <summary>Builds the outcome of evaluating <paramref name="entry"/>.</summary>
+    /// <param name="entry">The map entry that was evaluated.</param>
+    /// <param name="state">What this engine was able to say.</param>
+    /// <param name="explanation">The engine's own words for it.</param>
+    /// <param name="owed">
+    /// The <c>kind: assertion</c> entry whose value the caller owes, where one was demanded. It is
+    /// <paramref name="entry"/> itself when an assertion entry was evaluated directly, and a
+    /// different entry when a composite demanded a constituent's assertion — § 107.39 asking for
+    /// <c>reasonable-protection</c>, say. Null in every other case.
+    /// </param>
+    internal EvaluatedRequirement(
+        RegisteredEntry entry,
+        RequirementState state,
+        string explanation,
+        RegisteredEntry? owed = null)
     {
         EntryId = entry.Id;
         Status = entry.Status;
         Row = entry.Row;
         citations = entry.Locators;
-        assertedBy = entry.AssertedBy.IsDefault ? [] : entry.AssertedBy;
+
+        // Who may assert it is the *demanded* entry's, not the evaluated one's. A composite is not
+        // itself kind: assertion, so taking this from `entry` left it empty on exactly the outcomes
+        // that promise it.
+        var attributed = owed ?? entry;
+        assertedBy = attributed.AssertedBy.IsDefault ? [] : attributed.AssertedBy;
+        AssertionOwed = owed?.Id;
+        AssertionCites = owed?.Locator;
         State = state;
         Explanation = explanation;
     }
@@ -66,12 +87,36 @@ public sealed record EvaluatedRequirement
     public SourceLocator Locator => citations[0];
 
     /// <summary>
-    /// Who the corpus lets assert this entry, the map's <c>assertedBy</c>, in the corpus's own
-    /// words. Empty on an entry that is not <c>kind: assertion</c>. On
-    /// <see cref="RequirementState.HumanAssertionRequired"/> it is who may make the assertion the
-    /// caller owes.
+    /// Who the corpus lets assert the fact this outcome is about, the map's <c>assertedBy</c>, in
+    /// the corpus's own words. On <see cref="RequirementState.HumanAssertionRequired"/> it is who
+    /// may make the assertion the caller owes — which is <see cref="AssertionOwed"/>'s
+    /// <c>assertedBy</c> and not this entry's, because a composite that demands a constituent's
+    /// assertion is not itself <c>kind: assertion</c>. Empty where no assertion is in play.
     /// </summary>
     public ImmutableArray<string> AssertedBy => assertedBy;
+
+    /// <summary>
+    /// The map entry whose assertion the caller owes, on
+    /// <see cref="RequirementState.HumanAssertionRequired"/>; null otherwise.
+    /// </summary>
+    /// <remarks>
+    /// <b>This is not always <see cref="EntryId"/>, and the difference is the point</b> — the same
+    /// shape as <see cref="DeclineCites"/> beside <see cref="Locator"/>. Asking § 107.39 whether an
+    /// aircraft may be operated over a human being comes back owing
+    /// <c>reasonable-protection</c>'s assertion at § 107.39(b); asking § 107.31 as a whole comes
+    /// back owing <c>unaided-visual-contact</c>'s. <see cref="EntryId"/> stays the entry that was
+    /// evaluated, because that is what the caller asked; this names what a person still has to
+    /// attest, so that a product can name it without parsing the
+    /// <see cref="Explanation"/>'s English.
+    /// </remarks>
+    public string? AssertionOwed { get; }
+
+    /// <summary>
+    /// Where the assertion <see cref="AssertionOwed"/> names is stated in the corpus; null
+    /// otherwise. § 107.39(b) for <c>reasonable-protection</c>, § 107.31(a) for
+    /// <c>unaided-visual-contact</c>, and so on.
+    /// </summary>
+    public SourceLocator? AssertionCites { get; }
 
     /// <summary>
     /// The engine's own words for this outcome: the rule's finding, the decline's
@@ -162,6 +207,8 @@ public sealed record EvaluatedRequirement
         && State == other.State
         && Reason == other.Reason
         && DeclineCites == other.DeclineCites
+        && string.Equals(AssertionOwed, other.AssertionOwed, StringComparison.Ordinal)
+        && AssertionCites == other.AssertionCites
         && string.Equals(Explanation, other.Explanation, StringComparison.Ordinal)
         && string.Equals(MissingInput, other.MissingInput, StringComparison.Ordinal)
         && citations.SequenceEqual(other.citations)
