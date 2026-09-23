@@ -447,5 +447,50 @@
         "mutation": "AirspaceClass reopened the minting path, a public factory taking a designation (`public static AirspaceClass Other(string designation) => new(designation);` added beside ToString, where no such method exists), so a caller could again state an airspace the engine cannot identify; this test went red. That path is the defect the semantic review of PR #55 blocked on: because AirspaceClass is a sealed record whose only instance field backs Designation, value equality DOES match an exactly-equal designation — verified by asserting `Assert.Equal(AirspaceClass.ClassB, AirspaceClass.Other(\"Class B airspace\"))`, which passes — so the danger was never the exact designation but the near miss: `Other(\"Class B\")` is unequal to every named airspace, Airspace.Names returns false for it, and § 107.41 was reported not to reach a Class B operation with no authorization. The set is closed instead of guarded, and this test keeps it closed."
       }
     ]
+  },
+  "moving-aircraft-operation": {
+    "status": "implemented",
+    "implementedIn": {
+      "ruleset": "faa-part-107",
+      "version": 1
+    },
+    "tests": [
+      {
+        "test": "MovingAircraftOperationEntryPointTests.Operated_from_a_moving_aircraft_it_resolves_prohibited_citing_107_25",
+        "mutation": "MovingAircraft.Operation never prohibited anything (`Prohibited: false` for `Prohibited: fromAMovingAircraft` in the MovingAircraftFinding it constructs), so operation from a moving aircraft resolved as not prohibited; this test went red (Failed: 1, Passed: 0). It went red too with MovingAircraftFinding.Authority citing speed-limit's `§ 107.51(a)` (`MapEntries.SpeedLimit.Locator` for `MapEntries.MovingAircraftOperation.Locator`)."
+      },
+      {
+        "test": "MovingAircraftOperationEntryPointTests.Operated_from_an_aircraft_that_is_not_moving_107_25_a_does_not_prohibit_it",
+        "mutation": "MovingAircraft.Operation prohibited every operation (`Prohibited: true` for `Prohibited: fromAMovingAircraft`), so an aircraft the caller states is not moving was still prohibited — § 107.25(a) reaching further than \"a moving aircraft\"; this test went red (Failed: 1, Passed: 0)."
+      },
+      {
+        "test": "MovingAircraftOperationEntryPointTests.The_entry_reads_only_whether_the_aircraft_is_moving_and_no_condition_that_qualifies_only_the_vehicle_limb",
+        "mutation": "MovingAircraftOperationRequest gained a third settable input, § 107.25(b)'s condition (`public bool? OverASparselyPopulatedArea { get; init; }` added beside FromAMovingAircraft and Waiver), so the aircraft limb offered a condition that qualifies only the vehicle limb; this test went red (Failed: 1, Passed: 0). It went red too with MovingAircraftFinding.ToString importing that condition into the answer (\"... is prohibited unless it is over a sparsely populated area\" for \"... is prohibited\")."
+      },
+      {
+        "test": "MovingAircraftOperationEntryPointTests.While_a_waiver_of_107_25_is_stated_in_force_it_declines_OutsideCurrentScope_citing_107_205_and_names_this_entry",
+        "mutation": "MovingAircraft.Operation named the other limb of § 107.25 as the suspended entry (`MapEntries.MovingVehicleOperation` for `MapEntries.MovingAircraftOperation` in the call to Waivers.Suspension), so the decline's Attempted named moving-vehicle-operation rather than moving-aircraft-operation — the two entries share the locator `§ 107.25`, so only Attempted tells them apart; both theory cases went red (Failed: 2, Passed: 0). It went red too with Operation handing the gate a statement that no waiver is in force (`waiver with { InForce = false }` for `waiver`), so a stated waiver was not honoured and the entry resolved (Failed: 2, Passed: 0)."
+      },
+      {
+        "test": "MovingAircraftOperationEntryPointTests.Stated_that_no_waiver_is_in_force_the_rule_is_evaluated_and_the_statement_recorded",
+        "mutation": "MovingAircraft.Operation handed the gate a statement that a waiver is in force whatever the caller said (`waiver with { InForce = true }` for `waiver`), so a statement that none is held still declined OutsideCurrentScope instead of being evaluated and recorded; this test went red (Failed: 1, Passed: 1)."
+      },
+      {
+        "test": "MovingAircraftOperationEntryPointTests.Without_a_waiver_statement_it_refuses_rather_than_infer_one",
+        "mutation": "Handlers.MovingAircraftOperation defaulted a missing statement to none held (`request.Waiver ?? WaiverStatement.NoneHeld(MovingAircraft.Regulation, \"the engine\")` for `Demand(request.Waiver, ...)`); this test went red (Failed: 1, Passed: 5 — the other five are the same-named tests of the other implemented entries, which stayed green)."
+      },
+      {
+        "test": "MovingAircraftOperationEntryPointTests.Without_a_statement_whether_the_aircraft_is_moving_it_refuses_rather_than_infer_one",
+        "mutation": "Handlers.MovingAircraftOperation inferred the fact the rule turns on (`request.FromAMovingAircraft ?? false` for `Demand(request.FromAMovingAircraft, ...)`), so a request that says nothing about the aircraft resolved as not prohibited instead of refusing; this test went red (Failed: 1, Passed: 0)."
+      },
+      {
+        "test": "MovingAircraftOperationEntryPointTests.A_waiver_statement_about_another_regulation_is_refused",
+        "mutation": "MovingAircraft.Operation compared the statement's regulation with itself (`waiver.Regulation` for `Regulation` in the call to Waivers.Suspension), so a waiver of § 107.51 suspended § 107.25(a); this test went red (Failed: 1, Passed: 4)."
+      },
+      {
+        "test": "MovingAircraftOperationEntryPointTests.The_dictionary_dispatch_refuses_rather_than_infer_the_facts",
+        "mutation": "Handlers.Missing stopped naming the entry whose request was short (`$\"resolving a map entry needs its request's {name}, and it was not set\"` for `$\"resolving the map entry '{entryId}' needs its request's {name}, and it was not set\"`), so the dictionary dispatch refused without saying which entry it was resolving; this test went red (Failed: 1, Passed: 0)."
+      }
+    ]
   }
 }
