@@ -281,8 +281,8 @@ internal static partial class Handlers
     /// <summary>The operating limitations are complied with (<c>operating-limitations</c>): optional.</summary>
     static partial void OperatingLimitations(global::FaaPart107.Requests.OperatingLimitationsRequest request, ref Resolution<object>? resolution);
 
-    /// <summary>Which objects are prominent, for flight visibility (<c>prominent-objects</c>): optional.</summary>
-    static partial void ProminentObjects(global::FaaPart107.Requests.ProminentObjectsRequest request, ref Resolution<object>? resolution);
+    /// <summary>Which objects are prominent, for flight visibility (<c>prominent-objects</c>): required, the entry is implemented.</summary>
+    internal static partial Resolution<object> ProminentObjects(global::FaaPart107.Requests.ProminentObjectsRequest request);
 
     /// <summary>Only one aircraft is operated at a time (<c>single-aircraft</c>): required, the entry is implemented.</summary>
     internal static partial Resolution<object> SingleAircraft(global::FaaPart107.Requests.SingleAircraftRequest request);
@@ -433,7 +433,7 @@ internal static partial class Handlers
                 OperatingLimitations(request as global::FaaPart107.Requests.OperatingLimitationsRequest ?? new(assertions), ref resolution);
                 break;
             case "prominent-objects":
-                ProminentObjects(request as global::FaaPart107.Requests.ProminentObjectsRequest ?? new(assertions), ref resolution);
+                resolution = ProminentObjects(request as global::FaaPart107.Requests.ProminentObjectsRequest ?? new(assertions));
                 break;
             case "single-aircraft":
                 resolution = SingleAircraft(request as global::FaaPart107.Requests.SingleAircraftRequest ?? new(assertions));
@@ -564,7 +564,7 @@ internal static partial class Handlers
         "altitude-within-limit" => true,
         "weather-minimums-met" => Hooked("WeatherMinimumsMet", typeof(global::FaaPart107.Requests.WeatherMinimumsMetRequest)),
         "operating-limitations" => Hooked("OperatingLimitations", typeof(global::FaaPart107.Requests.OperatingLimitationsRequest)),
-        "prominent-objects" => Hooked("ProminentObjects", typeof(global::FaaPart107.Requests.ProminentObjectsRequest)),
+        "prominent-objects" => true,
         "single-aircraft" => true,
         "airspace-authorized" => Hooked("AirspaceAuthorized", typeof(global::FaaPart107.Requests.AirspaceAuthorizedRequest)),
         "restricted-area-permitted" => true,
