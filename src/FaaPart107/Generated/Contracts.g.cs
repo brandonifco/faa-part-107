@@ -287,8 +287,8 @@ internal static partial class Handlers
     /// <summary>Only one aircraft is operated at a time (<c>single-aircraft</c>): required, the entry is implemented.</summary>
     internal static partial Resolution<object> SingleAircraft(global::FaaPart107.Requests.SingleAircraftRequest request);
 
-    /// <summary>Controlled airspace requires prior ATC authorization (<c>airspace-authorized</c>): optional.</summary>
-    static partial void AirspaceAuthorized(global::FaaPart107.Requests.AirspaceAuthorizedRequest request, ref Resolution<object>? resolution);
+    /// <summary>Controlled airspace requires prior ATC authorization (<c>airspace-authorized</c>): required, the entry is implemented.</summary>
+    internal static partial Resolution<object> AirspaceAuthorized(global::FaaPart107.Requests.AirspaceAuthorizedRequest request);
 
     /// <summary>Prohibited or restricted areas require permission (<c>restricted-area-permitted</c>): required, the entry is implemented.</summary>
     internal static partial Resolution<object> RestrictedAreaPermitted(global::FaaPart107.Requests.RestrictedAreaPermittedRequest request);
@@ -439,7 +439,7 @@ internal static partial class Handlers
                 resolution = SingleAircraft(request as global::FaaPart107.Requests.SingleAircraftRequest ?? new(assertions));
                 break;
             case "airspace-authorized":
-                AirspaceAuthorized(request as global::FaaPart107.Requests.AirspaceAuthorizedRequest ?? new(assertions), ref resolution);
+                resolution = AirspaceAuthorized(request as global::FaaPart107.Requests.AirspaceAuthorizedRequest ?? new(assertions));
                 break;
             case "restricted-area-permitted":
                 resolution = RestrictedAreaPermitted(request as global::FaaPart107.Requests.RestrictedAreaPermittedRequest ?? new(assertions));
@@ -566,7 +566,7 @@ internal static partial class Handlers
         "operating-limitations" => Hooked("OperatingLimitations", typeof(global::FaaPart107.Requests.OperatingLimitationsRequest)),
         "prominent-objects" => true,
         "single-aircraft" => true,
-        "airspace-authorized" => Hooked("AirspaceAuthorized", typeof(global::FaaPart107.Requests.AirspaceAuthorizedRequest)),
+        "airspace-authorized" => true,
         "restricted-area-permitted" => true,
         "moving-vehicle-operation" => Hooked("MovingVehicleOperation", typeof(global::FaaPart107.Requests.MovingVehicleOperationRequest)),
         "moving-aircraft-operation" => Hooked("MovingAircraftOperation", typeof(global::FaaPart107.Requests.MovingAircraftOperationRequest)),
