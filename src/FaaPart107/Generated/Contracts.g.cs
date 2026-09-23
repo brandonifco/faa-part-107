@@ -368,8 +368,8 @@ internal static partial class Handlers
     /// <summary>The three named persons coordinate to scan the airspace and maintain awareness (<c>observer-coordination</c>): optional.</summary>
     static partial void ObserverCoordination(global::FaaPart107.Requests.ObserverCoordinationRequest request, ref Resolution<object>? resolution);
 
-    /// <summary>Preflight familiarization, inspection and actions (<c>preflight-actions</c>): optional.</summary>
-    static partial void PreflightActions(global::FaaPart107.Requests.PreflightActionsRequest request, ref Resolution<object>? resolution);
+    /// <summary>Preflight familiarization, inspection and actions (<c>preflight-actions</c>): required, the entry is implemented.</summary>
+    internal static partial Resolution<object> PreflightActions(global::FaaPart107.Requests.PreflightActionsRequest request);
 
     /// <summary>The operating environment has been assessed against the stated risks (<c>preflight-risk-assessment</c>): optional.</summary>
     static partial void PreflightRiskAssessment(global::FaaPart107.Requests.PreflightRiskAssessmentRequest request, ref Resolution<object>? resolution);
@@ -520,7 +520,7 @@ internal static partial class Handlers
                 ObserverCoordination(request as global::FaaPart107.Requests.ObserverCoordinationRequest ?? new(assertions), ref resolution);
                 break;
             case "preflight-actions":
-                PreflightActions(request as global::FaaPart107.Requests.PreflightActionsRequest ?? new(assertions), ref resolution);
+                resolution = PreflightActions(request as global::FaaPart107.Requests.PreflightActionsRequest ?? new(assertions));
                 break;
             case "preflight-risk-assessment":
                 PreflightRiskAssessment(request as global::FaaPart107.Requests.PreflightRiskAssessmentRequest ?? new(assertions), ref resolution);
@@ -593,7 +593,7 @@ internal static partial class Handlers
         "visual-observer-conditions" => true,
         "effective-communication" => true,
         "observer-coordination" => Hooked("ObserverCoordination", typeof(global::FaaPart107.Requests.ObserverCoordinationRequest)),
-        "preflight-actions" => Hooked("PreflightActions", typeof(global::FaaPart107.Requests.PreflightActionsRequest)),
+        "preflight-actions" => true,
         "preflight-risk-assessment" => Hooked("PreflightRiskAssessment", typeof(global::FaaPart107.Requests.PreflightRiskAssessmentRequest)),
         "participant-briefing" => Hooked("ParticipantBriefing", typeof(global::FaaPart107.Requests.ParticipantBriefingRequest)),
         "control-links-working" => true,
