@@ -335,8 +335,8 @@ internal static partial class Handlers
     /// <summary>A covered structure or stationary vehicle provides reasonable protection from a falling small unmanned aircraft (<c>reasonable-protection</c>): optional.</summary>
     static partial void ReasonableProtection(global::FaaPart107.Requests.ReasonableProtectionRequest request, ref Resolution<object>? resolution);
 
-    /// <summary>Operation over a human being (<c>over-human-beings</c>): optional.</summary>
-    static partial void OverHumanBeings(global::FaaPart107.Requests.OverHumanBeingsRequest request, ref Resolution<object>? resolution);
+    /// <summary>Operation over a human being (<c>over-human-beings</c>): required, the entry is implemented.</summary>
+    internal static partial Resolution<object> OverHumanBeings(global::FaaPart107.Requests.OverHumanBeingsRequest request);
 
     /// <summary>A human being is directly participating in the operation (<c>direct-participation</c>): required, the entry is implemented.</summary>
     internal static partial Resolution<object> DirectParticipation(global::FaaPart107.Requests.DirectParticipationRequest request);
@@ -487,7 +487,7 @@ internal static partial class Handlers
                 ReasonableProtection(request as global::FaaPart107.Requests.ReasonableProtectionRequest ?? new(assertions), ref resolution);
                 break;
             case "over-human-beings":
-                OverHumanBeings(request as global::FaaPart107.Requests.OverHumanBeingsRequest ?? new(assertions), ref resolution);
+                resolution = OverHumanBeings(request as global::FaaPart107.Requests.OverHumanBeingsRequest ?? new(assertions));
                 break;
             case "direct-participation":
                 resolution = DirectParticipation(request as global::FaaPart107.Requests.DirectParticipationRequest ?? new(assertions));
@@ -582,7 +582,7 @@ internal static partial class Handlers
         "well-clear" => true,
         "collision-hazard-proximity" => Hooked("CollisionHazardProximity", typeof(global::FaaPart107.Requests.CollisionHazardProximityRequest)),
         "reasonable-protection" => Hooked("ReasonableProtection", typeof(global::FaaPart107.Requests.ReasonableProtectionRequest)),
-        "over-human-beings" => Hooked("OverHumanBeings", typeof(global::FaaPart107.Requests.OverHumanBeingsRequest)),
+        "over-human-beings" => true,
         "direct-participation" => true,
         "subpart-d-categories" => Hooked("SubpartDCategories", typeof(global::FaaPart107.Requests.SubpartDCategoriesRequest)),
         "flash-rate-sufficient" => Hooked("FlashRateSufficient", typeof(global::FaaPart107.Requests.FlashRateSufficientRequest)),
