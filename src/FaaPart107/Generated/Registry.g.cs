@@ -165,7 +165,7 @@ public static class Registry
         new("collision-hazard-proximity", EntryStatus.Mapped, CorrespondenceRow.NotBuilt, [MapEntries.CollisionHazardProximity.Locator]) { AssertedBy = ["caller"] },
         new("reasonable-protection", EntryStatus.Mapped, CorrespondenceRow.NotBuilt, [MapEntries.ReasonableProtection.Locator]) { AssertedBy = ["caller"] },
         new("over-human-beings", EntryStatus.Mapped, CorrespondenceRow.NotBuilt, [MapEntries.OverHumanBeings.Locator]),
-        new("direct-participation", EntryStatus.Mapped, CorrespondenceRow.NotBuilt, [MapEntries.DirectParticipation.Locator]),
+        new("direct-participation", EntryStatus.Implemented, CorrespondenceRow.UnresolvedAmbiguity, [MapEntries.DirectParticipation.Locator]),
         new("subpart-d-categories", EntryStatus.Declined, CorrespondenceRow.ScopeOut, [MapEntries.SubpartDCategories.Locator]),
         new("flash-rate-sufficient", EntryStatus.Mapped, CorrespondenceRow.NotBuilt, [MapEntries.FlashRateSufficient.Locator]) { AssertedBy = ["caller"] },
         new("intensity-reduction-in-interest-of-safety", EntryStatus.Mapped, CorrespondenceRow.NotBuilt, [MapEntries.IntensityReductionInInterestOfSafety.Locator]) { AssertedBy = ["remote pilot in command"] },

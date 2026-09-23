@@ -645,5 +645,38 @@
         "mutation": "Handlers.AttachedObjectSecure answered the open question instead of declining (`Resolution<object>.FromValue(true)` for `AttachedObject.Secure()`), so the dictionary dispatch resolved to a value; this test went red (`Failed! - Failed: 1, Passed: 0, Skipped: 0, Total: 1`, `Assert.IsType() Failure: Value is not the exact type`). It went red too with the reason wrong (`UnresolvedReason.UnsupportedRule` for `UnresolvedReason.RequiresInterpretation`, `Assert.Equal() Failure: Values differ`), and with AttachedObject.Secure citing sufficient-available-power's `§ 107.49(d)` (`MapEntries.SufficientAvailablePower.Locator` for `MapEntries.AttachedObjectSecure.Locator`, `Assert.Equal() Failure: Strings differ`)."
       }
     ]
+  },
+  "direct-participation": {
+    "status": "implemented",
+    "implementedIn": {
+      "ruleset": "faa-part-107",
+      "version": 1
+    },
+    "tests": [
+      {
+        "test": "DirectParticipationEntryPointTests.Resolving_it_declines_RequiresInterpretation_citing_107_39_a",
+        "mutation": "Participation.Direct cited reasonable-protection's `§ 107.39(b)` (`MapEntries.ReasonableProtection.Locator` for `MapEntries.DirectParticipation.Locator`), so the decline named the wrong constituent of § 107.39; this test went red — `Failed!  - Failed:     1, Passed:     5, Skipped:     0, Total:     6` on net10.0 and net8.0, `Assert.Equal() Failure: Strings differ`. It went red too with the reason wrong (`UnresolvedReason.UnsupportedRule` for `UnresolvedReason.RequiresInterpretation`) — `Failed!  - Failed:     2, Passed:     4, Skipped:     0, Total:     6`, which reddened The_decline_is_the_same_whatever_the_caller_asserts_about_the_human_being too — and with Handlers.DirectParticipation answering the open question instead of declining (`Resolution<object>.FromValue(true)` for `Participation.Direct(Demand(...))`) — `Failed!  - Failed:     6, Passed:     0, Skipped:     0, Total:     6`."
+      },
+      {
+        "test": "DirectParticipationEntryPointTests.The_decline_is_the_rules_own_and_names_the_term_the_corpus_leaves_undefined",
+        "mutation": "Participation.Direct declined with the correspondence row's bare wording, naming no reason (`$\"resolve the map entry '{MapEntries.DirectParticipation.Id}'\"` for the message naming \"directly participating\" as undefined, \"not how direct it must be\" and the determination \"vested in nobody\"), so the decline cited where without saying why; this test went red — `Failed!  - Failed:     1, Passed:     5, Skipped:     0, Total:     6` on net10.0 and net8.0. It went red too with Handlers.DirectParticipation answering the open question instead of delegating to the rule (`Resolution<object>.FromValue(true)` for `Participation.Direct(Demand(...))`) — `Failed!  - Failed:     6, Passed:     0, Skipped:     0, Total:     6` — which broke the assertion that the entry point's resolution is exactly `Participation.Direct(NoWaiver)`."
+      },
+      {
+        "test": "DirectParticipationEntryPointTests.The_decline_is_the_same_whatever_the_caller_asserts_about_the_human_being",
+        "mutation": "Handlers.DirectParticipation answered from whatever the caller had asserted (`request.Assertions != RuleRequest.Empty ? Resolution<object>.FromValue(true) : Participation.Direct(Demand(...))` for `Participation.Direct(Demand(...))`), so a request carrying assertions resolved to a value while the bare request still declined; this test went red on its own, the other five passing — `Failed!  - Failed:     1, Passed:     5, Skipped:     0, Total:     6` on net10.0 and net8.0. It went red too with the reason wrong in Participation.Direct (`UnresolvedReason.UnsupportedRule` for `UnresolvedReason.RequiresInterpretation`) — `Failed!  - Failed:     2, Passed:     4, Skipped:     0, Total:     6`."
+      },
+      {
+        "test": "DirectParticipationEntryPointTests.While_a_waiver_of_107_39_is_stated_in_force_it_declines_OutsideCurrentScope_citing_107_205_and_records_the_statement",
+        "mutation": "Participation.Direct never reached its gate: the `Waivers.Suspension(MapEntries.DirectParticipation, Regulation, waiver)` block was lifted out of the method body into an unused private `Gate` helper, so the RequiresInterpretation decline answered even while a waiver of § 107.39 was stated in force; this test went red — `Failed!  - Failed:     2, Passed:     4, Skipped:     0, Total:     6` on net10.0 and net8.0, together with A_waiver_statement_about_another_regulation_is_refused. Red on its own, with the other five passing, with the gate naming reasonable-protection as the suspended entry (`MapEntries.ReasonableProtection` for `MapEntries.DirectParticipation` in the call to Waivers.Suspension), so Attempted named reasonable-protection rather than direct-participation — `Failed!  - Failed:     1, Passed:     5, Skipped:     0, Total:     6`."
+      },
+      {
+        "test": "DirectParticipationEntryPointTests.Without_a_waiver_statement_it_refuses_rather_than_infer_one",
+        "mutation": "Handlers.DirectParticipation defaulted a missing statement to none held (`request.Waiver ?? WaiverStatement.NoneHeld(Participation.Regulation, \"the engine\")` for `Demand(request.Waiver, request.EntryId, nameof(request.Waiver))`), so both the entry point's input-free request and the dictionary dispatch's resolved instead of refusing; this test went red — `Failed!  - Failed:     1, Passed:     5, Skipped:     0, Total:     6` on net10.0 and net8.0."
+      },
+      {
+        "test": "DirectParticipationEntryPointTests.A_waiver_statement_about_another_regulation_is_refused",
+        "mutation": "Participation.Direct compared the statement's regulation with itself (`waiver.Regulation` for `Regulation` in the call to Waivers.Suspension), so a waiver of § 107.49 suspended § 107.39(a); this test went red — `Failed!  - Failed:     1, Passed:     5, Skipped:     0, Total:     6` on net10.0 and net8.0. It went red too with the gate lifted out of Participation.Direct's body altogether, so no statement was ever checked against the entry's regulation — `Failed!  - Failed:     2, Passed:     4, Skipped:     0, Total:     6`."
+      }
+    ]
   }
 }

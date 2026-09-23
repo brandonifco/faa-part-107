@@ -250,8 +250,8 @@ public sealed class CorrespondenceTests
         AssertDeclines("over-human-beings", UnresolvedReason.UnsupportedRule, EntryPoints.OverHumanBeings.Resolve(global::FaaPart107.Requests.OverHumanBeingsRequest.Empty), new SourceLocator("cfr-14-107", "§ 107.39"));
 
     [Fact]
-    public void direct_participation__declines_UnsupportedRule_row_2() =>
-        AssertDeclines("direct-participation", UnresolvedReason.UnsupportedRule, EntryPoints.DirectParticipation.Resolve(global::FaaPart107.Requests.DirectParticipationRequest.Empty), new SourceLocator("cfr-14-107", "§ 107.39(a)"));
+    public void direct_participation__is_implemented_so_a_hand_written_handler_answers_it() =>
+        Assert.True(Registry.HasImplementation("direct-participation"), "direct-participation is implemented in the overlay and has no [Implements] handler");
 
     [Fact]
     public void subpart_d_categories__declines_OutsideCurrentScope_row_1() =>
