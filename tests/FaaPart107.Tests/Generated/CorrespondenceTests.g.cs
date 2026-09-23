@@ -274,8 +274,20 @@ public sealed class CorrespondenceTests
         AssertDeclines("flash-rate-sufficient", UnresolvedReason.UnsupportedRule, EntryPoints.FlashRateSufficient.Resolve(global::FaaPart107.Requests.FlashRateSufficientRequest.Empty), new SourceLocator("cfr-14-107", "§ 107.29(a)(2), (b)"));
 
     [Fact]
-    public void intensity_reduction_in_interest_of_safety__declines_UnsupportedRule_row_2() =>
-        AssertDeclines("intensity-reduction-in-interest-of-safety", UnresolvedReason.UnsupportedRule, EntryPoints.IntensityReductionInInterestOfSafety.Resolve(global::FaaPart107.Requests.IntensityReductionInInterestOfSafetyRequest.Empty), new SourceLocator("cfr-14-107", "§ 107.29(a)(2), (b)"));
+    public void intensity_reduction_in_interest_of_safety__is_implemented_and_answers_or_demands_the_assertion()
+    {
+        if (Registry.HasImplementation("intensity-reduction-in-interest-of-safety"))
+        {
+            return;
+        }
+
+        var value = new object();
+        var resolved = Registry.Resolve("intensity-reduction-in-interest-of-safety", RuleRequest.Empty.Assert("intensity-reduction-in-interest-of-safety", value)).Match<object?>(v => v, _ => null);
+        Assert.Same(value, resolved);
+        var typed = EntryPoints.IntensityReductionInInterestOfSafety.Resolve(global::FaaPart107.Requests.IntensityReductionInInterestOfSafetyRequest.Asserting(value)).Match<object?>(v => v, _ => null);
+        Assert.Same(value, typed);
+        Assert.Throws<AssertionRequiredException>(() => Registry.Resolve("intensity-reduction-in-interest-of-safety", RuleRequest.Empty));
+    }
 
     [Fact]
     public void anti_collision_lighting__declines_UnsupportedRule_row_2() =>

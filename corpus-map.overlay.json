@@ -1107,5 +1107,62 @@
         "mutation": "Coordination.Coordinate compared the statement's regulation with itself (`Waivers.Suspension(MapEntries.ObserverCoordination, waiver.Regulation, waiver)` for `..., Regulation, waiver)`), so a waiver of § 107.31 suspended § 107.33(c); this test went red alone (`Failed!  - Failed:     1, Passed:   385, Skipped:     0, Total:   386`). It went red too with no hand-written handler at all -- the whole partial method removed from src/FaaPart107/Handlers/ObserverCoordination.cs, so `Registry.HasImplementation(\"observer-coordination\")` is false and correspondence row 8's bare default answers, which neither consults the waiver gate, nor checks who asserted what, nor records the statement, and hands back the caller's own object (`Failed!  - Failed:    12, Passed:   374, Skipped:     0, Total:   386`)."
       }
     ]
+  },
+  "intensity-reduction-in-interest-of-safety": {
+    "status": "implemented",
+    "implementedIn": {
+      "ruleset": "faa-part-107",
+      "version": 1
+    },
+    "tests": [
+      {
+        "test": "IntensityReductionInInterestOfSafetyEntryPointTests.An_assertion_that_reducing_the_intensity_is_in_the_interest_of_safety_resolves_to_what_was_asserted_citing_107_29_a_2_b",
+        "mutation": "Lighting.IntensityReduction answered another entry's assertion (`Assertions.Stated(MapEntries.SufficientAvailablePower, assertions)` for `Assertions.Stated(MapEntries.IntensityReductionInInterestOfSafety, assertions)`), so § 107.29(a)(2), (b) was answered citing § 107.49(d) and every attribution and entry check ran against the wrong entry; this test went red (`Failed!  - Failed:     8, Passed:   377, Skipped:     0, Total:   385`). It went red too with Lighting.Regulation naming § 107.51 instead of § 107.29(a)(2) and (b), which makes the gate refuse every statement this entry is actually stated by (`Failed!  - Failed:    10, Passed:   375, Skipped:     0, Total:   385`)."
+      },
+      {
+        "test": "IntensityReductionInInterestOfSafetyEntryPointTests.An_assertion_that_it_is_not_in_the_interest_of_safety_resolves_to_that_and_is_not_turned_into_a_decline",
+        "mutation": "Assertions.Stated overrode a negative determination (`new Assertion(entry, Holds: true, assertion.AssertedBy)` for `new Assertion(entry, assertion.Holds, assertion.AssertedBy)`), so the engine decided the judgement § 107.29(a)(2), (b) gives to the remote pilot in command — a pilot who determined that reducing the intensity would not be in the interest of safety was reported as having determined that it would. This test went red with the matching tests of the other assertion entries (`Failed!  - Failed:     8, Passed:   377, Skipped:     0, Total:   385`)."
+      },
+      {
+        "test": "IntensityReductionInInterestOfSafetyEntryPointTests.The_resolved_answer_carries_the_waiver_statement_and_who_made_it",
+        "mutation": "Lighting.IntensityReduction substituted a statement of its own for the caller's (`new IntensityReductionFinding(determination, WaiverStatement.NoneHeld(Regulation, \"the engine\"))` for `new IntensityReductionFinding(determination, waiver)`), so the answer carried a waiver statement nobody had made and the caller could no longer say which statement, or whose, the determination was answered under; this test went red alone (`Failed!  - Failed:     1, Passed:   384, Skipped:     0, Total:   385`). This is the defect the semantic review of PR #74 recorded a fail for, in its original form: the gate consumed `waiver` and the resolved value was a bare `Assertion` with nowhere to keep it. Decision 0001 requires the other shape — \"A statement that none is in force evaluates the rule normally and travels with the result\", recorded \"as a typed field\" — and states it for every entry the map marks suspendedBy, not for speed alone. The shared Assertion record is not widened to carry a waiver, because it also answers ungated assertion entries such as participant-briefing; IntensityReductionFinding wraps it, as UnaidedVisualContactFinding does for § 107.31(a)."
+      },
+      {
+        "test": "IntensityReductionInInterestOfSafetyEntryPointTests.Asserting_nothing_demands_the_value_rather_than_declining_the_entry",
+        "mutation": "Lighting.IntensityReduction declined instead of demanding: the `Assertions.Stated` call wrapped in `try`/`catch (AssertionRequiredException)` returning `Resolution<IntensityReductionFinding>.FromUnresolved(new UnresolvedResult(UnresolvedReason.MissingRulesData, ..., MapEntries.IntensityReductionInInterestOfSafety.Locator))`, which is row 8's whole point inverted — a determination nobody supplied became an unresolved result instead of a demand on the caller. This test went red alone (`Failed!  - Failed:     1, Passed:   384, Skipped:     0, Total:   385`)."
+      },
+      {
+        "test": "IntensityReductionInInterestOfSafetyEntryPointTests.While_a_waiver_of_107_29_a_2_and_b_is_stated_in_force_it_declines_OutsideCurrentScope_citing_107_205_without_demanding_the_assertion",
+        "mutation": "Lighting.IntensityReduction read the two caller facts in the other order: `Assertions.Stated(...)` evaluated into a local before `Waivers.Suspension(...)` was consulted, instead of the gate short-circuiting the demand. A suspended entry then threw AssertionRequiredException for a determination § 107.205(b) had put out of reach, rather than declining OutsideCurrentScope. This test went red alone (`Failed!  - Failed:     1, Passed:   384, Skipped:     0, Total:   385`)."
+      },
+      {
+        "test": "IntensityReductionInInterestOfSafetyEntryPointTests.Without_a_waiver_statement_it_refuses_rather_than_infer_one",
+        "mutation": "Handlers.IntensityReductionInInterestOfSafety defaulted a missing statement to none held (`request.Waiver ?? WaiverStatement.NoneHeld(Lighting.Regulation, \"the engine\")` for `Demand(request.Waiver, ...)`); this test went red together with the dictionary-dispatch test (`Failed!  - Failed:     2, Passed:   383, Skipped:     0, Total:   385`)."
+      },
+      {
+        "test": "IntensityReductionInInterestOfSafetyEntryPointTests.A_waiver_statement_about_another_regulation_is_refused",
+        "mutation": "Lighting.IntensityReduction checked the statement against itself (`Waivers.Suspension(entry, waiver.Regulation, waiver)` for `Waivers.Suspension(entry, Regulation, waiver)`), so a waiver of § 107.51 suspended § 107.29(a)(2), (b); this test went red alone (`Failed!  - Failed:     1, Passed:   384, Skipped:     0, Total:   385`). It went red too with Lighting.Regulation naming the wrong regulation (`public const string Regulation = \"§ 107.51\"` for `\"§ 107.29(a)(2) and (b)\"`, § 107.205(b)'s own designation) (`Failed!  - Failed:    10, Passed:   375, Skipped:     0, Total:   385`)."
+      },
+      {
+        "test": "IntensityReductionInInterestOfSafetyEntryPointTests.The_dictionary_dispatch_demands_the_waiver_statement_the_engine_never_defaults",
+        "mutation": "Handlers.IntensityReductionInInterestOfSafety defaulted a missing statement to none held (`request.Waiver ?? WaiverStatement.NoneHeld(Lighting.Regulation, \"the engine\")` for `Demand(request.Waiver, ...)`), so an entry reached through Registry.Resolve — which builds the request with every input of its own at its default — resolved as though the caller had stated no waiver was held; this test went red with the missing-statement test (`Failed!  - Failed:     2, Passed:   383, Skipped:     0, Total:   385`). It went red too with no hand-written handler at all — the implementing partial method deleted so `Handlers.Has` finds no hook and correspondence row 8's bare default answers — which reddened eleven of the twelve, this one among them (`Failed!  - Failed:    11, Passed:   374, Skipped:     0, Total:   385`)."
+      },
+      {
+        "test": "IntensityReductionInInterestOfSafetyEntryPointTests.An_assertion_attributed_to_someone_107_29_does_not_name_is_refused",
+        "mutation": "Assertions.Stated compared each name the map allows with itself inside the `!NamesNobody(entry) && ...` guard decision 0003 added (`string.Equals(who, who, StringComparison.Ordinal)` for `string.Equals(who, assertion.AssertedBy, StringComparison.Ordinal)`), so a determination attributed to a visual observer was accepted for an entry § 107.29(a)(2), (b) gives to the remote pilot in command; this test went red with the matching tests of the other assertion entries (`Failed!  - Failed:     7, Passed:   378, Skipped:     0, Total:   385`). It went red too with no hand-written handler at all — the implementing partial method deleted so `Handlers.Has` finds no hook and correspondence row 8's bare default answers — which reddened eleven of the twelve, this one among them (`Failed!  - Failed:    11, Passed:   374, Skipped:     0, Total:   385`)."
+      },
+      {
+        "test": "IntensityReductionInInterestOfSafetyEntryPointTests.An_assertion_about_another_entry_is_refused",
+        "mutation": "Assertions.Stated compared the assertion's entry with itself (`string.Equals(assertion.Entry.Id, assertion.Entry.Id, StringComparison.Ordinal)` for `string.Equals(assertion.Entry.Id, entry.Id, ...)`), so an assertion about sufficient-available-power answered intensity-reduction-in-interest-of-safety; this test went red with the matching tests of the other assertion entries (`Failed!  - Failed:     6, Passed:   379, Skipped:     0, Total:   385`). It went red too with no hand-written handler at all — the implementing partial method deleted so `Handlers.Has` finds no hook and correspondence row 8's bare default answers — which reddened eleven of the twelve, this one among them (`Failed!  - Failed:    11, Passed:   374, Skipped:     0, Total:   385`)."
+      },
+      {
+        "test": "IntensityReductionInInterestOfSafetyEntryPointTests.A_value_that_is_not_an_assertion_is_refused",
+        "mutation": "Assertions.Stated made up the assertion the caller did not make (`asserted = asserted as Assertion ?? new Assertion(entry, Holds: true, entry.AssertedBy.First())` inserted before the refusal), so a bare `true` became a determination the engine attributed to the remote pilot in command; this test went red with the matching tests of the other assertion entries (`Failed!  - Failed:     6, Passed:   379, Skipped:     0, Total:   385`). It went red too with no hand-written handler at all — the implementing partial method deleted so `Handlers.Has` finds no hook and correspondence row 8's bare default answers — which reddened eleven of the twelve, this one among them (`Failed!  - Failed:    11, Passed:   374, Skipped:     0, Total:   385`)."
+      },
+      {
+        "test": "IntensityReductionInInterestOfSafetyEntryPointTests.The_citation_is_the_maps_and_a_caller_supplied_entry_does_not_become_it",
+        "mutation": "Assertions.Stated answered with the caller's own object (`Resolution<Assertion>.FromValue(assertion)` for `FromValue(new Assertion(entry, assertion.Holds, assertion.AssertedBy))`) — the defect the semantic review of PR #59 recorded a fail for. MapEntry and SourceLocator are publicly constructible, so an assertion carrying this entry's id under `§ 107.49(d)` and a name of the caller's choosing passed all three checks and § 107.29(a)(2), (b) was answered citing § 107.49(d). This test went red with the matching tests of the other assertion entries (`Failed!  - Failed:     7, Passed:   378, Skipped:     0, Total:   385`). It went red too with no hand-written handler at all — the implementing partial method deleted so `Handlers.Has` finds no hook and correspondence row 8's bare default answers — which reddened eleven of the twelve, this one among them (`Failed!  - Failed:    11, Passed:   374, Skipped:     0, Total:   385`)."
+      }
+    ]
   }
 }
