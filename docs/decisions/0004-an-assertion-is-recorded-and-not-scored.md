@@ -63,7 +63,7 @@ that `AGENTS.md` §5 calls an unreviewed mapper.
 
 **A `kind: assertion` entry's supplied value is reported in a state of its own,
 `RequirementState.HumanAssertionRecorded`, which is neither `Satisfied` nor `Violated`.** The
-outcome carries the `Assertion` itself on `RequirementOutcome.Finding` — the fact, who is
+outcome carries the `Assertion` itself on `EvaluatedRequirement.Finding` — the fact, who is
 answerable for it, and the map's own citation — so a caller has everything the engine has, and the
 engine claims nothing the map does not record.
 
@@ -142,7 +142,7 @@ is the engine working, not the engine failing — the same posture §6 records f
 ## Consequences
 
 - **The aggregate cannot be read as "legal to fly", and the type will not let it be.**
-  `OperationEvaluation` and `RequirementOutcome` expose no `bool` at all — no `IsCompliant`, no
+  `OperationEvaluation` and `EvaluatedRequirement` expose no `bool` at all — no `IsCompliant`, no
   `Passed`, no `IsValid` — and `OperationEvaluatorTests.The_evaluation_does_not_collapse_to_a_boolean_and_offers_no_way_to_claim_one`
   checks that by reflection over every public member of both types, so a later `bool` added in
   good faith fails the gate. The aggregate a caller can read is a count per state, plus

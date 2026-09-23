@@ -10,6 +10,12 @@ namespace FaaPart107.Evaluation;
 /// </summary>
 /// <remarks>
 /// <para>
+/// <b>Not to be confused with <see cref="FaaPart107.RequirementOutcome"/></b>, which is
+/// § 107.33's rule's own record of one of that section's three requirements. This type is the
+/// product-facing result for one <em>map entry</em>, and it is what
+/// <see cref="OperationEvaluation.Requirements"/> holds.
+/// </para>
+/// <para>
 /// <b>Every outcome is traceable.</b> <see cref="EntryId"/> names the map entry and
 /// <see cref="Citations"/> holds every locator that entry cites — a result a caller cannot trace
 /// to a rule and a citation is not acceptable output from this engine. <see cref="Status"/> and
@@ -22,12 +28,12 @@ namespace FaaPart107.Evaluation;
 /// was read from, is on <see cref="Finding"/> for a caller who wants the detail.
 /// </para>
 /// </remarks>
-public sealed record RequirementOutcome
+public sealed record EvaluatedRequirement
 {
     private readonly ImmutableArray<SourceLocator> citations;
     private readonly ImmutableArray<string> assertedBy;
 
-    internal RequirementOutcome(RegisteredEntry entry, RequirementState state, string explanation)
+    internal EvaluatedRequirement(RegisteredEntry entry, RequirementState state, string explanation)
     {
         EntryId = entry.Id;
         Status = entry.Status;
@@ -120,7 +126,7 @@ public sealed record RequirementOutcome
     /// still makes the outcomes differ.
     /// </para>
     /// </remarks>
-    public bool Equals(RequirementOutcome? other) =>
+    public bool Equals(EvaluatedRequirement? other) =>
         other is not null
         && string.Equals(EntryId, other.EntryId, StringComparison.Ordinal)
         && Status == other.Status

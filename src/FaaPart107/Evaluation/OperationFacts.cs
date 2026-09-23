@@ -111,6 +111,12 @@ public sealed record OperationFacts
     /// </summary>
     public LightingStatement? Lighting { get; init; }
 
+    /// <summary>
+    /// Whether a visual observer is used during the aircraft operation — § 107.33's chapeau's
+    /// condition (<c>visual-observer-conditions</c>). Never inferred in either direction.
+    /// </summary>
+    public VisualObserverUse? VisualObserverUse { get; init; }
+
     /// <summary>The airspace the operation is in (<c>airspace-authorized</c>, § 107.41).</summary>
     public AirspaceClass? Airspace { get; init; }
 

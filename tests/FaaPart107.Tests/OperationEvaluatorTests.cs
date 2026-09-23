@@ -45,6 +45,7 @@ public class OperationEvaluatorTests
         FeetHorizontallyFromCloud = 100m,
         BoundPerson = BoundPerson.RemotePilotInCommand,
         Lighting = LightingStatement.LightedAndVisibleFor(5m, Caller),
+        VisualObserverUse = VisualObserverUse.NotUsed,
         Shelter = Shelter.CoveredStructure,
         Airspace = AirspaceClass.ClassG,
         AtcAuthorization = AtcAuthorization.None(Caller),
@@ -84,7 +85,7 @@ public class OperationEvaluatorTests
         .Asserting(new Assertion(MapEntries.FlashRateSufficient, true, RemotePilotInCommand))
         .Asserting(new Assertion(MapEntries.ReasonableProtection, true, RemotePilotInCommand));
 
-    private static RequirementOutcome Outcome(string entryId, OperationFacts facts) =>
+    private static EvaluatedRequirement Outcome(string entryId, OperationFacts facts) =>
         OperationEvaluator.Evaluate(facts).Requirement(entryId);
 
     private static RequirementState State(string entryId, OperationFacts facts) =>
@@ -391,6 +392,26 @@ public class OperationEvaluatorTests
     }
 
     [Fact]
+    public void A_section_that_does_not_reach_the_operation_is_not_reported_as_complied_with()
+    {
+        var notUsed = Outcome("visual-observer-conditions", Complete() with { VisualObserverUse = VisualObserverUse.NotUsed });
+        var used = Outcome("visual-observer-conditions", Complete() with { VisualObserverUse = VisualObserverUse.Used });
+
+        // § 107.33's chapeau makes the section conditional, and where no visual observer is used it
+        // states no requirement to meet. The rule says so with a null verdict and a SectionApplies
+        // of its own; reading that null as compliance would be the engine inventing an answer.
+        var finding = Assert.IsType<VisualObserverConditionsFinding>(notUsed.Finding);
+        Assert.False(finding.SectionApplies);
+        Assert.Null(finding.AllRequirementsMet);
+        Assert.Equal(RequirementState.Informational, notUsed.State);
+        Assert.NotEqual(RequirementState.Satisfied, notUsed.State);
+        Assert.NotEqual(RequirementState.Violated, notUsed.State);
+
+        // Where the section does reach the operation, the answer is a different one.
+        Assert.NotEqual(notUsed.State, used.State);
+    }
+
+    [Fact]
     public void No_rule_this_engine_has_built_reports_that_an_action_is_required()
     {
         // docs/decisions/0005: every rule here that names an obtainable thing also demands the
@@ -514,6 +535,13 @@ public class OperationEvaluatorTests
                 f => f with { Lighting = LightingStatement.LightedAndVisibleFor(1m, Caller) }
             },
 
+            // § 107.33 as a whole, with no visual observer used: the section states no requirement
+            // to meet, which is neither satisfied nor violated.
+            {
+                "visual-observer-conditions", RequirementState.Informational,
+                f => f with { VisualObserverUse = VisualObserverUse.NotUsed }
+            },
+
             // § 107.31 as a whole: paragraph (b)'s first combination, and nobody at all.
             {
                 "visual-line-of-sight", RequirementState.Satisfied,
@@ -635,7 +663,7 @@ public class OperationEvaluatorTests
     public void The_evaluation_does_not_collapse_to_a_boolean_and_offers_no_way_to_claim_one()
     {
         var members = typeof(OperationEvaluation).GetMembers(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static)
-            .Concat(typeof(RequirementOutcome).GetMembers(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static))
+            .Concat(typeof(EvaluatedRequirement).GetMembers(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static))
             .Where(member => member is PropertyInfo or MethodInfo or FieldInfo)
             .ToArray();
 

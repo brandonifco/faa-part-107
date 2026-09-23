@@ -41,7 +41,7 @@ namespace FaaPart107.Evaluation;
 /// rule also records that what would have met it is an authorization or a permission: a caller who
 /// has stated they hold none has been answered, not asked
 /// (<c>docs/decisions/0005-the-rules-verdict-is-the-verdict.md</c>). What the caller could obtain
-/// is on the finding, which travels on <see cref="RequirementOutcome.Finding"/>.
+/// is on the finding, which travels on <see cref="EvaluatedRequirement.Finding"/>.
 /// </para>
 /// </remarks>
 public static class OperationEvaluator
@@ -53,7 +53,7 @@ public static class OperationEvaluator
     public static OperationEvaluation Evaluate(OperationFacts facts)
     {
         ArgumentNullException.ThrowIfNull(facts);
-        var outcomes = ImmutableArray.CreateBuilder<RequirementOutcome>(Registry.Entries.Length);
+        var outcomes = ImmutableArray.CreateBuilder<EvaluatedRequirement>(Registry.Entries.Length);
         foreach (var entry in Registry.Entries)
         {
             outcomes.Add(Answer(entry, facts));
@@ -62,13 +62,13 @@ public static class OperationEvaluator
         return new OperationEvaluation(outcomes.ToImmutable());
     }
 
-    private static RequirementOutcome Answer(RegisteredEntry entry, OperationFacts facts)
+    private static EvaluatedRequirement Answer(RegisteredEntry entry, OperationFacts facts)
     {
         try
         {
             return Resolve(entry, facts).Match(
-                value => new RequirementOutcome(entry, StateOf(entry, value), value.ToString() ?? string.Empty) { Finding = value },
-                decline => new RequirementOutcome(entry, RequirementStates.For(decline.Reason), decline.Attempted)
+                value => new EvaluatedRequirement(entry, StateOf(entry, value), value.ToString() ?? string.Empty) { Finding = value },
+                decline => new EvaluatedRequirement(entry, RequirementStates.For(decline.Reason), decline.Attempted)
                 {
                     Reason = decline.Reason,
                 });
@@ -78,7 +78,7 @@ public static class OperationEvaluator
             // Row 8, and never an unresolved result: the corpus gave the engine the means to
             // proceed and the caller owes the value. Folding this into a decline would tell a
             // caller the corpus is silent where in fact the caller is.
-            return new RequirementOutcome(entry, RequirementState.HumanAssertionRequired, required.Message);
+            return new EvaluatedRequirement(entry, RequirementState.HumanAssertionRequired, required.Message);
         }
         catch (ArgumentException refused) when (refused.GetType() == typeof(ArgumentException))
         {
@@ -91,7 +91,7 @@ public static class OperationEvaluator
             // (ArgumentNullException, ArgumentOutOfRangeException), and that is a fault inside the
             // engine or a malformed value, not a fact the caller owes. Reporting one of those as
             // FactRequired would tell a product to go and ask somebody for something.
-            return new RequirementOutcome(entry, RequirementState.FactRequired, refused.Message)
+            return new EvaluatedRequirement(entry, RequirementState.FactRequired, refused.Message)
             {
                 MissingInput = refused.ParamName,
             };
@@ -218,6 +218,14 @@ public static class OperationEvaluator
             new Requests.ObserverCoordinationRequest(facts.Assertions) { Waiver = facts.WaiverOf(Coordination.Regulation) }),
         "intensity-reduction-in-interest-of-safety" => EntryPoints.IntensityReductionInInterestOfSafety.Resolve(
             new Requests.IntensityReductionInInterestOfSafetyRequest(facts.Assertions) { Waiver = facts.WaiverOf(Lighting.Regulation) }),
+        "visual-observer-conditions" => EntryPoints.VisualObserverConditions.Resolve(
+            new Requests.VisualObserverConditionsRequest(facts.Assertions)
+            {
+                Use = facts.VisualObserverUse,
+                Exercise = facts.Exercise,
+                Waiver = facts.WaiverOf(Observers.Regulation),
+                VisualLineOfSightWaiver = facts.WaiverOf(LineOfSight.Regulation),
+            }),
         "anti-collision-lighting" => EntryPoints.AntiCollisionLighting.Resolve(
             new Requests.AntiCollisionLightingRequest(facts.Assertions)
             {
@@ -264,7 +272,7 @@ public static class OperationEvaluator
     /// A value this table does not name is <see cref="RequirementState.Informational"/>: the engine
     /// resolved something and this orchestrator has no compliance reading for it, which is the
     /// honest answer and never a verdict in either direction. The value is on
-    /// <see cref="RequirementOutcome.Finding"/>.
+    /// <see cref="EvaluatedRequirement.Finding"/>.
     /// </para>
     /// </remarks>
     private static RequirementState Verdict(object value) => value switch
@@ -285,6 +293,17 @@ public static class OperationEvaluator
         // § 107.29(a)(2) and (b): true when the lighting the clause requires is there. The rule
         // makes that conjunction from the caller's statement and two assertions; this reads it.
         AntiCollisionLightingFinding finding => Met(finding.Met),
+
+        // § 107.33 as a whole. Three answers, not two: the rule's own property is bool?, and null
+        // is the section not reaching this operation at all — which that property's own
+        // documentation is explicit is neither "met" nor "not met". SectionApplies, on the finding,
+        // says which case it is, and reading null as either verdict would invent one.
+        VisualObserverConditionsFinding finding => finding.AllRequirementsMet switch
+        {
+            true => RequirementState.Satisfied,
+            false => RequirementState.Violated,
+            null => RequirementState.Informational,
+        },
 
         // § 107.31 as a whole: true when paragraph (a)'s ability is there and paragraph (b)'s
         // requirement that it be exercised is satisfied. The rule makes that conjunction, not

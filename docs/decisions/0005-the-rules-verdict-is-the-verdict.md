@@ -76,7 +76,7 @@ now report `Violated` on exactly the inputs on which their own rules say the sec
 and `Satisfied` on the rest.
 
 **The obtainability is not lost; it was never the evaluator's to summarise.**
-`RequirementOutcome.Finding` carries the rule's finding whole, so a product that wants to render
+`EvaluatedRequirement.Finding` carries the rule's finding whole, so a product that wants to render
 *"you may still be able to obtain a prior ATC authorization"* reads
 `AirspaceFinding.AuthorizationRequired` and `AirspaceFinding.Authorization` — including the
 `None` / `NotPrior` distinction — from the answer it already has. What changes is that the engine

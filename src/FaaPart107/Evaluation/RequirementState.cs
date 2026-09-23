@@ -67,7 +67,7 @@ public enum RequirementState
     /// <see cref="Violated"/> means. The obtainability a caller wants to render is on the finding —
     /// <see cref="AirspaceFinding.AuthorizationRequired"/>,
     /// <see cref="AreaPermissionFinding.PermissionRequired"/> — which travels on
-    /// <see cref="RequirementOutcome.Finding"/>.
+    /// <see cref="EvaluatedRequirement.Finding"/>.
     /// </remarks>
     ActionRequired = 3,
 
@@ -75,14 +75,14 @@ public enum RequirementState
     /// The entry is <c>kind: assertion</c> and the caller asserted nothing for it
     /// (<see cref="AssertionRequiredException"/>). This is <b>not</b> an unresolved result: the
     /// corpus gave the engine the means to proceed and the caller owes the value.
-    /// <see cref="RequirementOutcome.AssertedBy"/> names who the corpus lets assert it.
+    /// <see cref="EvaluatedRequirement.AssertedBy"/> names who the corpus lets assert it.
     /// </summary>
     HumanAssertionRequired = 4,
 
     /// <summary>
     /// The entry is <c>kind: assertion</c>, the caller supplied the value, and the engine answered
     /// with it unchanged: the fact and who is answerable for it are on
-    /// <see cref="RequirementOutcome.Finding"/>.
+    /// <see cref="EvaluatedRequirement.Finding"/>.
     /// </summary>
     /// <remarks>
     /// It is deliberately neither <see cref="Satisfied"/> nor <see cref="Violated"/>. Whether the
@@ -96,8 +96,8 @@ public enum RequirementState
 
     /// <summary>
     /// The entry refused the request: an input it demands was not supplied, or the value supplied
-    /// is not one it accepts. <see cref="RequirementOutcome.MissingInput"/> names the input and
-    /// <see cref="RequirementOutcome.Explanation"/> is the entry's own words. A missing input is
+    /// is not one it accepts. <see cref="EvaluatedRequirement.MissingInput"/> names the input and
+    /// <see cref="EvaluatedRequirement.Explanation"/> is the entry's own words. A missing input is
     /// the caller's error and not a gap in the corpus, so it is never an unresolved result — and
     /// never an answer the engine invented from a default.
     /// </summary>
@@ -109,8 +109,10 @@ public enum RequirementState
     /// (<see cref="GroundspeedLimit"/>, <see cref="AltitudeLimit"/>,
     /// <see cref="VisibilityMinimum"/>, <see cref="CloudClearance"/>,
     /// <see cref="CivilTwilightWindows"/>), or a finding whose own documentation disclaims a
-    /// compliance verdict (<see cref="NightWaiverTerminationFinding"/>). It must not be read as
-    /// <see cref="Satisfied"/>.
+    /// compliance verdict (<see cref="NightWaiverTerminationFinding"/>), or a finding that says the
+    /// section does not reach this operation at all and so states no requirement to meet
+    /// (<see cref="VisualObserverConditionsFinding.AllRequirementsMet"/> is null where no visual
+    /// observer is used). It must not be read as <see cref="Satisfied"/>.
     /// </summary>
     Informational = 7,
 

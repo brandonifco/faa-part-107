@@ -5,7 +5,7 @@ using RulesKernel.Identity;
 namespace FaaPart107.Evaluation;
 
 /// <summary>
-/// What this engine says about one operation: one <see cref="RequirementOutcome"/> for every entry
+/// What this engine says about one operation: one <see cref="EvaluatedRequirement"/> for every entry
 /// of the map, in the map's order, and the identity of the engine that said it.
 /// </summary>
 /// <remarks>
@@ -14,7 +14,7 @@ namespace FaaPart107.Evaluation;
 /// The map covers a bounded slice of 14 CFR part 107 and none of the rest of the CFR, and several
 /// of its entries are ones this engine has not built, has been told are outside its scope, or
 /// declines because the corpus does not settle them. There is deliberately no aggregate verdict
-/// here, no boolean anywhere on this type or on <see cref="RequirementOutcome"/>, and nothing that
+/// here, no boolean anywhere on this type or on <see cref="EvaluatedRequirement"/>, and nothing that
 /// reduces the outcomes to one answer: what the engine evaluated and what it did not are both part
 /// of the answer, and <see cref="Unanswered"/> is how a caller reads the second half.
 /// </para>
@@ -23,14 +23,14 @@ namespace FaaPart107.Evaluation;
 /// <see cref="InState(RequirementState)"/> is one state; <see cref="Outstanding"/> is what the
 /// caller still owes, and <see cref="Unanswered"/> is what this engine cannot answer. Both
 /// groupings are filters over outcomes that each keep their own
-/// <see cref="RequirementOutcome.State"/>, so no distinction is lost by using one.
+/// <see cref="EvaluatedRequirement.State"/>, so no distinction is lost by using one.
 /// </para>
 /// </remarks>
 public sealed record OperationEvaluation
 {
-    private readonly ImmutableArray<RequirementOutcome> requirements;
+    private readonly ImmutableArray<EvaluatedRequirement> requirements;
 
-    internal OperationEvaluation(ImmutableArray<RequirementOutcome> requirements) =>
+    internal OperationEvaluation(ImmutableArray<EvaluatedRequirement> requirements) =>
         this.requirements = requirements;
 
     /// <summary>
@@ -38,7 +38,7 @@ public sealed record OperationEvaluation
     /// has not built and the entries the map puts out of scope, which are part of the answer and
     /// not omissions from it.
     /// </summary>
-    public ImmutableArray<RequirementOutcome> Requirements => requirements;
+    public ImmutableArray<EvaluatedRequirement> Requirements => requirements;
 
     /// <summary>
     /// The engine that evaluated this: the ruleset and its version, the replay schema, and the
@@ -52,7 +52,7 @@ public sealed record OperationEvaluation
     /// permission the rule names as obtainable, an assertion the corpus leaves to a person, and a
     /// fact an entry demanded and did not get.
     /// </summary>
-    public ImmutableArray<RequirementOutcome> Outstanding =>
+    public ImmutableArray<EvaluatedRequirement> Outstanding =>
         Where(RequirementState.ActionRequired, RequirementState.HumanAssertionRequired, RequirementState.FactRequired);
 
     /// <summary>
@@ -61,7 +61,7 @@ public sealed record OperationEvaluation
     /// it, the structured data is absent, or the combination is unresolved. None of these is a
     /// finding about the operation.
     /// </summary>
-    public ImmutableArray<RequirementOutcome> Unanswered =>
+    public ImmutableArray<EvaluatedRequirement> Unanswered =>
         Where(
             RequirementState.RequiresInterpretation,
             RequirementState.OutsideCurrentScope,
@@ -72,7 +72,7 @@ public sealed record OperationEvaluation
     /// <summary>The outcomes in <paramref name="state"/>, in the map's order.</summary>
     /// <param name="state">The state to read.</param>
     /// <returns>The outcomes in it; empty when there are none.</returns>
-    public ImmutableArray<RequirementOutcome> InState(RequirementState state) => Where(state);
+    public ImmutableArray<EvaluatedRequirement> InState(RequirementState state) => Where(state);
 
     /// <summary>How many outcomes are in <paramref name="state"/>.</summary>
     /// <param name="state">The state to count.</param>
@@ -95,7 +95,7 @@ public sealed record OperationEvaluation
     /// <param name="entryId">A map entry id.</param>
     /// <returns>Its outcome.</returns>
     /// <exception cref="KeyNotFoundException">The map has no such entry.</exception>
-    public RequirementOutcome Requirement(string entryId)
+    public EvaluatedRequirement Requirement(string entryId)
     {
         foreach (var outcome in requirements)
         {
@@ -142,7 +142,7 @@ public sealed record OperationEvaluation
     /// <param name="other">The other evaluation.</param>
     /// <returns>True when both say the same thing about the same entries, in the same order.</returns>
     /// <remarks>
-    /// By element for the reason <see cref="RequirementOutcome.Equals(RequirementOutcome)"/> gives:
+    /// By element for the reason <see cref="EvaluatedRequirement.Equals(EvaluatedRequirement)"/> gives:
     /// a record's generated equality would compare the backing array by identity, and determinism
     /// is about what the engine says.
     /// </remarks>
@@ -161,9 +161,9 @@ public sealed record OperationEvaluation
         return hash.ToHashCode();
     }
 
-    private ImmutableArray<RequirementOutcome> Where(params RequirementState[] states)
+    private ImmutableArray<EvaluatedRequirement> Where(params RequirementState[] states)
     {
-        var found = ImmutableArray.CreateBuilder<RequirementOutcome>();
+        var found = ImmutableArray.CreateBuilder<EvaluatedRequirement>();
         foreach (var outcome in requirements)
         {
             if (Array.IndexOf(states, outcome.State) >= 0)
