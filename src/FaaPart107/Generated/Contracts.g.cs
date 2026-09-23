@@ -383,8 +383,8 @@ internal static partial class Handlers
     /// <summary>There is enough available power for the intended operational time (<c>sufficient-available-power</c>): optional.</summary>
     static partial void SufficientAvailablePower(global::FaaPart107.Requests.SufficientAvailablePowerRequest request, ref Resolution<object>? resolution);
 
-    /// <summary>An attached or carried object is secure (<c>attached-object-secure</c>): optional.</summary>
-    static partial void AttachedObjectSecure(global::FaaPart107.Requests.AttachedObjectSecureRequest request, ref Resolution<object>? resolution);
+    /// <summary>An attached or carried object is secure (<c>attached-object-secure</c>): required, the entry is implemented.</summary>
+    internal static partial Resolution<object> AttachedObjectSecure(global::FaaPart107.Requests.AttachedObjectSecureRequest request);
 
     /// <summary>An attached or carried object does not adversely affect flight characteristics or controllability (<c>attached-object-no-adverse-effect</c>): optional.</summary>
     static partial void AttachedObjectNoAdverseEffect(global::FaaPart107.Requests.AttachedObjectNoAdverseEffectRequest request, ref Resolution<object>? resolution);
@@ -535,7 +535,7 @@ internal static partial class Handlers
                 SufficientAvailablePower(request as global::FaaPart107.Requests.SufficientAvailablePowerRequest ?? new(assertions), ref resolution);
                 break;
             case "attached-object-secure":
-                AttachedObjectSecure(request as global::FaaPart107.Requests.AttachedObjectSecureRequest ?? new(assertions), ref resolution);
+                resolution = AttachedObjectSecure(request as global::FaaPart107.Requests.AttachedObjectSecureRequest ?? new(assertions));
                 break;
             case "attached-object-no-adverse-effect":
                 AttachedObjectNoAdverseEffect(request as global::FaaPart107.Requests.AttachedObjectNoAdverseEffectRequest ?? new(assertions), ref resolution);
@@ -598,7 +598,7 @@ internal static partial class Handlers
         "participant-briefing" => Hooked("ParticipantBriefing", typeof(global::FaaPart107.Requests.ParticipantBriefingRequest)),
         "control-links-working" => true,
         "sufficient-available-power" => Hooked("SufficientAvailablePower", typeof(global::FaaPart107.Requests.SufficientAvailablePowerRequest)),
-        "attached-object-secure" => Hooked("AttachedObjectSecure", typeof(global::FaaPart107.Requests.AttachedObjectSecureRequest)),
+        "attached-object-secure" => true,
         "attached-object-no-adverse-effect" => Hooked("AttachedObjectNoAdverseEffect", typeof(global::FaaPart107.Requests.AttachedObjectNoAdverseEffectRequest)),
         "waiver-policy" => Hooked("WaiverPolicy", typeof(global::FaaPart107.Requests.WaiverPolicyRequest)),
         "waivable-regulations" => Hooked("WaivableRegulations", typeof(global::FaaPart107.Requests.WaivableRegulationsRequest)),
