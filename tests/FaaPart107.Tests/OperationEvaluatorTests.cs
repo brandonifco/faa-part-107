@@ -267,6 +267,75 @@ public class OperationEvaluatorTests
         Assert.Null(outcome.Reason);
     }
 
+    /// <summary>
+    /// The assertion entries whose polarity a built consumer supplies, which is the cost
+    /// <c>docs/decisions/0004</c> records. Measured, not read off the source: an entry has such a
+    /// consumer exactly when flipping the asserted fact moves some <em>other</em> entry's answer.
+    /// </summary>
+    /// <remarks>
+    /// The facts are chosen so that every consumer that exists can fire — the intensity stated
+    /// reduced, because <c>anti-collision-lighting</c> reads
+    /// <c>intensity-reduction-in-interest-of-safety</c> only then, and a visual observer used,
+    /// because § 107.33's chapeau gates <c>observer-coordination</c>. So this measures whether a
+    /// consumer can <em>ever</em> supply the polarity, which is the claim the record makes.
+    /// </remarks>
+    private static string[] AssertionsABuiltConsumerReads()
+    {
+        var facts = Complete() with
+        {
+            Lighting = LightingStatement.IntensityReducedAndVisibleFor(5m, Caller),
+            VisualObserverUse = VisualObserverUse.Used,
+        };
+        var baseline = OperationEvaluator.Evaluate(facts);
+        var consumed = new List<string>();
+        foreach (var entry in Registry.Entries
+            .Where(entry => entry.Row == CorrespondenceRow.Assertion && entry.Status == EntryStatus.Implemented))
+        {
+            var flipped = OperationEvaluator.Evaluate(
+                facts.Asserting(new Assertion(MapEntry(entry.Id), false, entry.AssertedBy[0])));
+            var movedElsewhere = baseline.Requirements
+                .Zip(flipped.Requirements, (before, after) => (before, after))
+                .Any(pair => pair.before != pair.after && !string.Equals(pair.before.EntryId, entry.Id, StringComparison.Ordinal));
+            if (movedElsewhere)
+            {
+                consumed.Add(entry.Id);
+            }
+        }
+
+        return [.. consumed];
+    }
+
+    [Fact]
+    public void The_cost_recorded_in_decision_0004_is_the_cost_the_engine_actually_has()
+    {
+        // docs/decisions/0004 names these four, and names the six that have no built consumer. The
+        // number has been wrong twice by being written at one head and left at another, so it is
+        // pinned here rather than proof-read: build a consumer for one of the six and this goes
+        // red, naming the record to update.
+        string[] recorded =
+        [
+            "flash-rate-sufficient",
+            "intensity-reduction-in-interest-of-safety",
+            "unaided-visual-contact",
+            "observer-coordination",
+        ];
+
+        var measured = AssertionsABuiltConsumerReads();
+
+        Assert.Equal(
+            recorded.Order(StringComparer.Ordinal),
+            measured.Order(StringComparer.Ordinal));
+
+        // And the rest of the census the record states: ten assertion entries, six of them with no
+        // built consumer to supply the polarity.
+        var rowEight = Registry.Entries
+            .Where(entry => entry.Row == CorrespondenceRow.Assertion && entry.Status == EntryStatus.Implemented)
+            .ToArray();
+
+        Assert.Equal(10, rowEight.Length);
+        Assert.Equal(6, rowEight.Length - measured.Length);
+    }
+
     [Fact]
     public void No_assertion_entry_is_ever_reported_as_satisfied_or_violated()
     {

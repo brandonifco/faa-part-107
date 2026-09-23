@@ -156,15 +156,39 @@ is the engine working, not the engine failing — the same posture §6 records f
   `OperationEvaluatorTests.No_assertion_entry_is_ever_reported_as_satisfied_or_violated` walks the
   registry rather than a list, so it covers them as they land.
 - **What this costs a caller, measured rather than asserted.** A consuming entry supplies the
-  polarity by using the fact: `visual-line-of-sight` consumes `unaided-visual-contact` through
-  `VisualLineOfSightFinding.Maintained`, which requires `Ability.Holds`, so for that one entry a
-  product can read compliance off § 107.31's own finding. Of the ten implemented row-8 entries,
-  **exactly one** has such a consumer built. `collision-hazard-proximity` has no consumer in the
-  map at all. So today a product that wants to know whether an asserted
-  `collision-hazard-proximity = true` is good news or bad has nowhere in this engine to read it,
-  and would have to go to the CFR itself — which is the second unreviewed reading `AGENTS.md` §5
-  exists to prevent, relocated to outside the engine. That is the map's gap and not this engine's
-  to close, and it is named here so that nobody has to rediscover it.
+  polarity by *using* the fact: where a built entry's own verdict requires an assertion to hold,
+  that entry has said which way the assertion points, and a product reads compliance off the
+  consumer's finding rather than off the assertion. Of the ten implemented row-8 entries,
+  **four** have such a consumer today:
+
+  | assertion entry | built consumer | how the consumer fixes the polarity |
+  |---|---|---|
+  | `unaided-visual-contact` | `visual-line-of-sight` | `Maintained => Ability.Holds && Exercised` |
+  | `unaided-visual-contact` | `visual-observer-conditions` | § 107.33(b), answered through `visual-line-of-sight` |
+  | `flash-rate-sufficient` | `anti-collision-lighting` | `Met` requires `FlashRate is { Holds: true }` |
+  | `intensity-reduction-in-interest-of-safety` | `anti-collision-lighting` | `WithinTheBound` requires `Reduction is { Holds: true }`, **and only where the intensity is stated reduced** — the clause bounds what may be done to the lighting, so where nothing was done the determination is not read |
+  | `observer-coordination` | `visual-observer-conditions` | § 107.33(c), `finding => finding.Holds`, **and only where a visual observer is used** — § 107.33's chapeau is a condition |
+
+  **Six have none**, and for two different reasons. `collision-hazard-proximity` has no consumer
+  **in the map at all**: § 107.37(b) is a prohibition standing on its own, and nothing entails
+  anything from it. `reasonable-protection` and the four § 107.49 constituents —
+  `preflight-risk-assessment`, `participant-briefing`, `sufficient-available-power`,
+  `attached-object-no-adverse-effect` — each have a consumer the map records (`over-human-beings`
+  and `preflight-actions`) that **this engine has not built yet**, so the cost is temporary for
+  five of the six and structural for one.
+
+  So today a product that wants to know whether an asserted `collision-hazard-proximity = true` is
+  good news or bad has nowhere in this engine to read it, and would have to go to the CFR itself —
+  which is the second unreviewed reading `AGENTS.md` §5 exists to prevent, relocated to outside the
+  engine. That is the map's gap and not this engine's to close, and it is named here so that nobody
+  has to rediscover it.
+
+  **This census is checked, not proof-read.** It was written at one head and not re-measured when
+  the branch moved, and was wrong.
+  `OperationEvaluatorTests.The_cost_recorded_in_decision_0004_is_the_cost_the_engine_actually_has`
+  now measures it from the engine — an assertion entry has a built consumer exactly when flipping
+  the asserted fact moves some other entry's answer — and fails naming this record when the answer
+  changes. Building `preflight-actions` or `over-human-beings` is what will change it.
 - **Nothing in any handler or rule changes.** This record is about how the orchestrator reads what
   the handlers already return; every regulatory answer in the output is still a handler's.
 - **`docs/decisions/**` is on this engine's semantic surface** (`.github/agent-policy.json`), so

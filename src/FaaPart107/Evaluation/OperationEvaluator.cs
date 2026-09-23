@@ -50,6 +50,16 @@ public static class OperationEvaluator
     /// <param name="facts">What the caller states about one operation.</param>
     /// <returns>One outcome per map entry, in the map's order, with the engine's identity.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="facts"/> is null.</exception>
+    /// <exception cref="ArgumentException">
+    /// A rule refused a value it was given as malformed rather than merely absent — a negative
+    /// distance, say — and the whole evaluation is abandoned rather than one entry's answer being
+    /// dressed as a fact the caller owes. A fact <em>not supplied</em> never throws: that entry
+    /// reports <see cref="RequirementState.FactRequired"/> and every other entry is still answered.
+    /// In practice this surfaces as the derived type the rule threw, usually
+    /// <see cref="ArgumentOutOfRangeException"/>. One malformed field therefore aborts all of it,
+    /// which is deliberate: it is a defect in the caller's own facts, not an answer this engine
+    /// could give about part of them.
+    /// </exception>
     public static OperationEvaluation Evaluate(OperationFacts facts)
     {
         ArgumentNullException.ThrowIfNull(facts);
