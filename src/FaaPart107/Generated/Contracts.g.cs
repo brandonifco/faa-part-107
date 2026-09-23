@@ -302,8 +302,8 @@ internal static partial class Handlers
     /// <summary>Operation at night (<c>night-operation</c>): optional.</summary>
     static partial void NightOperation(global::FaaPart107.Requests.NightOperationRequest request, ref Resolution<object>? resolution);
 
-    /// <summary>The remote pilot in command has completed the knowledge test or training for night operation (<c>night-training-completed</c>): optional.</summary>
-    static partial void NightTrainingCompleted(global::FaaPart107.Requests.NightTrainingCompletedRequest request, ref Resolution<object>? resolution);
+    /// <summary>The remote pilot in command has completed the knowledge test or training for night operation (<c>night-training-completed</c>): required, the entry is implemented.</summary>
+    internal static partial Resolution<object> NightTrainingCompleted(global::FaaPart107.Requests.NightTrainingCompletedRequest request);
 
     /// <summary>Aeronautical knowledge recency (<c>knowledge-recency</c>): optional.</summary>
     static partial void KnowledgeRecency(global::FaaPart107.Requests.KnowledgeRecencyRequest request, ref Resolution<object>? resolution);
@@ -454,7 +454,7 @@ internal static partial class Handlers
                 NightOperation(request as global::FaaPart107.Requests.NightOperationRequest ?? new(assertions), ref resolution);
                 break;
             case "night-training-completed":
-                NightTrainingCompleted(request as global::FaaPart107.Requests.NightTrainingCompletedRequest ?? new(assertions), ref resolution);
+                resolution = NightTrainingCompleted(request as global::FaaPart107.Requests.NightTrainingCompletedRequest ?? new(assertions));
                 break;
             case "knowledge-recency":
                 KnowledgeRecency(request as global::FaaPart107.Requests.KnowledgeRecencyRequest ?? new(assertions), ref resolution);
@@ -571,7 +571,7 @@ internal static partial class Handlers
         "moving-vehicle-operation" => true,
         "moving-aircraft-operation" => true,
         "night-operation" => Hooked("NightOperation", typeof(global::FaaPart107.Requests.NightOperationRequest)),
-        "night-training-completed" => Hooked("NightTrainingCompleted", typeof(global::FaaPart107.Requests.NightTrainingCompletedRequest)),
+        "night-training-completed" => true,
         "knowledge-recency" => Hooked("KnowledgeRecency", typeof(global::FaaPart107.Requests.KnowledgeRecencyRequest)),
         "night-waiver-termination" => Hooked("NightWaiverTermination", typeof(global::FaaPart107.Requests.NightWaiverTerminationRequest)),
         "night-waiver-bar" => Hooked("NightWaiverBar", typeof(global::FaaPart107.Requests.NightWaiverBarRequest)),

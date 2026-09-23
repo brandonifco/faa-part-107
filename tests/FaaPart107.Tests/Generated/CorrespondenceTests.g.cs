@@ -202,8 +202,8 @@ public sealed class CorrespondenceTests
         AssertDeclines("night-operation", UnresolvedReason.MissingRulesData, EntryPoints.NightOperation.Resolve(global::FaaPart107.Requests.NightOperationRequest.Empty), new SourceLocator("cfr-14-107", "§ 107.29(a)"));
 
     [Fact]
-    public void night_training_completed__declines_UnsupportedRule_row_2() =>
-        AssertDeclines("night-training-completed", UnresolvedReason.UnsupportedRule, EntryPoints.NightTrainingCompleted.Resolve(global::FaaPart107.Requests.NightTrainingCompletedRequest.Empty), new SourceLocator("cfr-14-107", "§ 107.29(a)(1)"));
+    public void night_training_completed__is_implemented_so_a_hand_written_handler_answers_it() =>
+        Assert.True(Registry.HasImplementation("night-training-completed"), "night-training-completed is implemented in the overlay and has no [Implements] handler");
 
     [Fact]
     public void knowledge_recency__declines_OutsideCurrentScope_row_1() =>

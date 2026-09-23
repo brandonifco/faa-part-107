@@ -566,5 +566,30 @@
         "mutation": "MovingVehicle.Operation compared the statement's regulation with itself (`waiver.Regulation` for `Regulation` in the call to Waivers.Suspension), so a waiver of § 107.51 suspended § 107.25; this test went red (`Failed: 1, Passed: 7`)."
       }
     ]
+  },
+  "night-training-completed": {
+    "status": "implemented",
+    "implementedIn": {
+      "ruleset": "faa-part-107",
+      "version": 1
+    },
+    "tests": [
+      {
+        "test": "NightTrainingCompletedEntryPointTests.Resolving_it_declines_RequiresInterpretation_citing_107_29_a_1",
+        "mutation": "NightTraining.Completed cited its out-of-scope dependency's § 107.65 (`MapEntries.KnowledgeRecency.Locator` for `MapEntries.NightTrainingCompleted.Locator`), so the decline named knowledge-recency's section rather than this entry's own constituent of § 107.29; this test went red: `Assert.Equal() Failure: Strings differ` — `Failed FaaPart107.Tests.NightTrainingCompletedEntryPointTests.Resolving_it_declines_RequiresInterpretation_citing_107_29_a_1`, `Failed!  - Failed:     1, Passed:     0, Skipped:     0, Total:     1` on net8.0 and net10.0."
+      },
+      {
+        "test": "NightTrainingCompletedEntryPointTests.The_decline_is_the_rules_own_and_names_what_the_corpus_leaves_open",
+        "mutation": "NightTraining.Completed declined with the correspondence row's bare wording, naming no reason (`$\"resolve the map entry '{MapEntries.NightTrainingCompleted.Id}'\"` for the message naming \"as applicable, under § 107.65\", the three ways § 107.65 names, and § 107.65(d)'s completions before April 6, 2021), so the decline cited where without saying why; this test went red: `Assert.Contains() Failure: Sub-string not found` — `Failed FaaPart107.Tests.NightTrainingCompletedEntryPointTests.The_decline_is_the_rules_own_and_names_what_the_corpus_leaves_open`, `Failed!  - Failed:     1, Passed:     0, Skipped:     0, Total:     1` on net8.0 and net10.0."
+      },
+      {
+        "test": "NightTrainingCompletedEntryPointTests.The_dictionary_dispatch_declines_the_same_way",
+        "mutation": "Handlers.NightTrainingCompleted answered the open question instead of declining (`Resolution<object>.FromValue(true)` for `NightTraining.Completed()`), so the dictionary dispatch resolved to a value; this test went red: `Assert.IsType() Failure: Value is not the exact type` — `Failed FaaPart107.Tests.NightTrainingCompletedEntryPointTests.The_dictionary_dispatch_declines_the_same_way`, `Failed!  - Failed:     1, Passed:     0, Skipped:     0, Total:     1` on net8.0 and net10.0."
+      },
+      {
+        "test": "NightTrainingCompletedEntryPointTests.The_out_of_scope_dependency_declines_on_its_own_terms_and_this_entry_does_not_borrow_that_answer",
+        "mutation": "NightTraining.Completed declined with correspondence row 5's answer instead of row 6's (`UnresolvedReason.MissingRulesData` for `UnresolvedReason.RequiresInterpretation`), as if the out-of-scope dependency knowledge-recency were an unimplemented value dependency; this test went red: `Assert.NotEqual() Failure: Values are equal` — `Failed FaaPart107.Tests.NightTrainingCompletedEntryPointTests.The_out_of_scope_dependency_declines_on_its_own_terms_and_this_entry_does_not_borrow_that_answer`, `Failed!  - Failed:     1, Passed:     0, Skipped:     0, Total:     1` on net8.0 and net10.0. It went red too with the entry borrowing its dependency's own answer (`UnresolvedReason.OutsideCurrentScope` for `UnresolvedReason.RequiresInterpretation`), the same `Assert.NotEqual() Failure: Values are equal` and `Failed!  - Failed:     1, Passed:     0, Skipped:     0, Total:     1` on both frameworks."
+      }
+    ]
   }
 }
