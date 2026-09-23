@@ -155,7 +155,7 @@ public static class Registry
         new("night-operation", EntryStatus.Declined, CorrespondenceRow.DefinedElsewhere, [MapEntries.NightOperation.Locator]),
         new("night-training-completed", EntryStatus.Implemented, CorrespondenceRow.UnresolvedAmbiguity, [MapEntries.NightTrainingCompleted.Locator]),
         new("knowledge-recency", EntryStatus.Declined, CorrespondenceRow.ScopeOut, [MapEntries.KnowledgeRecency.Locator]),
-        new("night-waiver-termination", EntryStatus.Mapped, CorrespondenceRow.NotBuilt, [MapEntries.NightWaiverTermination.Locator]),
+        new("night-waiver-termination", EntryStatus.Implemented, CorrespondenceRow.None, [MapEntries.NightWaiverTermination.Locator]),
         new("night-waiver-bar", EntryStatus.Mapped, CorrespondenceRow.NotBuilt, [MapEntries.NightWaiverBar.Locator]),
         new("civil-twilight-operation", EntryStatus.Mapped, CorrespondenceRow.NotBuilt, [MapEntries.CivilTwilightOperation.Locator]),
         new("civil-twilight-alaska", EntryStatus.Declined, CorrespondenceRow.DefinedElsewhere, [MapEntries.CivilTwilightAlaska.Locator]),
