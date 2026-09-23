@@ -1286,5 +1286,58 @@
         "mutation": "A `public decimal? FlashesPerMinute { get; init; }` was added to FlashRateSufficientRequest in the Requests partial beside the handler -- surface for the figure the entry's note says the corpus does not state (\"the corpus states no rate, so no figure is evidenced\"), and the first step of an engine substituting its own rule for § 107.29(a)(2) and (b)'s standard. This test went red alone with `Assert.Equal() Failure: Collections differ; Expected: [\"Assertions\", \"EntryId\", \"Waiver\"]; Actual: [\"Assertions\", \"EntryId\", \"FlashesPerMinute\", \"Waiver\"]` (`Failed!  - Failed:     1, Passed:   312, Skipped:     0, Total:   313`). It went red too with the handler resolving the sibling entry (`Failed!  - Failed:    12, Passed:   301, Skipped:     0, Total:   313`), with the marker predicate disabled (`Failed!  - Failed:    14, Passed:   299, Skipped:     0, Total:   313`), and It went red too with no hand-written handler at all -- `static partial void FlashRateSufficient` renamed to `internal static void FlashRateSufficientNotAHandler` so `Registry.HasImplementation` is false and correspondence row 8's bare default answers, `Resolution<object>.FromValue(request.Asserted(entry.Id))`, which consults no waiver gate, checks nothing about what was asserted, and hands back the caller's own object; that reddened 14 of this entry's 15 tests -- every one but the demand test, which the default also satisfies (`Failed!  - Failed:    14, Passed:   299, Skipped:     0, Total:   313`)."
       }
     ]
+  },
+  "operating-limitations": {
+    "status": "implemented",
+    "implementedIn": {
+      "ruleset": "faa-part-107",
+      "version": 1
+    },
+    "tests": [
+      {
+        "test": "OperatingLimitationsEntryPointTests.Each_limitation_the_engine_resolves_broken_makes_the_whole_not_complied_with_citing_107_51_introductory_text",
+        "mutation": "OperatingLimitationsFinding.CompliedWith took one limitation met for all of them (`Limitations.Any(limitation => limitation.Met == true)` for `Limitations.All(...)`), so an operation with a groundspeed beyond both printed figures, or an altitude above the ceiling, or neither cloud minimum met was answered as complied with; this test went red -- `Failed!  - Failed:     3, Passed:     0, Skipped:     0, Total:     3` on both net8.0 and net10.0, all three of the limitations' cases. It went red too with Compliance.CompliedWith refusing to let a broken limitation settle the conjunction (`return false || blocking is null` for `return Array.Exists(limitations, limitation => limitation.Met == false) || blocking is null`) -- `Failed!  - Failed:     2, Passed:     1, Skipped:     0, Total:     3` on both net8.0 and net10.0: exactly the two cases where another constituent is undetermined, the third staying green because every constituent resolved there. That is the pair that pins \"all of the following\": one limitation resolved broken settles it whatever an undetermined constituent would have said."
+      },
+      {
+        "test": "OperatingLimitationsEntryPointTests.The_verdicts_and_the_accounts_are_the_constituent_entries_own_and_are_not_restated_here",
+        "mutation": "Compliance.Outcome recorded a description of its own instead of what the constituent entry said (`entry.Name` for `value.ToString() ?? string.Empty`), so the account beside each verdict no longer matched the finding speed-within-limit and altitude-within-limit resolve through their own entry points; this test went red -- `Failed!  - Failed:     1, Passed:     0, Skipped:     0, Total:     1` on both net8.0 and net10.0."
+      },
+      {
+        "test": "OperatingLimitationsEntryPointTests.Every_limitation_the_engine_resolves_met_with_one_undetermined_declines_naming_this_entry_and_the_constituent",
+        "mutation": "Compliance.Undetermined cited this entry rather than the constituent whose question blocks it (`MapEntries.OperatingLimitations.Locator` for `blocking.Entry.Locator`), so the decline pointed at § 107.51's introductory text -- which states no limitation -- instead of at the entry that could not answer; this test went red -- `Failed!  - Failed:     1, Passed:     0, Skipped:     0, Total:     1` on both net8.0 and net10.0. It went red too with the blocking constituent taken last rather than first in this entry's dependsOn order (`Array.FindLast` for `Array.Find`), which left the two-undetermined case citing weather-minimums-met's § 107.51(c)-(d) instead of speed-within-limit's § 107.51(a) -- `Failed!  - Failed:     1, Passed:     0, Skipped:     0, Total:     1` on both net8.0 and net10.0."
+      },
+      {
+        "test": "OperatingLimitationsEntryPointTests.The_decline_is_this_entrys_own_and_not_the_constituents_handed_back",
+        "mutation": "Compliance.Undetermined handed the constituent's own text back verbatim (`blocking.Account` for the message it builds), which is the propagation shape #78 records as a defect in right-of-way: the decline's subject became prominent-objects, three levels down, with no trace of the entry the caller asked about; this test went red -- `Failed!  - Failed:     1, Passed:     0, Skipped:     0, Total:     1` on both net8.0 and net10.0, on `Assert.NotEqual(constituent.Attempted, mine.Attempted)`."
+      },
+      {
+        "test": "OperatingLimitationsEntryPointTests.Both_persons_the_introductory_text_names_are_bound_and_are_answered_alike",
+        "mutation": "Compliance.CompliedWith ignored the person the caller stated and recorded the first the introductory text names (`new OperatingLimitationsFinding(BoundPerson.RemotePilotInCommand, limitations, waiver)` for `new OperatingLimitationsFinding(person, limitations, waiver)`); this test went red -- `Failed!  - Failed:     1, Passed:     1, Skipped:     0, Total:     2` on both net8.0 and net10.0, exactly the case asking about the person manipulating the flight controls, the remote pilot in command's staying green because that is the one the mutation substitutes."
+      },
+      {
+        "test": "OperatingLimitationsEntryPointTests.Both_persons_are_every_person_the_introductory_text_names",
+        "mutation": "BoundPerson.PersonManipulatingTheFlightControls dropped the words the introductory text prints (`new(\"the person manipulating the flight controls\")` for `new(\"the person manipulating the flight controls of the small unmanned aircraft system\")`); this test went red -- `Failed!  - Failed:     1, Passed:     0, Skipped:     0, Total:     1` on both net8.0 and net10.0."
+      },
+      {
+        "test": "OperatingLimitationsEntryPointTests.While_a_waiver_of_107_51_is_stated_in_force_it_declines_OutsideCurrentScope_citing_107_205_naming_this_entry",
+        "mutation": "Compliance.CompliedWith skipped its own gate check (`is { } suspended && suspended.Reason == UnresolvedReason.UnsupportedRule`, never true, for `is { } suspended`), so the answer to a stated waiver came from the first constituent asked instead: the decline cited speed-within-limit's § 107.51(a) rather than waivable-regulations' § 107.205, and was RequiresInterpretation rather than OutsideCurrentScope; this test went red -- `Failed!  - Failed:     1, Passed:     0, Skipped:     0, Total:     1` on both net8.0 and net10.0, on `Assert.Equal() Failure: Strings differ / Expected: \"§ 107.205\" / Actual: \"§ 107.51(a)\"`."
+      },
+      {
+        "test": "OperatingLimitationsEntryPointTests.Stated_that_no_waiver_is_in_force_the_rule_is_evaluated_and_the_statement_recorded",
+        "mutation": "Compliance.CompliedWith recorded a statement of the engine's own rather than the caller's (`WaiverStatement.NoneHeld(Regulation, \"the engine\")` for `waiver` in the finding it constructs), so the outcome no longer carried who is answerable for saying no waiver is held; this test went red -- `Failed!  - Failed:     1, Passed:     0, Skipped:     0, Total:     1` on both net8.0 and net10.0."
+      },
+      {
+        "test": "OperatingLimitationsEntryPointTests.A_waiver_statement_about_another_regulation_is_refused",
+        "mutation": "Compliance.CompliedWith compared the statement's regulation with itself (`waiver.Regulation` for `Regulation` in the call to Waivers.Suspension), so a statement about § 107.37(a) was accepted as a statement about § 107.51 and the entry answered instead of refusing; this test went red -- `Failed!  - Failed:     1, Passed:     0, Skipped:     0, Total:     1` on both net8.0 and net10.0."
+      },
+      {
+        "test": "OperatingLimitationsEntryPointTests.Without_the_facts_the_limitations_are_tested_against_it_refuses_rather_than_assume_them",
+        "mutation": "Handlers.OperatingLimitations invented the person when it was not given (`request.Person ?? BoundPerson.RemotePilotInCommand` for `Demand(request.Person, ...)`), so a request that named nobody was answered as though it had named the remote pilot in command; this test went red -- `Failed!  - Failed:     1, Passed:     0, Skipped:     0, Total:     1` on both net8.0 and net10.0. It went red too with the distance below the cloud defaulted to zero (`request.FeetBelowCloud ?? 0m` for its Demand) -- `Failed!  - Failed:     1, Passed:     0, Skipped:     0, Total:     1` on both net8.0 and net10.0: every input is checked in this one test, so a default on any of the eight turns it red."
+      },
+      {
+        "test": "OperatingLimitationsEntryPointTests.The_dictionary_dispatch_refuses_rather_than_answering_from_defaults",
+        "mutation": "Handlers.OperatingLimitations defaulted all eight inputs at once (`request.Person ?? BoundPerson.RemotePilotInCommand`, `request.Groundspeed ?? Groundspeed.InKnots(0m)`, `request.AltitudeAboveGroundLevelFeet ?? 0m`, `request.Structure ?? StructureStatement.NoneWithinRadius(\"the engine\")`, `request.FlightVisibilityStatuteMiles ?? 0m`, `request.FeetBelowCloud ?? 0m`, `request.FeetHorizontallyFromCloud ?? 0m` and `request.Waiver ?? WaiverStatement.NoneHeld(Compliance.Regulation, \"the engine\")` for their eight `Demand(...)` calls), so `Registry.Resolve(\"operating-limitations\", RuleRequest.Empty)` -- which builds a request with every input at its default -- resolved that the operating limitations are not complied with, from an operation nobody described, instead of refusing; this test went red -- `Failed!  - Failed:     1, Passed:     0, Skipped:     0, Total:     1` on both net8.0 and net10.0 on `Assert.Throws() Failure: No exception was thrown`. The whole set is the mutation: the dictionary dispatch cannot carry typed inputs, and nothing but the handler's Demands stands between it and an invented answer."
+      }
+    ]
   }
 }

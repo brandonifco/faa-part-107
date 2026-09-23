@@ -1,0 +1,78 @@
+using RulesKernel.Resolution;
+
+namespace FaaPart107.Requests
+{
+    /// <summary>The inputs <c>operating-limitations</c>'s rule reads.</summary>
+    /// <remarks>
+    /// <para>
+    /// Which of the two people § 107.51's introductory text names is asking, the waiver statement,
+    /// and the facts each constituent limitation is tested against — the same facts those entries'
+    /// own requests declare, stated once here because this entry asks all three of them about one
+    /// operation. Nothing here is a verdict: a caller does not tell this entry whether a limitation
+    /// is met, and this entry does not take it when offered.
+    /// </para>
+    /// <para>
+    /// Every input is demanded and none is defaulted. An operation the caller has not described is
+    /// not an operation that complies (rules-factory decision 0021, and <c>docs/decisions/0001</c>).
+    /// </para>
+    /// </remarks>
+    public sealed partial class OperatingLimitationsRequest
+    {
+        /// <summary>
+        /// Which of the two people § 107.51's introductory text binds the caller is asking about, as
+        /// the caller states it. Required, and never inferred.
+        /// </summary>
+        public BoundPerson? Person { get; init; }
+
+        /// <summary>The small unmanned aircraft's groundspeed, for § 107.51(a). Required.</summary>
+        public Groundspeed? Groundspeed { get; init; }
+
+        /// <summary>The small unmanned aircraft's altitude, in feet above ground level, for § 107.51(b). Required.</summary>
+        public decimal? AltitudeAboveGroundLevelFeet { get; init; }
+
+        /// <summary>
+        /// What the caller states about the structure § 107.51(b)'s exception is claimed under.
+        /// Required: the engine does not assume there is no structure, and does not infer one.
+        /// </summary>
+        public StructureStatement? Structure { get; init; }
+
+        /// <summary>
+        /// The flight visibility observed from the location of the control station, in statute
+        /// miles, as the caller states it, for § 107.51(c). Required, and not negative.
+        /// </summary>
+        public decimal? FlightVisibilityStatuteMiles { get; init; }
+
+        /// <summary>
+        /// How far below the cloud the small unmanned aircraft is, in feet, as the caller states it,
+        /// for § 107.51(d)(1). Required, and not negative.
+        /// </summary>
+        public decimal? FeetBelowCloud { get; init; }
+
+        /// <summary>
+        /// How far horizontally from the cloud the small unmanned aircraft is, in feet, as the
+        /// caller states it, for § 107.51(d)(2). Required, and not negative.
+        /// </summary>
+        public decimal? FeetHorizontallyFromCloud { get; init; }
+
+        /// <summary>Whether a certificate of waiver authorizing deviation from § 107.51 is in force, as the caller states it. Required.</summary>
+        public WaiverStatement? Waiver { get; init; }
+    }
+}
+
+namespace FaaPart107
+{
+    internal static partial class Handlers
+    {
+        /// <summary><c>operating-limitations</c>: <see cref="Compliance.CompliedWith"/>, the finding, or the rule's decline.</summary>
+        internal static partial Resolution<object> OperatingLimitations(Requests.OperatingLimitationsRequest request) =>
+            Answer(Compliance.CompliedWith(
+                Demand(request.Person, request.EntryId, nameof(request.Person)),
+                Demand(request.Groundspeed, request.EntryId, nameof(request.Groundspeed)),
+                Demand(request.AltitudeAboveGroundLevelFeet, request.EntryId, nameof(request.AltitudeAboveGroundLevelFeet)),
+                Demand(request.Structure, request.EntryId, nameof(request.Structure)),
+                Demand(request.FlightVisibilityStatuteMiles, request.EntryId, nameof(request.FlightVisibilityStatuteMiles)),
+                Demand(request.FeetBelowCloud, request.EntryId, nameof(request.FeetBelowCloud)),
+                Demand(request.FeetHorizontallyFromCloud, request.EntryId, nameof(request.FeetHorizontallyFromCloud)),
+                Demand(request.Waiver, request.EntryId, nameof(request.Waiver))));
+    }
+}
