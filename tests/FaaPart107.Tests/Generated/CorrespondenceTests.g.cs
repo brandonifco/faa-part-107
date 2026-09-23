@@ -270,8 +270,8 @@ public sealed class CorrespondenceTests
     }
 
     [Fact]
-    public void over_human_beings__declines_UnsupportedRule_row_2() =>
-        AssertDeclines("over-human-beings", UnresolvedReason.UnsupportedRule, EntryPoints.OverHumanBeings.Resolve(global::FaaPart107.Requests.OverHumanBeingsRequest.Empty), new SourceLocator("cfr-14-107", "§ 107.39"));
+    public void over_human_beings__is_implemented_so_a_hand_written_handler_answers_it() =>
+        Assert.True(Registry.HasImplementation("over-human-beings"), "over-human-beings is implemented in the overlay and has no [Implements] handler");
 
     [Fact]
     public void direct_participation__is_implemented_so_a_hand_written_handler_answers_it() =>
