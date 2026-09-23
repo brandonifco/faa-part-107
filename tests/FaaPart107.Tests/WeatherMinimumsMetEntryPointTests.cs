@@ -16,10 +16,11 @@ namespace FaaPart107.Tests;
 /// <para>
 /// The entry resolves exactly one outcome, the minimums not met, and only where neither cloud
 /// minimum is met — § 107.51(d) is then broken on either reading of how its two figures combine,
-/// so the conjunction is false whatever the visibility is. Everywhere else § 107.51(c) is reached
-/// and the answer turns on which objects are "prominent", which <c>prominent-objects</c> holds
-/// open, so the engine declines rather than reading the caller's stated figure as the section's
-/// defined flight visibility. The tests below pin both halves of that, and the figures compared
+/// so the conjunction is false whatever the visibility is. Everywhere else a cloud is named,
+/// § 107.51(c) is reached and the answer turns on which objects are "prominent", which
+/// <c>prominent-objects</c> holds open, so the engine declines rather than reading the caller's
+/// stated figure as the section's defined flight visibility. The tests below pin both halves of
+/// that, and the figures compared
 /// against are never written here as literals expected to come from the entry: they are
 /// <c>visibility-minimum</c>'s and <c>cloud-clearance</c>'s, resolved through their own entry
 /// points.
@@ -172,24 +173,30 @@ public class WeatherMinimumsMetEntryPointTests
         Assert.Contains("one of § 107.51(d)'s two minimums and not the other", unresolved.Attempted, StringComparison.Ordinal);
     }
 
-    public static TheoryData<decimal, decimal, decimal> EverySituation => new()
+    /// <summary>
+    /// Every situation the entry answers differently when no waiver is in force — each cloud
+    /// statement it can be given, and the visibility at and away from the figure — so that the gate
+    /// is shown to run before any of them. The last row is the one <see cref="CloudStatement.NoCloud"/>
+    /// added: the gate has to be reached before the no-cloud branch as much as before the others.
+    /// </summary>
+    public static TheoryData<decimal, CloudStatement> EverySituation => new()
     {
-        { 10m, 0m, 0m },
-        { 10m, 500m, 1999.99m },
-        { 10m, 1000m, 5000m },
-        { 0m, 1000m, 5000m },
+        { 10m, CloudStatement.Measured(0m, 0m, Caller) },
+        { 10m, CloudStatement.Measured(500m, 1999.99m, Caller) },
+        { 10m, CloudStatement.Measured(1000m, 5000m, Caller) },
+        { 0m, CloudStatement.Measured(1000m, 5000m, Caller) },
+        { 10m, CloudStatement.NoCloud(Caller) },
     };
 
     [Theory]
     [MemberData(nameof(EverySituation))]
     public void While_a_waiver_of_107_51_is_stated_in_force_it_declines_OutsideCurrentScope_citing_107_205_and_records_the_statement(
         decimal visibility,
-        decimal below,
-        decimal horizontal)
+        CloudStatement cloud)
     {
         var waiver = WaiverStatement.Held("§ 107.51", Caller);
 
-        var unresolved = Declined(Resolve(visibility, below, horizontal, waiver));
+        var unresolved = Declined(Resolve(visibility, cloud, waiver));
 
         Assert.Equal(UnresolvedReason.OutsideCurrentScope, unresolved.Reason);
         Assert.Equal("cfr-14-107", unresolved.Locator.SourceId);
@@ -197,6 +204,11 @@ public class WeatherMinimumsMetEntryPointTests
         Assert.Equal(EntryPoints.WaivableRegulations.Registered.Locator, unresolved.Locator);
         Assert.Contains("weather-minimums-met", unresolved.Attempted, StringComparison.Ordinal);
         Assert.Contains($"in force, as stated by {Caller}", unresolved.Attempted, StringComparison.Ordinal);
+
+        // The gate is the whole of the answer and the rule was never applied: a statement naming no
+        // cloud gets this decline too, not the no-cloud branch's, because the gate runs first.
+        Assert.DoesNotContain("has no measured distance on this operation", unresolved.Attempted, StringComparison.Ordinal);
+        Assert.DoesNotContain("prominent-objects", unresolved.Attempted, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -279,6 +291,14 @@ public class WeatherMinimumsMetEntryPointTests
             StringComparison.Ordinal);
         Assert.Contains("prominent-objects", unresolved.Attempted, StringComparison.Ordinal);
         Assert.Contains("\"prominent\"", unresolved.Attempted, StringComparison.Ordinal);
+
+        // And it claims no more than that. Undecided what § 107.51(d) requires here is not
+        // § 107.51(d) satisfied, so the decline does not say the outcome turns on § 107.51(c):
+        // it says § 107.51(d) settles nothing here, and that § 107.51(c) would be undetermined
+        // whatever § 107.51(d) came to.
+        Assert.Contains("§ 107.51(d) does not settle the outcome here", unresolved.Attempted, StringComparison.Ordinal);
+        Assert.Contains("§ 107.51(c) is undetermined in any event", unresolved.Attempted, StringComparison.Ordinal);
+        Assert.DoesNotContain("the outcome turns on", unresolved.Attempted, StringComparison.Ordinal);
 
         // cloud-clearance's open question is how § 107.51(d)'s two figures combine. Nothing was
         // measured for them to combine over, so it is not what blocks this answer and is not named.

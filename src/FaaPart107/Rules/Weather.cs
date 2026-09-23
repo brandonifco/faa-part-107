@@ -16,8 +16,9 @@ namespace FaaPart107;
 /// reading settles it, whatever the other is. Neither cloud minimum met is that case: read
 /// literally both must hold, read as a region around the cloud either suffices, and neither holds,
 /// so <c>cloud-clearance</c>'s open question does not have to be answered to know § 107.51(d) is
-/// not met. Every other situation reaches § 107.51(c), whose quantity <c>prominent-objects</c>
-/// holds open, and <see cref="Weather.MinimumsMet"/> declines instead of constructing this.
+/// not met. Every other situation leaves the conjunction undetermined — § 107.51(c)'s quantity is
+/// held open by <c>prominent-objects</c>, and a statement naming no cloud leaves § 107.51(d)
+/// unsettled besides — and <see cref="Weather.MinimumsMet"/> declines instead of constructing this.
 /// </remarks>
 /// <param name="FlightVisibilityStatuteMiles">The flight visibility the caller stated, in statute miles, recorded with the outcome.</param>
 /// <param name="BelowCloudMinimumMet">
@@ -98,8 +99,9 @@ public sealed record WeatherMinimumsFinding(
 /// whole of it. Neither cloud minimum met is exactly that, and the entry resolves it — which is why
 /// the map split <c>prominent-objects</c> out instead of reclassifying this entry, "classifying the
 /// whole entry by one of its clauses would have thrown away the 500-foot and 2,000-foot figures".
-/// Everywhere else § 107.51(c) is reached and the answer is undetermined, so the decline cites
-/// <c>prominent-objects</c>' § 107.51(c) and names the term the corpus leaves undefined.
+/// Everywhere else a cloud is named, § 107.51(c) is reached and the answer is undetermined, so the
+/// decline cites <c>prominent-objects</c>' § 107.51(c) and names the term the corpus leaves
+/// undefined.
 /// </para>
 /// <para>
 /// <b>The cloud is a <see cref="CloudStatement"/>, and no cloud is a case the caller states.</b>
@@ -130,8 +132,8 @@ public static class Weather
     /// Resolves only where the caller's statement names a cloud and neither cloud minimum is met:
     /// § 107.51(d) is then broken on either reading of how its two figures combine, so the
     /// conjunction is false whatever the flight visibility is, and § 107.51(c) is never reached.
-    /// Every other situation reaches § 107.51(c) and declines, including one whose stated
-    /// visibility is far above or far below the figure: the stated distance is not § 107.51(c)'s
+    /// Every other statement that names a cloud reaches § 107.51(c) and declines, including one
+    /// whose stated visibility is far above or far below the figure: the stated distance is not § 107.51(c)'s
     /// flight visibility until "prominent" is fixed, and this engine does not fix it. Where the
     /// cloud half is itself undetermined — one minimum met and not the other — the decline names
     /// <c>cloud-clearance</c>'s question as well.
@@ -143,8 +145,10 @@ public static class Weather
     /// is what a stated zero is, and what an operation in clear air had no other way to say — and it
     /// does not read it as § 107.51(d) met either, because what that paragraph requires of an
     /// operation with no cloud is not something the map settles and not this engine's to decide
-    /// (<c>AGENTS.md</c> §6). Declining is the whole of the answer, and the outcome still turns on
-    /// § 107.51(c), whose quantity <c>prominent-objects</c> holds open.
+    /// (<c>AGENTS.md</c> §6). Declining is the whole of the answer: § 107.51(d) settles the
+    /// conjunction neither way here, and § 107.51(c) is undetermined in any event, its quantity
+    /// held open by <c>prominent-objects</c>. The outcome is not said to turn on § 107.51(c)
+    /// alone, which would presume of § 107.51(d) the very thing this entry declines to decide.
     /// </para>
     /// </remarks>
     /// <param name="flightVisibilityStatuteMiles">The flight visibility the caller states, observed from the location of the control station, in statute miles, not negative.</param>
@@ -202,14 +206,24 @@ public static class Weather
 
     /// <summary>
     /// The decline for an operation the caller states is not near a cloud: § 107.51(d) has no
-    /// measured distance to reach, this engine does not decide what the paragraph then requires,
-    /// and § 107.51(c) is reached with its quantity still open.
+    /// measured distance to reach and this engine does not decide what the paragraph then requires,
+    /// so nothing there settles the outcome; and § 107.51(c) is undetermined in any event, its
+    /// quantity still open.
     /// </summary>
     /// <remarks>
+    /// <para>
+    /// The two halves are stated separately because neither carries the other. § 107.51(d) is not
+    /// said to be met and is not said to be broken, so it settles nothing here — and that is
+    /// exactly why § 107.51(c) has to be spoken to on its own: were the conjunction's cloud half
+    /// merely left to one side, the outcome would look as though it turned on § 107.51(c) alone,
+    /// which is more than this engine knows.
+    /// </para>
+    /// <para>
     /// <c>cloud-clearance</c>'s question is not named here, and deliberately: what that entry holds
     /// open is how § 107.51(d)'s two figures combine, and no measurement has been offered for
-    /// either of them to combine over. What blocks the answer is § 107.51(c)'s, which is what this
-    /// decline cites.
+    /// either of them to combine over. The question this decline cites is § 107.51(c)'s, which is
+    /// open on this operation as on any other.
+    /// </para>
     /// </remarks>
     private static UnresolvedResult NoCloudToMeasureFrom(
         decimal flightVisibilityStatuteMiles,
@@ -222,8 +236,9 @@ public static class Weather
                 $"decide whether the map entry '{MapEntries.WeatherMinimumsMet.Id}' is met on a stated flight "
                 + $"visibility of {flightVisibilityStatuteMiles} statute miles: {cloud}, so § 107.51(d)'s \"minimum "
                 + $"distance of the small unmanned aircraft from clouds\" has no measured distance on this operation "
-                + $"and this engine does not decide what that paragraph requires of one; the outcome turns on "
-                + $"§ 107.51(c), which requires no less than {minimum.StatuteMiles} statute miles of the flight "
+                + $"and this engine does not decide what that paragraph requires of one, so § 107.51(d) does not "
+                + $"settle the outcome here; and § 107.51(c) is undetermined in any event, because it requires no "
+                + $"less than {minimum.StatuteMiles} statute miles of the flight "
                 + $"visibility it defines, and the map entry '{MapEntries.ProminentObjects.Id}' holds open which "
                 + $"objects are \"prominent\" — the degree that fixes the distance the definition reports — so the "
                 + $"stated figure is not yet that quantity"),
