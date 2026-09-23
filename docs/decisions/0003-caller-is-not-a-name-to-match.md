@@ -6,7 +6,7 @@
 
 Ten entries in `RulesFactory.Maps.FaaPart107` 4.0.0 are `kind: assertion`, and every one carries
 `assertedBy`: the list of who the corpus says supplies or decides the fact, in the corpus's own
-words. Seven of those lists are people — `remote pilot in command` on six, and the three named
+words. Seven of those lists are people — `remote pilot in command` on five, and the three named
 persons on § 107.31(a) and § 107.33(c). Three are the single value `caller`:
 
 | entry | locator |
@@ -47,6 +47,13 @@ entries by id:
 > | `faa-part-107` (2026) | 10 assertions | `remote pilot in command` ×6 (4 anchored in § 107.49's
 > quoted lead-in), the three named persons on § 107.31(a) and § 107.33(c), `caller` on
 > `collision-hazard-proximity`, `reasonable-protection`, `flash-rate-sufficient` |
+
+That table says `×6` where this map has **five** entries whose `assertedBy` is exactly
+`["remote pilot in command"]` — § 107.29(a)(2) and (b), and § 107.49(a), (b), (d) and (e). The
+quotation above is left as 0025 wrote it, because correcting somebody else's record inside a
+quotation of it is how a miscount becomes untraceable. The count is upstream's to fix, and nothing
+here or in the engine reads it: `Assertions.Stated` reads `entry.AssertedBy` on the entry in hand
+and counts nothing.
 
 Each of the three entries' notes ends by citing it — this engine's own `collision-hazard-proximity`
 note says *"so assertedBy is the caller (0025)"* — so the map is pointing at 0025, not at a reading
