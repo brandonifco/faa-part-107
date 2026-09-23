@@ -175,8 +175,7 @@ public static class OperationEvaluator
             new Requests.WeatherMinimumsMetRequest(facts.Assertions)
             {
                 FlightVisibilityStatuteMiles = facts.FlightVisibilityStatuteMiles,
-                FeetBelowCloud = facts.FeetBelowCloud,
-                FeetHorizontallyFromCloud = facts.FeetHorizontallyFromCloud,
+                Cloud = facts.Cloud,
                 Waiver = facts.WaiverOf(Weather.Regulation),
             }),
         "operating-limitations" => facts => EntryPoints.OperatingLimitations.Resolve(
@@ -187,8 +186,7 @@ public static class OperationEvaluator
                 AltitudeAboveGroundLevelFeet = facts.AltitudeAboveGroundLevelFeet,
                 Structure = facts.Structure,
                 FlightVisibilityStatuteMiles = facts.FlightVisibilityStatuteMiles,
-                FeetBelowCloud = facts.FeetBelowCloud,
-                FeetHorizontallyFromCloud = facts.FeetHorizontallyFromCloud,
+                Cloud = facts.Cloud,
                 Waiver = facts.WaiverOf(Compliance.Regulation),
             }),
         "preflight-actions" => facts => EntryPoints.PreflightActions.Resolve(

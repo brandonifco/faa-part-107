@@ -55,6 +55,7 @@ public class OperatingLimitationsEntryPointTests
         decimal horizontal = 5000m,
         BoundPerson? person = null,
         StructureStatement? structure = null,
+        CloudStatement? cloud = null,
         WaiverStatement? waiver = null) =>
         EntryPoints.OperatingLimitations.Resolve(new OperatingLimitationsRequest
         {
@@ -63,8 +64,7 @@ public class OperatingLimitationsEntryPointTests
             AltitudeAboveGroundLevelFeet = altitudeFeet,
             Structure = structure ?? NoStructure,
             FlightVisibilityStatuteMiles = visibility,
-            FeetBelowCloud = below,
-            FeetHorizontallyFromCloud = horizontal,
+            Cloud = cloud ?? CloudStatement.Measured(below, horizontal, Caller),
             Waiver = waiver ?? NoWaiver,
         });
 
@@ -78,8 +78,7 @@ public class OperatingLimitationsEntryPointTests
         bool altitude = true,
         bool structure = true,
         bool visibility = true,
-        bool below = true,
-        bool horizontal = true,
+        bool cloud = true,
         bool waiver = true) =>
         new()
         {
@@ -88,8 +87,7 @@ public class OperatingLimitationsEntryPointTests
             AltitudeAboveGroundLevelFeet = altitude ? 200m : null,
             Structure = structure ? NoStructure : null,
             FlightVisibilityStatuteMiles = visibility ? 10m : null,
-            FeetBelowCloud = below ? 1000m : null,
-            FeetHorizontallyFromCloud = horizontal ? 5000m : null,
+            Cloud = cloud ? CloudStatement.Measured(1000m, 5000m, Caller) : null,
             Waiver = waiver ? NoWaiver : null,
         };
 
@@ -211,8 +209,7 @@ public class OperatingLimitationsEntryPointTests
         var constituent = Declined(EntryPoints.WeatherMinimumsMet.Resolve(new WeatherMinimumsMetRequest
         {
             FlightVisibilityStatuteMiles = 10m,
-            FeetBelowCloud = 1000m,
-            FeetHorizontallyFromCloud = 5000m,
+            Cloud = CloudStatement.Measured(1000m, 5000m, Caller),
             Waiver = NoWaiver,
         }));
 
@@ -231,6 +228,61 @@ public class OperatingLimitationsEntryPointTests
         Assert.NotEqual(constituent.Locator, mine.Locator);
         Assert.Equal(EntryPoints.ProminentObjects.Registered.Locator, constituent.Locator);
         Assert.Equal(EntryPoints.WeatherMinimumsMet.Registered.Locator, mine.Locator);
+    }
+
+    /// <summary>
+    /// The operation issue #79 names: a remote pilot in command, 50 knots, 200 feet above ground
+    /// level, no structure claimed, 10 statute miles of stated visibility, no waiver — and clear
+    /// air. Put to the constituent and to this entry, and answered the same way by both.
+    /// </summary>
+    /// <remarks>
+    /// This is where the defect surfaced. With two bare distances the only thing such a caller
+    /// could state was zero feet below and zero feet horizontally from a cloud, which is the
+    /// aircraft at the cloud: <c>weather-minimums-met</c> resolved the minimums not met, and this
+    /// entry resolved that § 107.51 was not complied with, on the most ordinary weather there is.
+    /// Both now decline, and the decline is the honest answer — § 107.51(d) has no measured
+    /// distance and § 107.51(c)'s quantity is <c>prominent-objects</c>', which the map holds open.
+    /// </remarks>
+    [Fact]
+    public void An_ordinary_clear_air_operation_is_not_reported_as_breaking_the_operating_limitations()
+    {
+        var clearAir = CloudStatement.NoCloud(Caller);
+
+        // The constituent, asked directly.
+        var weather = Declined(EntryPoints.WeatherMinimumsMet.Resolve(new WeatherMinimumsMetRequest
+        {
+            FlightVisibilityStatuteMiles = 10m,
+            Cloud = clearAir,
+            Waiver = NoWaiver,
+        }));
+
+        Assert.Equal(UnresolvedReason.RequiresInterpretation, weather.Reason);
+        Assert.Equal(EntryPoints.ProminentObjects.Registered.Locator, weather.Locator);
+        Assert.Contains("not operated near a cloud", weather.Attempted, StringComparison.Ordinal);
+
+        // And this entry, on the same operation: undetermined, not "not complied with".
+        var limitations = Declined(Resolve(cloud: clearAir));
+
+        Assert.Equal(UnresolvedReason.RequiresInterpretation, limitations.Reason);
+        Assert.Equal(EntryPoints.WeatherMinimumsMet.Registered.Locator, limitations.Locator);
+        Assert.Contains("operating-limitations", limitations.Attempted, StringComparison.Ordinal);
+        Assert.Contains("weather-minimums-met", limitations.Attempted, StringComparison.Ordinal);
+        Assert.Contains(
+            "no limitation this engine resolved is broken",
+            limitations.Attempted,
+            StringComparison.Ordinal);
+
+        // § 107.51(a) and (b) are answered on this operation and neither is broken, so neither is
+        // named among the entries that did not resolve.
+        Assert.DoesNotContain("speed-within-limit", limitations.Attempted, StringComparison.Ordinal);
+        Assert.DoesNotContain("altitude-within-limit", limitations.Attempted, StringComparison.Ordinal);
+
+        // The same operation stated as a measured zero is a different operation — the aircraft at
+        // the cloud — and that one still resolves, not complied with. Clear air is no longer it.
+        var atTheCloud = Finding(Resolve(cloud: CloudStatement.Measured(0m, 0m, Caller)));
+
+        Assert.False(atTheCloud.CompliedWith);
+        Assert.False(Limitation(atTheCloud, "weather-minimums-met").Met);
     }
 
     [Theory]
@@ -326,8 +378,7 @@ public class OperatingLimitationsEntryPointTests
                 (nameof(OperatingLimitationsRequest.AltitudeAboveGroundLevelFeet), Incomplete(altitude: false)),
                 (nameof(OperatingLimitationsRequest.Structure), Incomplete(structure: false)),
                 (nameof(OperatingLimitationsRequest.FlightVisibilityStatuteMiles), Incomplete(visibility: false)),
-                (nameof(OperatingLimitationsRequest.FeetBelowCloud), Incomplete(below: false)),
-                (nameof(OperatingLimitationsRequest.FeetHorizontallyFromCloud), Incomplete(horizontal: false)),
+                (nameof(OperatingLimitationsRequest.Cloud), Incomplete(cloud: false)),
                 (nameof(OperatingLimitationsRequest.Waiver), Incomplete(waiver: false)),
             },
             missing => Assert.Equal(

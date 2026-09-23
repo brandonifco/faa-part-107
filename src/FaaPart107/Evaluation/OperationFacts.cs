@@ -80,16 +80,17 @@ public sealed record OperationFacts
     public decimal? FlightVisibilityStatuteMiles { get; init; }
 
     /// <summary>
-    /// How far below the cloud the small unmanned aircraft is, in feet
-    /// (<c>weather-minimums-met</c>, § 107.51(c)-(d)).
+    /// What the caller states about the cloud § 107.51(d)'s two minimums are distances from — how
+    /// far below it and how far horizontally from it the small unmanned aircraft is, or that the
+    /// aircraft is not operated near a cloud at all (<c>weather-minimums-met</c>, § 107.51(c)-(d)).
+    /// Never inferred: the engine does not invent a cloud, and does not assume there is none.
     /// </summary>
-    public decimal? FeetBelowCloud { get; init; }
-
-    /// <summary>
-    /// How far horizontally from the cloud the small unmanned aircraft is, in feet
-    /// (<c>weather-minimums-met</c>, § 107.51(c)-(d)).
-    /// </summary>
-    public decimal? FeetHorizontallyFromCloud { get; init; }
+    /// <remarks>
+    /// The two distances are not two properties here, and cannot be: two bare figures leave a
+    /// caller in clear air only zero to state, and zero feet below a cloud is the closest an
+    /// aircraft can be to one. <see cref="CloudStatement.NoCloud"/> is the other case, stated.
+    /// </remarks>
+    public CloudStatement? Cloud { get; init; }
 
     /// <summary>
     /// Which of the two people § 107.51's introductory text binds the caller is asking about

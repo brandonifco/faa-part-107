@@ -64,8 +64,7 @@ public class OperationEvaluatorTests
         AltitudeAboveGroundLevelFeet = 300m,
         Structure = StructureStatement.NoneWithinRadius(Caller),
         FlightVisibilityStatuteMiles = 5m,
-        FeetBelowCloud = 100m,
-        FeetHorizontallyFromCloud = 100m,
+        Cloud = CloudStatement.Measured(100m, 100m, Caller),
         BoundPerson = BoundPerson.RemotePilotInCommand,
         Lighting = LightingStatement.LightedAndVisibleFor(5m, Caller),
         VisualObserverUse = VisualObserverUse.NotUsed,
@@ -860,10 +859,14 @@ public class OperationEvaluatorTests
     [Fact]
     public void A_value_a_rule_refuses_is_a_fault_and_is_not_dressed_as_a_fact_the_caller_owes()
     {
-        // § 107.51(d)'s rule refuses a negative distance with ArgumentOutOfRangeException. That is
-        // a malformed value, not an input the caller failed to supply, and reporting it as
+        // § 107.51(c)'s rule refuses a negative flight visibility with ArgumentOutOfRangeException.
+        // That is a malformed value, not an input the caller failed to supply, and reporting it as
         // FactRequired would tell a product to go and ask somebody for something it already has.
-        var facts = Complete() with { FeetBelowCloud = -1m };
+        //
+        // The cloud distances cannot reach the evaluator malformed at all: they are carried by a
+        // CloudStatement, which refuses a negative distance when the statement is made. Same
+        // policy, one step earlier.
+        var facts = Complete() with { FlightVisibilityStatuteMiles = -1m };
 
         Assert.Throws<ArgumentOutOfRangeException>(() => OperationEvaluator.Evaluate(facts));
 
