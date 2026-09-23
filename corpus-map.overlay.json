@@ -620,5 +620,30 @@
         "mutation": "Communication.Effective compared the statement's regulation with itself (`waiver.Regulation` for `Regulation` in the call to Waivers.Suspension), so a waiver of § 107.31 suspended § 107.33(a); this test went red with `Assert.Throws() Failure: No exception was thrown`."
       }
     ]
+  },
+  "attached-object-secure": {
+    "status": "implemented",
+    "implementedIn": {
+      "ruleset": "faa-part-107",
+      "version": 1
+    },
+    "tests": [
+      {
+        "test": "AttachedObjectSecureEntryPointTests.Resolving_it_declines_RequiresInterpretation_citing_107_49_e",
+        "mutation": "AttachedObject.Secure cited sufficient-available-power's `§ 107.49(d)` (`MapEntries.SufficientAvailablePower.Locator` for `MapEntries.AttachedObjectSecure.Locator`), so the decline named the wrong constituent of § 107.49; this test went red (`Failed! - Failed: 1, Passed: 0, Skipped: 0, Total: 1`, `Assert.Equal() Failure: Strings differ`). It went red too with the reason wrong (`UnresolvedReason.UnsupportedRule` for `UnresolvedReason.RequiresInterpretation`, `Assert.Equal() Failure: Values differ`), and with Handlers.AttachedObjectSecure answering the open question instead of declining (`Resolution<object>.FromValue(true)` for `AttachedObject.Secure()`, `Assert.IsType() Failure: Value is not the exact type`)."
+      },
+      {
+        "test": "AttachedObjectSecureEntryPointTests.The_decline_is_the_rules_own_and_names_the_term_the_corpus_leaves_undefined",
+        "mutation": "AttachedObject.Secure declined with the correspondence row's bare wording, naming no reason (`$\"resolve the map entry '{MapEntries.AttachedObjectSecure.Id}'\"` for the message naming \"secure\" as undefined), so the decline cited where without saying why; this test went red (`Failed! - Failed: 1, Passed: 0, Skipped: 0, Total: 1`, `Assert.Contains() Failure: Sub-string not found`). It went red too with Handlers.AttachedObjectSecure answering the open question instead of delegating to the rule (`Resolution<object>.FromValue(true)` for `AttachedObject.Secure()`, `Assert.IsType() Failure: Value is not the exact type`), which broke the assertion that the entry point's resolution is exactly `AttachedObject.Secure()`."
+      },
+      {
+        "test": "AttachedObjectSecureEntryPointTests.The_decline_names_this_constituent_though_107_49_e_is_one_sentence_under_two_ids",
+        "mutation": "AttachedObject.Secure named the second conjunct's entry (`MapEntries.AttachedObjectNoAdverseEffect.Id` for `MapEntries.AttachedObjectSecure.Id`), so the decline claimed to be about attached-object-no-adverse-effect — which the shared locator `§ 107.49(e)` cannot contradict; this test went red (`Failed! - Failed: 1, Passed: 0, Skipped: 0, Total: 1`, `Assert.Contains() Failure: Sub-string not found`). It went red too with AttachedObject.Secure citing participant-briefing's `§ 107.49(b)` (`MapEntries.ParticipantBriefing.Locator` for `MapEntries.AttachedObjectSecure.Locator`, `Assert.Equal() Failure: Values differ`), so the assertion that the cited locator is § 107.49(e) — the one both ids share — is load-bearing too."
+      },
+      {
+        "test": "AttachedObjectSecureEntryPointTests.The_dictionary_dispatch_declines_the_same_way",
+        "mutation": "Handlers.AttachedObjectSecure answered the open question instead of declining (`Resolution<object>.FromValue(true)` for `AttachedObject.Secure()`), so the dictionary dispatch resolved to a value; this test went red (`Failed! - Failed: 1, Passed: 0, Skipped: 0, Total: 1`, `Assert.IsType() Failure: Value is not the exact type`). It went red too with the reason wrong (`UnresolvedReason.UnsupportedRule` for `UnresolvedReason.RequiresInterpretation`, `Assert.Equal() Failure: Values differ`), and with AttachedObject.Secure citing sufficient-available-power's `§ 107.49(d)` (`MapEntries.SufficientAvailablePower.Locator` for `MapEntries.AttachedObjectSecure.Locator`, `Assert.Equal() Failure: Strings differ`)."
+      }
+    ]
   }
 }

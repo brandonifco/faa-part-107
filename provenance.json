@@ -215,91 +215,87 @@
     },
     {
       "path": "backlog/001-weather-minimums-met.md",
-      "sha256": "1ab41a68319bd647a556082fba960efd2628c096de956b683a1f096503e0661b"
+      "sha256": "ccb0636020ce5a5b5c7d2c779896586541ed83564f4ade4ee0404f7d9f19423d"
     },
     {
       "path": "backlog/002-operating-limitations.md",
-      "sha256": "cc7debc891bdd322d2757addf42594dee888acd36f9d0cbca9f63581f19b5dab"
+      "sha256": "f8d21be4bf3d60b848a0e27b4bc76266e164f06941d56f07e5ea5688f501eb85"
     },
     {
       "path": "backlog/003-night-waiver-termination.md",
-      "sha256": "bc4d6929a77a49ce137477bcfb0ff0664a608c24bb623b4eef85a23894b7b024"
+      "sha256": "9be3adda9b726acba141ceaa9cc2aaa295a5e6dcd1f00c3abc97283e2ca0eb0a"
     },
     {
       "path": "backlog/004-right-of-way.md",
-      "sha256": "269b1ce74faee1344ff96f108cad8d81bcd0c42f8e1a5175d958404c43239f47"
+      "sha256": "1fab7bb16d634de3553e000ce4a6bb131923e3d20e28133b5aab2b59420f92f2"
     },
     {
       "path": "backlog/005-collision-hazard-proximity.md",
-      "sha256": "ef09114735d8abb972b3e56f023aabeb528cee7438efee59fd00472da24bb336"
+      "sha256": "9e51ce6aeeca15f02d00c2e2643f28be8fc6f147d9d5b739dd90f3833e3c3117"
     },
     {
       "path": "backlog/006-reasonable-protection.md",
-      "sha256": "c50b78d25ce2c2a4ee396c4f1c8228177139cc9af0cae18c3abd956aab2187b3"
+      "sha256": "6fbfe897f0448659291d471280f875a41b16efd64282441889eac9463f5e73c8"
     },
     {
       "path": "backlog/007-direct-participation.md",
-      "sha256": "b7422d61fce8f35ccebd443c8a4d1c388f48407ab7ff54ca3aacdb904f7866b2"
+      "sha256": "5557e38530c84dee3ae36e3e45b4510fb6e4de9a552dcadec023befa06106c36"
     },
     {
       "path": "backlog/008-over-human-beings.md",
-      "sha256": "064e179efe9794b86c522d6a62f0e304aa75803c9859bcaa8f3f70e7dd3a78ac"
+      "sha256": "2d4245c1110ee9b613eab4ffef042fba7240aefa076e637746f33e87dcf0079f"
     },
     {
       "path": "backlog/009-flash-rate-sufficient.md",
-      "sha256": "558560bb3e44d95d63d8ec789f8c496dacd63f8d78b9ab85198e0ae8bc6a1426"
+      "sha256": "ed4dc55c0ae6105d604c09957802e65bd920a010f2a26d3578ea1ffdb84850c0"
     },
     {
       "path": "backlog/010-intensity-reduction-in-interest-of-safety.md",
-      "sha256": "83f918c95c7b76abb56a98a81c5c1dda42c212682174613d55015ed6c49a5725"
+      "sha256": "7f0371f85b3923f77a6a61f15fba16633fc1eedc7a408fd0ef4543cd4d8531c2"
     },
     {
       "path": "backlog/011-anti-collision-lighting.md",
-      "sha256": "8a0ecc273188b7061f66092482fdbc3f64138301787a7884347838dad3844d5b"
+      "sha256": "cdd422bbe6562e585a1e4308c26c0394d2335cffe96581663fc0bcd805cc164e"
     },
     {
       "path": "backlog/012-civil-twilight-operation.md",
-      "sha256": "cf6ea556bce7c116f84ecb29a726f26529833158ececc1b8e803248fc3b64f6f"
+      "sha256": "0a2ebbe925547bf7c1e68f6134f6d7f32c02bdb2d51a522e43335c52df8ea1bc"
     },
     {
       "path": "backlog/013-unaided-visual-contact.md",
-      "sha256": "bcf2ccc951b45a103a4866a59c1ecadd599e45acf9b09e0dc73a7923b2d9d332"
+      "sha256": "bd4cc6cbe951d9f162a0cae9503144501ea2de7d6b532acf6e322af123793188"
     },
     {
       "path": "backlog/014-visual-line-of-sight.md",
-      "sha256": "7b70bfc1595c5058d006b619398f389abf1d5c8efc171834ee03557d4bfd7208"
+      "sha256": "59d4bd40f1bc9a73763b3d6c2bdfeb535ab163009678b9cff638f1cb6a15b1f5"
     },
     {
       "path": "backlog/015-observer-coordination.md",
-      "sha256": "28318d4bbf74b49a300800546e45646d92f7f4af2875b4b6606ea61a37325326"
+      "sha256": "cae826fdf23145fdce711dd88c0d54e45982a2be48c48d836e2fe44cf0cab68b"
     },
     {
       "path": "backlog/016-visual-observer-conditions.md",
-      "sha256": "c5a58d4ecde9ca464ad6b0648f2e722e8eef60baea2a59966e04fca99361d28a"
+      "sha256": "bec67934c88766e20bde3219c5b464d203d31f3ee37dc2b3f0dcbb36edc517be"
     },
     {
       "path": "backlog/017-preflight-risk-assessment.md",
-      "sha256": "147fc24f3611f35518c8b5cfc98402286c9cc5f8f6c96bfef5cc9e04567b7f60"
+      "sha256": "1f3e90e36d2539737fb4e58357623645d2ea3d683b39326cff39382a60f073f0"
     },
     {
       "path": "backlog/018-participant-briefing.md",
-      "sha256": "74adab265348d765059661d8064216f13bd74b0a786d6b6d09c2bf89c17ba7b4"
+      "sha256": "dad3bb966cfcee6ab520237d0adfc275479f701c7f7edad3df7abe092440febf"
     },
     {
-      "path": "backlog/019-attached-object-secure.md",
-      "sha256": "9fd66270f1ac28234960255c3c17c236f3d91e1d2cdd7f51ca717d22fd70100c"
+      "path": "backlog/019-attached-object-no-adverse-effect.md",
+      "sha256": "f5485dd9f7b2c1fbbd404609677a8460a3a585cdccf220d8773e06ef24a70c40"
     },
     {
-      "path": "backlog/020-attached-object-no-adverse-effect.md",
-      "sha256": "ae73a577477339b2a0a9ef209f7f09fb20dae5be89963ea15ec5a79be2cbef87"
-    },
-    {
-      "path": "backlog/021-preflight-actions.md",
-      "sha256": "6f80c36871914565b174ef9e578e5ed95781091b2377b58019655c4bd7c70418"
+      "path": "backlog/020-preflight-actions.md",
+      "sha256": "711d66cdc5c9d5aeb751bdcc6e62029862793513228bbcbd077e482ffe0ffec3"
     },
     {
       "path": "backlog/README.md",
-      "sha256": "738bd84e967fb195f8865d7e6f754fb8188caa06968db000c3bf61bcdd301bce"
+      "sha256": "6c8cabfe6f4fc54885bcc17c3db0883b276d943b3367ad860f1ecdf873843a35"
     },
     {
       "path": "corpus/part107.xml",
@@ -339,7 +335,7 @@
     },
     {
       "path": "src/FaaPart107/Generated/Contracts.g.cs",
-      "sha256": "6914fd0f642fa7fef497da20668db94f1dc87ef261873c06f4d7014b1313f274"
+      "sha256": "2c440510f58fda16f8d148316e58d5ebd29680bee3cd59be8f13023ff59002bf"
     },
     {
       "path": "src/FaaPart107/Generated/MapEntries.g.cs",
@@ -351,7 +347,7 @@
     },
     {
       "path": "src/FaaPart107/Generated/Registry.g.cs",
-      "sha256": "f79f4043b49c989c03bce3de186bd5af6fe2beb5431d86ad2c93a5fbb9ce4699"
+      "sha256": "61bd7e8bae1db038d43f5ff23c733ecd9e519556e0b80e3893c4308238dfa578"
     },
     {
       "path": "src/FaaPart107/Generated/Requests.g.cs",
@@ -359,7 +355,7 @@
     },
     {
       "path": "tests/FaaPart107.Tests/Generated/CorrespondenceTests.g.cs",
-      "sha256": "7563713a1952a20323b44909f736e924222c997233ad7b07cb39c19377663080"
+      "sha256": "695577abb45b3572483ac8cc749e446a7d1a32d8273992dd2c9b6b68ef042513"
     },
     {
       "path": "tests/FaaPart107.Tests/Generated/ProvenanceTests.g.cs",
@@ -547,7 +543,7 @@
     },
     {
       "path": "corpus-map.overlay.json",
-      "sha256": "65cad08304e52ad5bd94569b62a3341df5ba3ebea79793c5c1b80dad20ead5bb"
+      "sha256": "c61a58b2f02a1d07fc9112b9570f60807e9a85c216bfec329ac56da980389839"
     },
     {
       "path": "src/FaaPart107/FaaPart107.csproj",

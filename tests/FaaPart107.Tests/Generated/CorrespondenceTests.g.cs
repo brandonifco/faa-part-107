@@ -322,8 +322,8 @@ public sealed class CorrespondenceTests
     }
 
     [Fact]
-    public void attached_object_secure__declines_UnsupportedRule_row_2() =>
-        AssertDeclines("attached-object-secure", UnresolvedReason.UnsupportedRule, EntryPoints.AttachedObjectSecure.Resolve(global::FaaPart107.Requests.AttachedObjectSecureRequest.Empty), new SourceLocator("cfr-14-107", "§ 107.49(e)"));
+    public void attached_object_secure__is_implemented_so_a_hand_written_handler_answers_it() =>
+        Assert.True(Registry.HasImplementation("attached-object-secure"), "attached-object-secure is implemented in the overlay and has no [Implements] handler");
 
     [Fact]
     public void attached_object_no_adverse_effect__declines_UnsupportedRule_row_2() =>
