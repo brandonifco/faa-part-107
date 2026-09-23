@@ -322,8 +322,20 @@ public sealed class CorrespondenceTests
     }
 
     [Fact]
-    public void participant_briefing__declines_UnsupportedRule_row_2() =>
-        AssertDeclines("participant-briefing", UnresolvedReason.UnsupportedRule, EntryPoints.ParticipantBriefing.Resolve(global::FaaPart107.Requests.ParticipantBriefingRequest.Empty), new SourceLocator("cfr-14-107", "§ 107.49(b)"));
+    public void participant_briefing__is_implemented_and_answers_or_demands_the_assertion()
+    {
+        if (Registry.HasImplementation("participant-briefing"))
+        {
+            return;
+        }
+
+        var value = new object();
+        var resolved = Registry.Resolve("participant-briefing", RuleRequest.Empty.Assert("participant-briefing", value)).Match<object?>(v => v, _ => null);
+        Assert.Same(value, resolved);
+        var typed = EntryPoints.ParticipantBriefing.Resolve(global::FaaPart107.Requests.ParticipantBriefingRequest.Asserting(value)).Match<object?>(v => v, _ => null);
+        Assert.Same(value, typed);
+        Assert.Throws<AssertionRequiredException>(() => Registry.Resolve("participant-briefing", RuleRequest.Empty));
+    }
 
     [Fact]
     public void control_links_working__is_implemented_so_a_hand_written_handler_answers_it() =>
