@@ -101,6 +101,18 @@ public class OperatingLimitationsEntryPointTests
         finding.Limitations.Single(limitation => limitation.Entry.Id == entryId);
 
     /// <summary>
+    /// The whole of a finding but the person it is about: every limitation as the entry that states
+    /// it answered it — that entry, its citation, its verdict and its account — and the conjunction
+    /// read off them. § 107.51's introductory text joins its two people by "and", so this is the one
+    /// obligation both of them are under, and no part of it may turn on which of them asked.
+    /// </summary>
+    private static IEnumerable<string> Answer(OperatingLimitationsFinding finding) =>
+        finding.Limitations
+            .Select(limitation =>
+                $"'{limitation.Entry.Id}' [{limitation.Entry.Locator.Citation}] {limitation.Verdict}: {limitation.Account}")
+            .Append($"complied with all of them: {finding.CompliedWith}");
+
+    /// <summary>
     /// One situation per limitation the introductory text conjoins, each with exactly that
     /// limitation resolved broken: a groundspeed beyond both printed figures; an altitude above the
     /// ceiling with no structure claimed; and a cloud close enough that neither of § 107.51(d)'s
@@ -297,11 +309,18 @@ public class OperatingLimitationsEntryPointTests
         Assert.Contains(person.Designation, finding.ToString(), StringComparison.Ordinal);
         Assert.Contains(person.Designation, unresolved.Attempted, StringComparison.Ordinal);
 
-        // And the obligation does not turn on which of them asks: same facts, same answer.
+        // And the obligation does not turn on which of them asks: same facts, same answer. What is
+        // compared is the whole of that answer — every limitation as the entry that states it
+        // answered it, and the conjunction read off them — and not CompliedWith on its own. That
+        // property is false for every operation this engine can resolve, because
+        // weather-minimums-met resolves one outcome only and it is the minimums not met; comparing
+        // it across the two people compares one constant with another, which any implementation
+        // answering false for everything satisfies. The accounts below are not constant: they are
+        // what each constituent said about the operation the caller stated.
         Assert.False(finding.CompliedWith);
         Assert.Equal(
-            Finding(Resolve(Groundspeed.InKnots(120m), person: BoundPerson.RemotePilotInCommand)).CompliedWith,
-            finding.CompliedWith);
+            Answer(Finding(Resolve(Groundspeed.InKnots(120m), person: BoundPerson.RemotePilotInCommand))),
+            Answer(finding));
     }
 
     /// <summary>The two people § 107.51's introductory text names, and there is no third.</summary>
