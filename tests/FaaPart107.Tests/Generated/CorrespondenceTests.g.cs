@@ -182,8 +182,8 @@ public sealed class CorrespondenceTests
         Assert.True(Registry.HasImplementation("single-aircraft"), "single-aircraft is implemented in the overlay and has no [Implements] handler");
 
     [Fact]
-    public void airspace_authorized__declines_UnsupportedRule_row_2() =>
-        AssertDeclines("airspace-authorized", UnresolvedReason.UnsupportedRule, EntryPoints.AirspaceAuthorized.Resolve(global::FaaPart107.Requests.AirspaceAuthorizedRequest.Empty), new SourceLocator("cfr-14-107", "§ 107.41"));
+    public void airspace_authorized__is_implemented_so_a_hand_written_handler_answers_it() =>
+        Assert.True(Registry.HasImplementation("airspace-authorized"), "airspace-authorized is implemented in the overlay and has no [Implements] handler");
 
     [Fact]
     public void restricted_area_permitted__is_implemented_so_a_hand_written_handler_answers_it() =>

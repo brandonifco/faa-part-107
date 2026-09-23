@@ -390,5 +390,62 @@
         "mutation": "Prominence.Objects compared the statement's regulation with itself (`waiver.Regulation` for `Regulation` in the call to Waivers.Suspension), so a waiver of § 107.41 suspended § 107.51(c); this test went red."
       }
     ]
+  },
+  "airspace-authorized": {
+    "status": "implemented",
+    "implementedIn": {
+      "ruleset": "faa-part-107",
+      "version": 1
+    },
+    "tests": [
+      {
+        "test": "AirspaceAuthorizedEntryPointTests.Each_airspace_107_41_names_may_be_operated_in_with_prior_ATC_authorization_citing_107_41",
+        "mutation": "Airspace.Authorized ignored the authorization the caller stated (`var mayOperate = !required;` for `var mayOperate = !required || (authorization.Held && authorization.ObtainedBeforeTheOperation);`), so prior ATC authorization no longer lifted § 107.41's prohibition in any airspace it names; this test went red for all four. It went red too with AirspaceFinding.Authority citing restricted-area-permitted's `§ 107.45` instead of airspace-authorized's locator (`MapEntries.RestrictedAreaPermitted.Locator` for `MapEntries.AirspaceAuthorized.Locator`)."
+      },
+      {
+        "test": "AirspaceAuthorizedEntryPointTests.Each_airspace_107_41_names_may_not_be_operated_in_without_ATC_authorization",
+        "mutation": "AtcAuthorization.None fabricated a prior authorization out of a statement that there is none (`new(held: true, obtainedBeforeTheOperation: true, statedBy, reference: null)` for `new(held: false, obtainedBeforeTheOperation: false, statedBy, reference: null)`), so an unauthorized operation in each airspace § 107.41 names resolved as one it may make; this test went red for all four."
+      },
+      {
+        "test": "AirspaceAuthorizedEntryPointTests.An_ATC_authorization_that_was_not_prior_does_not_satisfy_107_41",
+        "mutation": "Airspace.Authorized dropped the section's word \"prior\", accepting any authorization from ATC whenever it was obtained (`var mayOperate = !required || authorization.Held;` for `var mayOperate = !required || (authorization.Held && authorization.ObtainedBeforeTheOperation);`), so an authorization obtained after the operation began satisfied § 107.41; this test went red for all four airspaces."
+      },
+      {
+        "test": "AirspaceAuthorizedEntryPointTests.Airspace_107_41_does_not_name_needs_no_authorization_and_the_statement_is_still_recorded",
+        "mutation": "Airspace.Names claimed § 107.41 names every airspace (`airspace is not null;` for the four-way comparison with ClassB, ClassC, ClassD and ClassESurfaceAreaDesignatedForAnAirport), so Class G and Class E outside an airport surface area both required prior ATC authorization; this test went red for both."
+      },
+      {
+        "test": "AirspaceAuthorizedEntryPointTests.While_a_waiver_of_107_41_is_stated_in_force_it_declines_OutsideCurrentScope_citing_107_205_and_records_the_statement",
+        "mutation": "Airspace.Authorized handed the gate a statement that no waiver is in force (`waiver with { InForce = false }` for `waiver`), so a stated waiver was not honoured and the finding resolved; this test went red for all four airspaces. It went red too with Airspace.Authorized naming restricted-area-permitted as the suspended entry (`MapEntries.RestrictedAreaPermitted` for `MapEntries.AirspaceAuthorized`), so Attempted named that entry rather than airspace-authorized."
+      },
+      {
+        "test": "AirspaceAuthorizedEntryPointTests.Stated_that_no_waiver_is_in_force_the_rule_is_evaluated_and_the_statement_recorded",
+        "mutation": "Airspace.Authorized handed the gate a statement that a waiver is in force whatever the caller said (`waiver with { InForce = true }` for `waiver`), so a statement that none is held still declined OutsideCurrentScope instead of being evaluated; this test went red."
+      },
+      {
+        "test": "AirspaceAuthorizedEntryPointTests.Without_an_airspace_it_refuses_rather_than_infer_one",
+        "mutation": "Handlers.AirspaceAuthorized inferred an airspace the caller did not state (`request.Airspace ?? AirspaceClass.ClassG` for `Demand(request.Airspace, ...)`), so a request naming no airspace resolved as Class G instead of refusing; this test went red."
+      },
+      {
+        "test": "AirspaceAuthorizedEntryPointTests.Without_an_ATC_authorization_statement_it_refuses_rather_than_infer_one",
+        "mutation": "Handlers.AirspaceAuthorized read an unstated authorization as a denial (`request.Authorization ?? AtcAuthorization.None(\"the engine\")` for `Demand(request.Authorization, ...)`), so a request stating nothing about ATC authorization resolved as one where none was obtained instead of refusing; this test went red."
+      },
+      {
+        "test": "AirspaceAuthorizedEntryPointTests.Without_a_waiver_statement_it_refuses_rather_than_infer_one",
+        "mutation": "Handlers.AirspaceAuthorized defaulted a missing statement to none held (`request.Waiver ?? WaiverStatement.NoneHeld(Airspace.Regulation, \"the engine\")` for `Demand(request.Waiver, ...)`); this test went red."
+      },
+      {
+        "test": "AirspaceAuthorizedEntryPointTests.A_waiver_statement_about_another_regulation_is_refused",
+        "mutation": "Airspace.Authorized compared the statement's regulation with itself (`waiver.Regulation` for `Regulation` in the call to Waivers.Suspension), so a waiver of § 107.51 suspended § 107.41; this test went red."
+      },
+      {
+        "test": "AirspaceAuthorizedEntryPointTests.Every_airspace_this_engine_names_is_on_exactly_one_side_of_107_41s_table",
+        "mutation": "AirspaceClass.All grew a seventh entry nobody classified (`ClassG,` followed by `ClassB,` in the collection initializer, for `ClassG,` alone), so the set a caller may state was larger than the two sides of § 107.41's table the theories check; this test went red. It is the guard against a finite table being sampled rather than checked exhaustively: an airspace added to the type without a decision about which side it falls on cannot pass unnoticed."
+      },
+      {
+        "test": "AirspaceAuthorizedEntryPointTests.There_is_no_public_way_to_state_an_airspace_this_engine_does_not_name",
+        "mutation": "AirspaceClass reopened the minting path, a public factory taking a designation (`public static AirspaceClass Other(string designation) => new(designation);` added beside ToString, where no such method exists), so a caller could again state an airspace the engine cannot identify; this test went red. That path is the defect the semantic review of PR #55 blocked on: because AirspaceClass is a sealed record whose only instance field backs Designation, value equality DOES match an exactly-equal designation — verified by asserting `Assert.Equal(AirspaceClass.ClassB, AirspaceClass.Other(\"Class B airspace\"))`, which passes — so the danger was never the exact designation but the near miss: `Other(\"Class B\")` is unequal to every named airspace, Airspace.Names returns false for it, and § 107.41 was reported not to reach a Class B operation with no authorization. The set is closed instead of guarded, and this test keeps it closed."
+      }
+    ]
   }
 }
