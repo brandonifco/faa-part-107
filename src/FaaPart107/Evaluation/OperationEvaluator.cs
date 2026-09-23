@@ -46,6 +46,20 @@ namespace FaaPart107.Evaluation;
 /// </remarks>
 public static class OperationEvaluator
 {
+    /// <summary>
+    /// The map entries whose request this API builds from <see cref="OperationFacts"/>, in the
+    /// map's order: the entries whose own request type declares inputs a caller can state.
+    /// </summary>
+    /// <remarks>
+    /// Every other entry is resolved through the registry with the caller's assertions alone, which
+    /// is the right answer for one that declares no inputs and for one this engine has not built.
+    /// This is read from the builder table itself, so it cannot drift from it; the coverage test
+    /// compares it with the generated request types and fails naming an entry that has inputs and
+    /// no builder.
+    /// </remarks>
+    public static ImmutableArray<string> EntriesBuiltFromFacts { get; } =
+        [.. Registry.Entries.Select(entry => entry.Id).Where(id => Builder(id) is not null)];
+
     /// <summary>Evaluates <paramref name="facts"/> against every entry of the map.</summary>
     /// <param name="facts">What the caller states about one operation.</param>
     /// <returns>One outcome per map entry, in the map's order, with the engine's identity.</returns>
@@ -109,39 +123,44 @@ public static class OperationEvaluator
     }
 
     private static Resolution<object> Resolve(RegisteredEntry entry, OperationFacts facts) =>
-        ThroughItsEntryPoint(entry.Id, facts) ?? Registry.Resolve(entry.Id, facts.Assertions);
+        Builder(entry.Id) is { } build ? build(facts) : Registry.Resolve(entry.Id, facts.Assertions);
 
     /// <summary>
-    /// The entries whose requests declare inputs, each built from the facts and resolved through
-    /// its own generated entry point. Null for every other entry, which is then resolved through
-    /// the registry with the caller's assertions and nothing else: an entry with no inputs needs
-    /// none, and an entry this engine has not built answers from its correspondence row whatever
-    /// it is handed.
+    /// The entries whose requests declare inputs: how to build each one from the facts and resolve
+    /// it through its own generated entry point. Null for every other entry, which is then resolved
+    /// through the registry with the caller's assertions and nothing else — an entry with no inputs
+    /// needs none, and an entry this engine has not built answers from its correspondence row
+    /// whatever it is handed.
     /// </summary>
-    private static Resolution<object>? ThroughItsEntryPoint(string entryId, OperationFacts facts) => entryId switch
+    /// <remarks>
+    /// This is the single place that knows which entries the facts type feeds, and
+    /// <see cref="EntriesBuiltFromFacts"/> reads it rather than restating it — so the coverage test
+    /// checks the table itself and not a copy of it.
+    /// </remarks>
+    private static Func<OperationFacts, Resolution<object>>? Builder(string entryId) => entryId switch
     {
-        "speed-limit" => EntryPoints.SpeedLimit.Resolve(
+        "speed-limit" => facts => EntryPoints.SpeedLimit.Resolve(
             new Requests.SpeedLimitRequest(facts.Assertions) { Waiver = facts.WaiverOf(Speed.Regulation) }),
-        "altitude-limit" => EntryPoints.AltitudeLimit.Resolve(
+        "altitude-limit" => facts => EntryPoints.AltitudeLimit.Resolve(
             new Requests.AltitudeLimitRequest(facts.Assertions) { Waiver = facts.WaiverOf(Altitude.Regulation) }),
-        "visibility-minimum" => EntryPoints.VisibilityMinimum.Resolve(
+        "visibility-minimum" => facts => EntryPoints.VisibilityMinimum.Resolve(
             new Requests.VisibilityMinimumRequest(facts.Assertions) { Waiver = facts.WaiverOf(Visibility.Regulation) }),
-        "cloud-clearance" => EntryPoints.CloudClearance.Resolve(
+        "cloud-clearance" => facts => EntryPoints.CloudClearance.Resolve(
             new Requests.CloudClearanceRequest(facts.Assertions) { Waiver = facts.WaiverOf(Clouds.Regulation) }),
-        "speed-within-limit" => EntryPoints.SpeedWithinLimit.Resolve(
+        "speed-within-limit" => facts => EntryPoints.SpeedWithinLimit.Resolve(
             new Requests.SpeedWithinLimitRequest(facts.Assertions)
             {
                 Groundspeed = facts.Groundspeed,
                 Waiver = facts.WaiverOf(Speed.Regulation),
             }),
-        "altitude-within-limit" => EntryPoints.AltitudeWithinLimit.Resolve(
+        "altitude-within-limit" => facts => EntryPoints.AltitudeWithinLimit.Resolve(
             new Requests.AltitudeWithinLimitRequest(facts.Assertions)
             {
                 AltitudeAboveGroundLevelFeet = facts.AltitudeAboveGroundLevelFeet,
                 Structure = facts.Structure,
                 Waiver = facts.WaiverOf(Altitude.Regulation),
             }),
-        "weather-minimums-met" => EntryPoints.WeatherMinimumsMet.Resolve(
+        "weather-minimums-met" => facts => EntryPoints.WeatherMinimumsMet.Resolve(
             new Requests.WeatherMinimumsMetRequest(facts.Assertions)
             {
                 FlightVisibilityStatuteMiles = facts.FlightVisibilityStatuteMiles,
@@ -149,7 +168,7 @@ public static class OperationEvaluator
                 FeetHorizontallyFromCloud = facts.FeetHorizontallyFromCloud,
                 Waiver = facts.WaiverOf(Weather.Regulation),
             }),
-        "operating-limitations" => EntryPoints.OperatingLimitations.Resolve(
+        "operating-limitations" => facts => EntryPoints.OperatingLimitations.Resolve(
             new Requests.OperatingLimitationsRequest(facts.Assertions)
             {
                 Person = facts.BoundPerson,
@@ -161,35 +180,42 @@ public static class OperationEvaluator
                 FeetHorizontallyFromCloud = facts.FeetHorizontallyFromCloud,
                 Waiver = facts.WaiverOf(Compliance.Regulation),
             }),
-        "reasonable-protection" => EntryPoints.ReasonableProtection.Resolve(
+        "over-human-beings" => facts => EntryPoints.OverHumanBeings.Resolve(
+            new Requests.OverHumanBeingsRequest(facts.Assertions)
+            {
+                Location = facts.HumanBeingLocation,
+                Shelter = facts.Shelter,
+                Waiver = facts.WaiverOf(Overflight.Regulation),
+            }),
+        "reasonable-protection" => facts => EntryPoints.ReasonableProtection.Resolve(
             new Requests.ReasonableProtectionRequest(facts.Assertions)
             {
                 Shelter = facts.Shelter,
                 Waiver = facts.WaiverOf(Protection.Regulation),
             }),
-        "prominent-objects" => EntryPoints.ProminentObjects.Resolve(
+        "prominent-objects" => facts => EntryPoints.ProminentObjects.Resolve(
             new Requests.ProminentObjectsRequest(facts.Assertions) { Waiver = facts.WaiverOf(Prominence.Regulation) }),
-        "single-aircraft" => EntryPoints.SingleAircraft.Resolve(
+        "single-aircraft" => facts => EntryPoints.SingleAircraft.Resolve(
             new Requests.SingleAircraftRequest(facts.Assertions)
             {
                 Person = facts.Person,
                 Engagements = facts.Engagements,
                 Waiver = facts.WaiverOf(MultipleAircraft.Regulation),
             }),
-        "airspace-authorized" => EntryPoints.AirspaceAuthorized.Resolve(
+        "airspace-authorized" => facts => EntryPoints.AirspaceAuthorized.Resolve(
             new Requests.AirspaceAuthorizedRequest(facts.Assertions)
             {
                 Airspace = facts.Airspace,
                 Authorization = facts.AtcAuthorization,
                 Waiver = facts.WaiverOf(Airspace.Regulation),
             }),
-        "restricted-area-permitted" => EntryPoints.RestrictedAreaPermitted.Resolve(
+        "restricted-area-permitted" => facts => EntryPoints.RestrictedAreaPermitted.Resolve(
             new Requests.RestrictedAreaPermittedRequest(facts.Assertions)
             {
                 Area = facts.Area,
                 Permission = facts.AreaPermission,
             }),
-        "moving-vehicle-operation" => EntryPoints.MovingVehicleOperation.Resolve(
+        "moving-vehicle-operation" => facts => EntryPoints.MovingVehicleOperation.Resolve(
             new Requests.MovingVehicleOperationRequest(facts.Assertions)
             {
                 FromMovingLandOrWaterBorneVehicle = facts.FromMovingLandOrWaterBorneVehicle,
@@ -197,38 +223,38 @@ public static class OperationEvaluator
                     facts.TransportingAnotherPersonsPropertyForCompensationOrHire,
                 Waiver = facts.WaiverOf(MovingVehicle.Regulation),
             }),
-        "moving-aircraft-operation" => EntryPoints.MovingAircraftOperation.Resolve(
+        "moving-aircraft-operation" => facts => EntryPoints.MovingAircraftOperation.Resolve(
             new Requests.MovingAircraftOperationRequest(facts.Assertions)
             {
                 FromAMovingAircraft = facts.FromAMovingAircraft,
                 Waiver = facts.WaiverOf(MovingAircraft.Regulation),
             }),
-        "night-waiver-termination" => EntryPoints.NightWaiverTermination.Resolve(
+        "night-waiver-termination" => facts => EntryPoints.NightWaiverTermination.Resolve(
             new Requests.NightWaiverTerminationRequest(facts.Assertions)
             {
                 Certificate = facts.NightWaiverCertificate,
                 AsOf = facts.AsOf,
             }),
-        "right-of-way" => EntryPoints.RightOfWay.Resolve(
+        "right-of-way" => facts => EntryPoints.RightOfWay.Resolve(
             new Requests.RightOfWayRequest(facts.Assertions)
             {
                 Encountered = facts.Encountered,
                 Position = facts.Position,
                 Waiver = facts.WaiverOf(Yielding.Regulation),
             }),
-        "well-clear" => EntryPoints.WellClear.Resolve(
+        "well-clear" => facts => EntryPoints.WellClear.Resolve(
             new Requests.WellClearRequest(facts.Assertions) { Waiver = facts.WaiverOf(Yielding.Regulation) }),
-        "direct-participation" => EntryPoints.DirectParticipation.Resolve(
+        "direct-participation" => facts => EntryPoints.DirectParticipation.Resolve(
             new Requests.DirectParticipationRequest(facts.Assertions) { Waiver = facts.WaiverOf(Participation.Regulation) }),
-        "effective-communication" => EntryPoints.EffectiveCommunication.Resolve(
+        "effective-communication" => facts => EntryPoints.EffectiveCommunication.Resolve(
             new Requests.EffectiveCommunicationRequest(facts.Assertions) { Waiver = facts.WaiverOf(Communication.Regulation) }),
-        "unaided-visual-contact" => EntryPoints.UnaidedVisualContact.Resolve(
+        "unaided-visual-contact" => facts => EntryPoints.UnaidedVisualContact.Resolve(
             new Requests.UnaidedVisualContactRequest(facts.Assertions) { Waiver = facts.WaiverOf(UnaidedVision.Regulation) }),
-        "observer-coordination" => EntryPoints.ObserverCoordination.Resolve(
+        "observer-coordination" => facts => EntryPoints.ObserverCoordination.Resolve(
             new Requests.ObserverCoordinationRequest(facts.Assertions) { Waiver = facts.WaiverOf(Coordination.Regulation) }),
-        "intensity-reduction-in-interest-of-safety" => EntryPoints.IntensityReductionInInterestOfSafety.Resolve(
+        "intensity-reduction-in-interest-of-safety" => facts => EntryPoints.IntensityReductionInInterestOfSafety.Resolve(
             new Requests.IntensityReductionInInterestOfSafetyRequest(facts.Assertions) { Waiver = facts.WaiverOf(Lighting.Regulation) }),
-        "visual-observer-conditions" => EntryPoints.VisualObserverConditions.Resolve(
+        "visual-observer-conditions" => facts => EntryPoints.VisualObserverConditions.Resolve(
             new Requests.VisualObserverConditionsRequest(facts.Assertions)
             {
                 Use = facts.VisualObserverUse,
@@ -236,15 +262,15 @@ public static class OperationEvaluator
                 Waiver = facts.WaiverOf(Observers.Regulation),
                 VisualLineOfSightWaiver = facts.WaiverOf(LineOfSight.Regulation),
             }),
-        "anti-collision-lighting" => EntryPoints.AntiCollisionLighting.Resolve(
+        "anti-collision-lighting" => facts => EntryPoints.AntiCollisionLighting.Resolve(
             new Requests.AntiCollisionLightingRequest(facts.Assertions)
             {
                 Lighting = facts.Lighting,
                 Waiver = facts.WaiverOf(Lights.Regulation),
             }),
-        "flash-rate-sufficient" => EntryPoints.FlashRateSufficient.Resolve(
+        "flash-rate-sufficient" => facts => EntryPoints.FlashRateSufficient.Resolve(
             new Requests.FlashRateSufficientRequest(facts.Assertions) { Waiver = facts.WaiverOf(FlashRate.Regulation) }),
-        "visual-line-of-sight" => EntryPoints.VisualLineOfSight.Resolve(
+        "visual-line-of-sight" => facts => EntryPoints.VisualLineOfSight.Resolve(
             new Requests.VisualLineOfSightRequest(facts.Assertions)
             {
                 Exercise = facts.Exercise,
@@ -314,6 +340,10 @@ public static class OperationEvaluator
             false => RequirementState.Violated,
             null => RequirementState.Informational,
         },
+
+        // § 107.39: true when one of the section's excepted cases is met, which is the rule's own
+        // conjunction over (a), (b) and (c). False is the section prohibiting the operation.
+        OverHumanBeingsFinding finding => Met(finding.MayOperate),
 
         // § 107.31 as a whole: true when paragraph (a)'s ability is there and paragraph (b)'s
         // requirement that it be exercised is satisfied. The rule makes that conjunction, not

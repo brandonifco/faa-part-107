@@ -47,6 +47,7 @@ public class OperationEvaluatorTests
         Lighting = LightingStatement.LightedAndVisibleFor(5m, Caller),
         VisualObserverUse = VisualObserverUse.NotUsed,
         Shelter = Shelter.CoveredStructure,
+        HumanBeingLocation = HumanBeingLocation.UnderACoveredStructure,
         Airspace = AirspaceClass.ClassG,
         AtcAuthorization = AtcAuthorization.None(Caller),
         Area = AreaDesignation.NeitherProhibitedNorRestricted,
@@ -139,6 +140,69 @@ public class OperationEvaluatorTests
 
         // And the three answers it gives are three, not one.
         Assert.Equal(3, unbuilt.Select(entry => FromItsRow(entry.Row)).Distinct().Count());
+    }
+
+    /// <summary>
+    /// The <c>init</c> properties an entry's request declares beyond the generated shape — the
+    /// inputs a caller can state. The generated members (<c>EntryId</c>, <c>Assertions</c>) are
+    /// get-only, so an init-only setter is exactly a hand-declared input.
+    /// </summary>
+    private static string[] DeclaredInputsOf(string entryId) =>
+        [.. RequestTypeOf(entryId)
+            .GetProperties(BindingFlags.Public | BindingFlags.Instance)
+            .Where(property => property.SetMethod is { } setter
+                && setter.ReturnParameter.GetRequiredCustomModifiers()
+                    .Any(modifier => modifier == typeof(System.Runtime.CompilerServices.IsExternalInit)))
+            .Select(property => property.Name)];
+
+    [Fact]
+    public void Every_implemented_entry_whose_request_declares_inputs_has_a_builder()
+    {
+        // The property this API most needs to keep true as the engine grows, and the one that had
+        // been checked only by whoever happened to review it. An implemented entry with inputs and
+        // no builder is not a wrong answer — it reports FactRequired — but it is an entry a caller
+        // cannot reach at all, which is worse for being quiet.
+        var owed = Registry.Entries
+            .Where(entry => entry.Status == EntryStatus.Implemented && DeclaredInputsOf(entry.Id).Length > 0)
+            .Select(entry => entry.Id)
+            .ToArray();
+
+        var missing = owed.Except(OperationEvaluator.EntriesBuiltFromFacts, StringComparer.Ordinal).ToArray();
+
+        Assert.True(
+            missing.Length == 0,
+            $"these implemented entries declare inputs and have no arm in OperationEvaluator.Builder, so a caller "
+            + $"cannot state their facts: {string.Join(", ", missing)}. Add the arm, and the OperationFacts field "
+            + "each input needs.");
+
+        // And the other direction: nothing is built for an entry that is not implemented, or for one
+        // that declares no inputs — either would be surface this evaluator cannot justify.
+        foreach (var entryId in OperationEvaluator.EntriesBuiltFromFacts)
+        {
+            Assert.Equal(EntryStatus.Implemented, Registry.Entry(entryId).Status);
+            Assert.NotEmpty(DeclaredInputsOf(entryId));
+        }
+
+        Assert.Equal(owed.Order(StringComparer.Ordinal), OperationEvaluator.EntriesBuiltFromFacts.Order(StringComparer.Ordinal));
+    }
+
+    [Fact]
+    public void A_complete_fact_set_reaches_every_entry_this_engine_has_built()
+    {
+        // The same property from the other end, and the one that catches a missing OperationFacts
+        // field as well as a missing arm: with everything stated, no built entry may come back
+        // asking the caller for something.
+        var evaluation = OperationEvaluator.Evaluate(Complete());
+
+        var owing = evaluation.Requirements
+            .Where(outcome => outcome.State == RequirementState.FactRequired)
+            .Select(outcome => $"{outcome.EntryId} wants {outcome.MissingInput}")
+            .ToArray();
+
+        Assert.True(
+            owing.Length == 0,
+            "a complete fact set left entries still asking for facts, so either an arm or an OperationFacts "
+            + $"field is missing: {string.Join("; ", owing)}");
     }
 
     [Fact]
@@ -314,6 +378,7 @@ public class OperationEvaluatorTests
         // red, naming the record to update.
         string[] recorded =
         [
+            "reasonable-protection",
             "flash-rate-sufficient",
             "intensity-reduction-in-interest-of-safety",
             "unaided-visual-contact",
@@ -333,7 +398,7 @@ public class OperationEvaluatorTests
             .ToArray();
 
         Assert.Equal(10, rowEight.Length);
-        Assert.Equal(6, rowEight.Length - measured.Length);
+        Assert.Equal(5, rowEight.Length - measured.Length);
     }
 
     [Fact]
@@ -478,6 +543,47 @@ public class OperationEvaluatorTests
 
         // Where the section does reach the operation, the answer is a different one.
         Assert.NotEqual(notUsed.State, used.State);
+    }
+
+    [Fact]
+    public void The_three_ways_107_39_can_want_something_are_three_different_answers()
+    {
+        var facts = Complete();
+
+        // Where the human being is, not stated at all: the engine locates nobody.
+        var unlocated = Outcome("over-human-beings", facts with { HumanBeingLocation = null });
+        Assert.Equal(RequirementState.FactRequired, unlocated.State);
+        Assert.Equal(nameof(Requests.OverHumanBeingsRequest.Location), unlocated.MissingInput);
+
+        // Located under one of § 107.39(b)'s two places, and the standard asserted for neither:
+        // a demand on a person, and never a decline.
+        var unasserted = OperationEvaluator
+            .Evaluate(new OperationFacts { HumanBeingLocation = HumanBeingLocation.UnderACoveredStructure, Shelter = Shelter.CoveredStructure }
+                .Stating(WaiverStatement.NoneHeld(Overflight.Regulation, Caller)))
+            .Requirement("over-human-beings");
+        Assert.Equal(RequirementState.HumanAssertionRequired, unasserted.State);
+        Assert.Null(unasserted.Reason);
+
+        // Both facts stated, and about different places. The caller has spoken twice and the rule
+        // will not read the one as the other, so it is still owed the value for the place in hand —
+        // reported with the rule's own words, which name both places.
+        var mismatched = Outcome(
+            "over-human-beings",
+            facts with { HumanBeingLocation = HumanBeingLocation.InsideAStationaryVehicle, Shelter = Shelter.CoveredStructure });
+        Assert.Equal(RequirementState.FactRequired, mismatched.State);
+        Assert.Equal(nameof(Requests.OverHumanBeingsRequest.Shelter), mismatched.MissingInput);
+        Assert.Contains("stationary vehicle", mismatched.Explanation, StringComparison.Ordinal);
+        Assert.Contains("covered structure", mismatched.Explanation, StringComparison.Ordinal);
+
+        // The three are told apart by what they name, not by sharing a state: the two that ask for
+        // a fact name different inputs, and the one that asks a person is a different state.
+        Assert.NotEqual(unlocated.MissingInput, mismatched.MissingInput);
+        Assert.NotEqual(unlocated.State, unasserted.State);
+
+        // And where the facts agree, § 107.39 answers.
+        var answered = Outcome("over-human-beings", facts);
+        Assert.Equal(RequirementState.Satisfied, answered.State);
+        Assert.IsType<OverHumanBeingsFinding>(answered.Finding);
     }
 
     [Fact]

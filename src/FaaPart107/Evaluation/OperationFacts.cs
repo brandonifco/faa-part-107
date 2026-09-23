@@ -99,9 +99,19 @@ public sealed record OperationFacts
 
     /// <summary>
     /// Which of § 107.39(b)'s two the caller's assertion is about — a covered structure, or a
-    /// stationary vehicle (<c>reasonable-protection</c>).
+    /// stationary vehicle (<c>reasonable-protection</c>, and <c>over-human-beings</c>, which reads
+    /// it to check the assertion is about the place the human being is).
     /// </summary>
     public Shelter? Shelter { get; init; }
+
+    /// <summary>
+    /// Where the human being the aircraft is operated over is located, as the caller states it:
+    /// under a covered structure, inside a stationary vehicle, or under neither
+    /// (<c>over-human-beings</c>, § 107.39). Never inferred, and never derived from
+    /// <see cref="Shelter"/> — § 107.39(b) binds the two, and deciding which place an assertion was
+    /// about is the caller's to state.
+    /// </summary>
+    public HumanBeingLocation? HumanBeingLocation { get; init; }
 
     /// <summary>
     /// What the caller states about the small unmanned aircraft's anti-collision lighting —
