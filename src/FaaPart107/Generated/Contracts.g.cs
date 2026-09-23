@@ -266,8 +266,8 @@ internal static partial class Handlers
     /// <summary>Minimum distance from clouds (<c>cloud-clearance</c>): required, the entry is implemented.</summary>
     internal static partial Resolution<object> CloudClearance(global::FaaPart107.Requests.CloudClearanceRequest request);
 
-    /// <summary>Civil twilight, outside Alaska (<c>civil-twilight-window</c>): optional.</summary>
-    static partial void CivilTwilightWindow(global::FaaPart107.Requests.CivilTwilightWindowRequest request, ref Resolution<object>? resolution);
+    /// <summary>Civil twilight, outside Alaska (<c>civil-twilight-window</c>): required, the entry is implemented.</summary>
+    internal static partial Resolution<object> CivilTwilightWindow(global::FaaPart107.Requests.CivilTwilightWindowRequest request);
 
     /// <summary>Groundspeed is within the limit (<c>speed-within-limit</c>): required, the entry is implemented.</summary>
     internal static partial Resolution<object> SpeedWithinLimit(global::FaaPart107.Requests.SpeedWithinLimitRequest request);
@@ -418,7 +418,7 @@ internal static partial class Handlers
                 resolution = CloudClearance(request as global::FaaPart107.Requests.CloudClearanceRequest ?? new(assertions));
                 break;
             case "civil-twilight-window":
-                CivilTwilightWindow(request as global::FaaPart107.Requests.CivilTwilightWindowRequest ?? new(assertions), ref resolution);
+                resolution = CivilTwilightWindow(request as global::FaaPart107.Requests.CivilTwilightWindowRequest ?? new(assertions));
                 break;
             case "speed-within-limit":
                 resolution = SpeedWithinLimit(request as global::FaaPart107.Requests.SpeedWithinLimitRequest ?? new(assertions));
@@ -559,7 +559,7 @@ internal static partial class Handlers
         "altitude-limit" => true,
         "visibility-minimum" => true,
         "cloud-clearance" => true,
-        "civil-twilight-window" => Hooked("CivilTwilightWindow", typeof(global::FaaPart107.Requests.CivilTwilightWindowRequest)),
+        "civil-twilight-window" => true,
         "speed-within-limit" => true,
         "altitude-within-limit" => Hooked("AltitudeWithinLimit", typeof(global::FaaPart107.Requests.AltitudeWithinLimitRequest)),
         "weather-minimums-met" => Hooked("WeatherMinimumsMet", typeof(global::FaaPart107.Requests.WeatherMinimumsMetRequest)),
