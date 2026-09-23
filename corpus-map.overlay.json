@@ -719,5 +719,50 @@
         "mutation": "Handlers.NightWaiverTermination defaulted a missing certificate (`request.Certificate ?? new WaiverCertificate(new DateOnly(2021, 3, 15), true, \"the engine\")` for `Demand(request.Certificate, ...)`), so Registry.Resolve(\"night-waiver-termination\", RuleRequest.Empty) -- which builds a request with every input at its default -- resolved to a finding instead of refusing; this test went red -- `Failed!  - Failed:     1, Passed:     0, Skipped:     0, Total:     1`. It is the same substitution the typed-path test above names, run on the path that test does not cover: the dictionary dispatch cannot carry typed inputs, so nothing but the handler's Demand stands between it and an invented answer."
       }
     ]
+  },
+  "preflight-risk-assessment": {
+    "status": "implemented",
+    "implementedIn": {
+      "ruleset": "faa-part-107",
+      "version": 1
+    },
+    "tests": [
+      {
+        "test": "PreflightRiskAssessmentEntryPointTests.An_assertion_that_the_operating_environment_was_assessed_resolves_to_what_was_asserted_citing_107_49_a",
+        "mutation": "Assertion.Authority cited participant-briefing's § 107.49(b) (`MapEntries.ParticipantBriefing.Locator` for `Entry.Locator`), so the answered fact named the wrong constituent of § 107.49; this test went red, with the dictionary-dispatch test and the citation test, and with sufficient-available-power's three of the same shape (`Failed!  - Failed:     6, Passed:   161, Skipped:     0, Total:   167`). It went red too with Handlers.PreflightRiskAssessment resolving another entry's assertion (`MapEntries.ParticipantBriefing` for `MapEntries.PreflightRiskAssessment`), which reddened all nine."
+      },
+      {
+        "test": "PreflightRiskAssessmentEntryPointTests.An_assertion_that_it_was_not_assessed_resolves_to_that_and_is_not_turned_into_a_decline",
+        "mutation": "Assertions.Stated overrode a negative assertion (`new Assertion(entry, Holds: true, assertion.AssertedBy)` for `new Assertion(entry, assertion.Holds, assertion.AssertedBy)`), so the engine decided the fact § 107.49(a) gives to the remote pilot in command — a remote pilot in command who reports that the operating environment was not assessed was answered that it was. This test went red, with sufficient-available-power's of the same shape (`Failed!  - Failed:     2, Passed:   165, Skipped:     0, Total:   167`)."
+      },
+      {
+        "test": "PreflightRiskAssessmentEntryPointTests.Asserting_nothing_demands_the_value_rather_than_declining_the_entry",
+        "mutation": "Assertions.Stated declined instead of demanding: `assertions.Asserted(entry.Id)` wrapped in `try`/`catch (AssertionRequiredException)` returning `Resolution<Assertion>.FromUnresolved(new UnresolvedResult(UnresolvedReason.MissingRulesData, ..., entry.Locator))`, which is row 8's whole point inverted — an assessment nobody asserted became an unresolved result instead of a demand on the caller. This test went red with `Assert.Throws() Failure: No exception was thrown / Expected: typeof(FaaPart107.AssertionRequiredException)`, together with the dictionary-dispatch test and sufficient-available-power's two of the same shape (`Failed!  - Failed:     4, Passed:   163, Skipped:     0, Total:   167`)."
+      },
+      {
+        "test": "PreflightRiskAssessmentEntryPointTests.The_dictionary_dispatch_answers_and_demands_the_same_way",
+        "mutation": "Handlers.PreflightRiskAssessment resolved another entry's assertion (`Assertions.Stated(MapEntries.ParticipantBriefing, request.Assertions)` for `MapEntries.PreflightRiskAssessment`), so the dispatch demanded a value for § 107.49(b), the participant briefing, and never answered § 107.49(a); this test went red, and so did all nine (`Failed!  - Failed:     9, Passed:   158, Skipped:     0, Total:   167`). It went red too with Assertion.Authority citing participant-briefing's locator, and with Assertions.Stated declining rather than demanding when nothing was asserted."
+      },
+      {
+        "test": "PreflightRiskAssessmentEntryPointTests.An_assertion_attributed_to_someone_107_49_does_not_name_is_refused",
+        "mutation": "Assertions.Stated compared each name the map allows with itself (`string.Equals(who, who, StringComparison.Ordinal)` for `string.Equals(who, assertion.AssertedBy, StringComparison.Ordinal)`), so an assertion attributed to a visual observer was accepted for an entry § 107.49's lead-in gives to the remote pilot in command; this test went red, with sufficient-available-power's of the same shape (`Failed!  - Failed:     2, Passed:   165, Skipped:     0, Total:   167`). It went red too with no hand-written handler at all — the partial method renamed so `Registry.HasImplementation` is false and correspondence row 8's bare default answers — which reddened exactly the four tests of what the handler adds over that default (`Failed!  - Failed:     4, Passed:   163, Skipped:     0, Total:   167`)."
+      },
+      {
+        "test": "PreflightRiskAssessmentEntryPointTests.An_assertion_about_another_entry_is_refused",
+        "mutation": "Assertions.Stated compared the assertion's entry with itself (`string.Equals(assertion.Entry.Id, assertion.Entry.Id, StringComparison.Ordinal)` for `string.Equals(assertion.Entry.Id, entry.Id, ...)`), so an assertion about sufficient-available-power answered preflight-risk-assessment; this test went red, with sufficient-available-power's of the same shape (`Failed!  - Failed:     2, Passed:   165, Skipped:     0, Total:   167`). It went red too with no hand-written handler at all, the row's bare default accepting any value whatever (`Failed!  - Failed:     4, Passed:   163, Skipped:     0, Total:   167`)."
+      },
+      {
+        "test": "PreflightRiskAssessmentEntryPointTests.A_value_that_is_not_an_assertion_is_refused",
+        "mutation": "Assertions.Stated made up the assertion the caller did not make (`var assertion = asserted as Assertion ?? new Assertion(entry, Holds: true, \"remote pilot in command\")` for the refusal), so a bare `true` became an assessment the engine attributed to the remote pilot in command; this test went red with `Assert.Throws() Failure: No exception was thrown`, with sufficient-available-power's of the same shape (`Failed!  - Failed:     2, Passed:   165, Skipped:     0, Total:   167`). It went red too with no hand-written handler at all, the row's bare default answering an unattributed value (`Failed!  - Failed:     4, Passed:   163, Skipped:     0, Total:   167`)."
+      },
+      {
+        "test": "PreflightRiskAssessmentEntryPointTests.The_citation_is_the_maps_and_a_caller_supplied_entry_does_not_become_it",
+        "mutation": "Assertions.Stated answered with the caller's own object (`Resolution<Assertion>.FromValue(assertion)` for `FromValue(new Assertion(entry, assertion.Holds, assertion.AssertedBy))`) — the defect the semantic review of PR #59 recorded a fail for. MapEntry and SourceLocator are publicly constructible, so an assertion carrying this entry's id under `§ 107.51(b)` and a name of the caller's choosing then passed all three checks and § 107.49(a) was answered citing § 107.51(b). This test went red with `Assert.Equal() Failure: Values differ / Expected: cfr-14-107 / § 107.49(a) / Actual: cfr-14-107 / § 107.51(b)`, with sufficient-available-power's of the same shape (`Failed!  - Failed:     2, Passed:   165, Skipped:     0, Total:   167`). It went red too with Assertion.Authority citing participant-briefing's locator, and with no hand-written handler at all, the row's bare default answering the caller's object unchecked (`Failed!  - Failed:     4, Passed:   163, Skipped:     0, Total:   167`)."
+      },
+      {
+        "test": "PreflightRiskAssessmentEntryPointTests.The_four_item_enumeration_is_one_asserted_fact_and_the_engine_takes_no_input_of_its_own",
+        "mutation": "The engine started taking the enumeration as input: `public bool? LocalWeatherConditions { get; init; }` added to the `PreflightRiskAssessmentRequest` partial for § 107.49(a)(1), which is the first step of the engine doing the assessing § 107.49(a) gives to the remote pilot in command. This test went red alone with `Assert.Equal() Failure: Collections differ / Expected: [\"Assertions\", \"EntryId\"] / Actual: [\"Assertions\", \"EntryId\", \"LocalWeatherConditions\"]` (`Failed!  - Failed:     1, Passed:   166, Skipped:     0, Total:   167`). It went red too with Handlers.PreflightRiskAssessment resolving another entry's assertion, which answered under § 107.49(b)'s name."
+      }
+    ]
   }
 }
