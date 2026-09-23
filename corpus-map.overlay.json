@@ -1001,5 +1001,50 @@
         "mutation": "Handlers.WeatherMinimumsMet defaulted every input (`request.FlightVisibilityStatuteMiles ?? 0m`, `request.FeetBelowCloud ?? 0m`, `request.FeetHorizontallyFromCloud ?? 0m` and `request.Waiver ?? WaiverStatement.NoneHeld(Weather.Regulation, \"the engine\")` for their four `Demand(...)` calls), so `Registry.Resolve(\"weather-minimums-met\", RuleRequest.Empty)` -- which builds a request with every input at its default -- resolved a finding that the minimums are not met, from zero feet below and zero feet horizontally from a cloud the caller never mentioned, instead of refusing; this test went red -- `Failed!  - Failed:     1, Passed:     0, Skipped:     0, Total:     1` on `Assert.Throws() Failure: No exception was thrown`. Defaulting the flight visibility alone still refused, on the next input, so this test's mutation is the whole set: the dictionary dispatch cannot carry typed inputs, and nothing but the handler's Demands stands between it and an invented answer."
       }
     ]
+  },
+  "right-of-way": {
+    "status": "implemented",
+    "implementedIn": {
+      "ruleset": "faa-part-107",
+      "version": 1
+    },
+    "tests": [
+      {
+        "test": "RightOfWayEntryPointTests.An_object_107_37_a_does_not_name_resolves_whatever_the_pass_citing_107_37_a",
+        "mutation": "Yielding.Names named the object § 107.37(a) does not (`|| encountered == EncounteredObject.NoneOfThem` added to the three it lists), so an object the caller states is none of the three was treated as one the paragraph names and, passed over, under or ahead, declined instead of resolving; this test went red — `Failed!  - Failed:     4, Passed:     0, Skipped:     0, Total:     4` on both net8.0 and net10.0. Class-wide it turned 8 of the 52 cases red, the other 4 being the exhaustive table's."
+      },
+      {
+        "test": "RightOfWayEntryPointTests.An_object_107_37_a_names_passed_neither_over_under_nor_ahead_resolves_citing_107_37_a",
+        "mutation": "Yielding.Prohibits prohibited the pass § 107.37(a) does not (`|| position == RelativePosition.NoneOfThem` added to over, under and ahead), so a pass the caller states is none of the three was treated as one the paragraph prohibits and declined instead of resolving; this test went red — `Failed!  - Failed:     3, Passed:     0, Skipped:     0, Total:     3` on both net8.0 and net10.0. Class-wide it turned 7 of the 52 cases red, the other 4 being the exhaustive table's."
+      },
+      {
+        "test": "RightOfWayEntryPointTests.An_object_107_37_a_names_passed_over_under_or_ahead_declines_with_well_clears_own_decline",
+        "mutation": "Yielding.RightOfWay answered the exception itself instead of asking well-clear (the `WellClear(waiver) is Resolution<object>.Unresolved open ? ... open.Result` propagation replaced by `Resolution<RightOfWayFinding>.FromUnresolved(new UnresolvedResult(UnresolvedReason.RequiresInterpretation, $\"decide whether the map entry '{MapEntries.RightOfWay.Id}' is met: the pass is over, under or ahead of an object the paragraph names, unless well clear\", MapEntries.RightOfWay.Locator))`), so the decline named right-of-way as the entry with the open question rather than returning the dependency's own; this test went red — `Failed!  - Failed:     9, Passed:     0, Skipped:     0, Total:     9` on both net8.0 and net10.0, and only this test of the 52 cases. Citing right-of-way's locator alone (`MapEntries.RightOfWay.Locator` for `MapEntries.WellClear.Locator` in Yielding.WellClear's decline) did NOT turn it red — `Passed!  - Failed:     0, Passed:    52` — because both entries cite § 107.37(a): the locator cannot tell them apart, and only what was attempted does."
+      },
+      {
+        "test": "RightOfWayEntryPointTests.Every_combination_of_the_two_enumerations_is_decided_by_those_enumerations_alone",
+        "mutation": "RelativePosition.All stopped listing every position the caller can state (`NoneOfThem` dropped from the collection expression), so the closed set no longer held the four cases and the exhaustive table was no longer exhaustive; this test went red — `Failed!  - Failed:    12, Passed:     0, Skipped:     0, Total:    12` on both net8.0 and net10.0, and only this test: the class ran 43 cases instead of 52 and the other 31 passed."
+      },
+      {
+        "test": "RightOfWayEntryPointTests.While_a_waiver_of_107_37_a_is_stated_in_force_it_declines_OutsideCurrentScope_citing_107_205_and_names_this_entry_not_well_clear",
+        "mutation": "Yielding.RightOfWay named well-clear as the suspended entry (`MapEntries.WellClear` for `MapEntries.RightOfWay` in the call to Waivers.Suspension), so the gate's decline said the other entry at the same locator had been suspended; this test went red — `Failed!  - Failed:    16, Passed:     0, Skipped:     0, Total:    16` on both net8.0 and net10.0. The two entries share the locator § 107.37(a) and both are suspended by § 107.205(f), so neither the reason nor the citation moved: only the entry named in Attempted did. Class-wide 17 of the 52 cases went red, the seventeenth being the wrong-regulation refusal, whose message names the entry too."
+      },
+      {
+        "test": "RightOfWayEntryPointTests.It_resolves_the_same_way_whatever_the_caller_asserts_for_it",
+        "mutation": "Handlers.RightOfWay took the caller's word for the entry, as though it were `kind: assertion` (`request.Assertions != RuleRequest.Empty ? Resolution<object>.FromValue(true) :` inserted before the call to Yielding.RightOfWay), so a caller who asserted right-of-way and well-clear true resolved to true instead of the rule's answer; this test went red — `Failed!  - Failed:     1, Passed:     0, Skipped:     0, Total:     1` on both net8.0 and net10.0, and only this one of the 52 cases."
+      },
+      {
+        "test": "RightOfWayEntryPointTests.Without_a_waiver_statement_it_refuses_rather_than_infer_one",
+        "mutation": "Handlers.RightOfWay defaulted a missing statement to none held (`request.Waiver ?? WaiverStatement.NoneHeld(Yielding.Regulation, \"the engine\")` for `Demand(request.Waiver, ...)`); this test went red — `Failed!  - Failed:     1, Passed:     0, Skipped:     0, Total:     1` on both net8.0 and net10.0, and only this one of the 52 cases."
+      },
+      {
+        "test": "RightOfWayEntryPointTests.Without_the_object_or_the_pass_it_refuses",
+        "mutation": "Handlers.RightOfWay invented the object when it was not given (`request.Encountered ?? EncounteredObject.NoneOfThem` for `Demand(request.Encountered, ...)`), so a request with no object — and Registry.Resolve(\"right-of-way\", RuleRequest.Empty), which builds one with every input at its default — resolved to \"§ 107.37(a) does not name it\" instead of refusing; this test went red — `Failed!  - Failed:     1, Passed:     0, Skipped:     0, Total:     1` on both net8.0 and net10.0, and only this one of the 52 cases."
+      },
+      {
+        "test": "RightOfWayEntryPointTests.A_waiver_statement_about_another_regulation_is_refused",
+        "mutation": "Yielding.RightOfWay compared the statement's regulation with itself (`waiver.Regulation` for `Regulation` in the call to Waivers.Suspension), so a stated waiver of § 107.51 suspended § 107.37(a) and the entry declined OutsideCurrentScope instead of refusing; this test went red — `Failed!  - Failed:     1, Passed:     0, Skipped:     0, Total:     1` on both net8.0 and net10.0, and only this one of the 52 cases."
+      }
+    ]
   }
 }
