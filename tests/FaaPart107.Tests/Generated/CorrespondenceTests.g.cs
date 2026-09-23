@@ -218,8 +218,8 @@ public sealed class CorrespondenceTests
         AssertDeclines("night-waiver-bar", UnresolvedReason.UnsupportedRule, EntryPoints.NightWaiverBar.Resolve(global::FaaPart107.Requests.NightWaiverBarRequest.Empty), new SourceLocator("cfr-14-107", "§ 107.29(d)"));
 
     [Fact]
-    public void civil_twilight_operation__declines_UnsupportedRule_row_2() =>
-        AssertDeclines("civil-twilight-operation", UnresolvedReason.UnsupportedRule, EntryPoints.CivilTwilightOperation.Resolve(global::FaaPart107.Requests.CivilTwilightOperationRequest.Empty), new SourceLocator("cfr-14-107", "§ 107.29(b)-(c)"));
+    public void civil_twilight_operation__is_implemented_so_a_hand_written_handler_answers_it() =>
+        Assert.True(Registry.HasImplementation("civil-twilight-operation"), "civil-twilight-operation is implemented in the overlay and has no [Implements] handler");
 
     [Fact]
     public void civil_twilight_alaska__declines_MissingRulesData_row_3() =>
