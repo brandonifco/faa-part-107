@@ -254,8 +254,20 @@ public sealed class CorrespondenceTests
     }
 
     [Fact]
-    public void reasonable_protection__declines_UnsupportedRule_row_2() =>
-        AssertDeclines("reasonable-protection", UnresolvedReason.UnsupportedRule, EntryPoints.ReasonableProtection.Resolve(global::FaaPart107.Requests.ReasonableProtectionRequest.Empty), new SourceLocator("cfr-14-107", "§ 107.39(b)"));
+    public void reasonable_protection__is_implemented_and_answers_or_demands_the_assertion()
+    {
+        if (Registry.HasImplementation("reasonable-protection"))
+        {
+            return;
+        }
+
+        var value = new object();
+        var resolved = Registry.Resolve("reasonable-protection", RuleRequest.Empty.Assert("reasonable-protection", value)).Match<object?>(v => v, _ => null);
+        Assert.Same(value, resolved);
+        var typed = EntryPoints.ReasonableProtection.Resolve(global::FaaPart107.Requests.ReasonableProtectionRequest.Asserting(value)).Match<object?>(v => v, _ => null);
+        Assert.Same(value, typed);
+        Assert.Throws<AssertionRequiredException>(() => Registry.Resolve("reasonable-protection", RuleRequest.Empty));
+    }
 
     [Fact]
     public void over_human_beings__declines_UnsupportedRule_row_2() =>

@@ -214,32 +214,28 @@
       "sha256": "6da95d24394881865c0153cef534c33a53702d28ca609c8b3712bd9a1191f1ef"
     },
     {
-      "path": "backlog/001-reasonable-protection.md",
-      "sha256": "04ba748fea7f99e415a0548833311757a8d4110adabc5f46ebeed16e0df9a245"
+      "path": "backlog/001-over-human-beings.md",
+      "sha256": "d0fa51c10ab7107e590e027d700802199e2ec28c5efada68118a8757791e9bfa"
     },
     {
-      "path": "backlog/002-over-human-beings.md",
-      "sha256": "71ac31b018a153beabbcde79fa846a2c8e3c2f70bdd5f03e1ae1e93477a713ec"
+      "path": "backlog/002-anti-collision-lighting.md",
+      "sha256": "f94d902017649824df050263439667c19429ea6306999f3bef5bf05c7e45d1fc"
     },
     {
-      "path": "backlog/003-anti-collision-lighting.md",
-      "sha256": "38d1318c5f916a1947bf010fd9da7d8d794dc09e9aeb3d5c667efcb34805bb25"
+      "path": "backlog/003-civil-twilight-operation.md",
+      "sha256": "ca7a25ae326279cf3246b160e381c37328e32efc35e639f11c66c6606c6ae380"
     },
     {
-      "path": "backlog/004-civil-twilight-operation.md",
-      "sha256": "cc6b2c813d55aeb5c301c0c216f9b2a7cf43a32f5b95793c173d2a2e7432cf93"
+      "path": "backlog/004-visual-observer-conditions.md",
+      "sha256": "b34270f3279d51fe20de2ede52173ebb34448ba2adaa5fdbb76829cbd2650b9f"
     },
     {
-      "path": "backlog/005-visual-observer-conditions.md",
-      "sha256": "aa94efacae687319732d83e82eb7c30e5a568d55c40550064b1eec430a7851e8"
-    },
-    {
-      "path": "backlog/006-preflight-actions.md",
-      "sha256": "64ce1909a90c8b737e8f8d62991daafe113dc84df5d07a675c3853ae20cd39d5"
+      "path": "backlog/005-preflight-actions.md",
+      "sha256": "e90716e9ff1e7791895b6e5794c03ac271dd3ec4bb3a3c63be0190073cc9f385"
     },
     {
       "path": "backlog/README.md",
-      "sha256": "d817aa7f45a35c28a4e8a89b766c109e877001a1358b33200da98d163f5fb5d8"
+      "sha256": "cf2d35c20dd1a571dd4592d013f7ebc4e7e9339241865fd6757e214965f78bf3"
     },
     {
       "path": "corpus/part107.xml",
@@ -291,7 +287,7 @@
     },
     {
       "path": "src/FaaPart107/Generated/Registry.g.cs",
-      "sha256": "06d6ebaebea1098b2af83801123dcadfaf445e214863ffebbe0d7ee3639744d8"
+      "sha256": "2bf867969c2d10714190b9e2527b3f5eb6f1a8bb16b77773f9ed04fa7b5cc27e"
     },
     {
       "path": "src/FaaPart107/Generated/Requests.g.cs",
@@ -299,7 +295,7 @@
     },
     {
       "path": "tests/FaaPart107.Tests/Generated/CorrespondenceTests.g.cs",
-      "sha256": "5a871515c976feed655b8ba47495f20a1e3c20748119f8b6567696f7341bd3bc"
+      "sha256": "c52c965834e80b19d4e39fb40b46aff7695cb499ba6aa68331582775a693ca6b"
     },
     {
       "path": "tests/FaaPart107.Tests/Generated/ProvenanceTests.g.cs",
@@ -487,7 +483,7 @@
     },
     {
       "path": "corpus-map.overlay.json",
-      "sha256": "0578ce2324ce9f74ad6cdb25524f5ed7e37e6e89f2055fbcedb99cdbf09fe8dc"
+      "sha256": "a37dad0f99378e05529c8d5c57c07eadf7d720ec6f812b3b1f785148ff5e13ca"
     },
     {
       "path": "src/FaaPart107/FaaPart107.csproj",
