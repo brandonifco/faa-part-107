@@ -1412,5 +1412,70 @@
         "mutation": "The hand-written handler removed entirely — `static partial void ReasonableProtection` renamed to `static void ReasonableProtectionNotAHandler` so `Registry.HasImplementation` is false and correspondence row 8's bare default answers, which consults no waiver gate, checks no attribution, records neither the place nor the statement, and hands back the caller's own object with the caller's own citation on it. It still builds, and nothing else goes red on its own account, which is why the handler's absence is silent: it reddened fourteen of this entry's sixteen tests (`Failed!  - Failed:    14, Passed:   400, Skipped:     0, Total:   414`). This test went red too with the waiver statement defaulted to none held in the handler, so `Registry.Resolve(id, RuleRequest)` — which builds the request from the assertions alone and can carry neither the statement nor the place — answered the entry instead of refusing (`Failed!  - Failed:     2, Passed:   412, Skipped:     0, Total:   414`); with the place the engine picked rather than the caller's (`Failed!  - Failed:     4, Passed:   410, Skipped:     0, Total:   414`); and with Protection.Reasonable recording a statement the engine made up (`Failed!  - Failed:     3, Passed:   411, Skipped:     0, Total:   414`)."
       }
     ]
+  },
+  "anti-collision-lighting": {
+    "status": "implemented",
+    "implementedIn": {
+      "ruleset": "faa-part-107",
+      "version": 1
+    },
+    "tests": [
+      {
+        "test": "AntiCollisionLightingEntryPointTests.Lighted_anti_collision_lighting_visible_for_at_least_3_statute_miles_with_a_sufficient_flash_rate_meets_the_clause",
+        "mutation": "AntiCollisionLightingFinding.Authority cited the paragraph that states the night prohibition rather than the clause that states the lighting (`MapEntries.NightOperation.Locator`, § 107.29(a), for `MapEntries.AntiCollisionLighting.Locator`), so the requirement was answered under a citation this entry is not mapped from; this test went red with `Assert.Equal() Failure: Strings differ` -- `Failed!  - Failed:     5, Passed:   445, Skipped:     0, Total:   450` on both net8.0 and net10.0, together with the printed-figure, unfitted, shared-locator and night-and-civil-twilight tests, and not one test of any other entry."
+      },
+      {
+        "test": "AntiCollisionLightingEntryPointTests.At_3_statute_miles_it_is_met_and_below_it_is_not_because_the_corpus_prints_at_least_3",
+        "mutation": "AntiCollisionLightingFinding.VisibleFarEnough read the printed figure as an exclusive bound (`miles > VisibleForAtLeastStatuteMiles` for `miles >= VisibleForAtLeastStatuteMiles`), so lighting visible for exactly the 3 statute miles the corpus prints stopped meeting \"visible for at least 3 statute miles\"; this test went red on exactly the row at the figure and no other -- `Failed!  - Failed:     1, Passed:   449, Skipped:     0, Total:   450` on both net8.0 and net10.0 (`At_3_statute_miles_it_is_met_and_below_it_is_not_because_the_corpus_prints_at_least_3(statuteMiles: 3, farEnough: True)`)."
+      },
+      {
+        "test": "AntiCollisionLightingEntryPointTests.The_3_statute_mile_figure_is_this_entrys_own_as_printed",
+        "mutation": "AntiCollisionLightingFinding.VisibleForAtLeastStatuteMiles printed a figure the clause does not (`= 5m` for `= 3m`), which is this engine substituting its own distance for the one § 107.29(a)(2) and (b) state twice; this test went red -- `Failed!  - Failed:     5, Passed:   445, Skipped:     0, Total:   450` on both net8.0 and net10.0, with the two boundary rows at and just above 3 statute miles and the two reduced-intensity tests, whose lighting is visible for 4 miles."
+      },
+      {
+        "test": "AntiCollisionLightingEntryPointTests.An_aircraft_with_no_anti_collision_lighting_does_not_meet_it_and_no_fact_about_lighting_it_lacks_is_demanded",
+        "mutation": "Lights.AsRequired asked flash-rate-sufficient before it read what the caller said about the lighting (`var asked = FlashRate.SufficientToAvoidACollision(waiver, assertions);` hoisted above the `if (!lighting.Lighted)` return, the `Match` then on `asked`), so a caller who said the aircraft has no anti-collision lighting -- which settles the conjunction whatever the flash rate is -- was asked to assert the flash rate of lighting that does not exist: `FaaPart107.AssertionRequiredException : the map entry 'flash-rate-sufficient' is an assertion; the caller must supply its value`. This test went red with the extinguished-lighting test, which is the same short circuit for the other unlighted case -- `Failed!  - Failed:     2, Passed:   448, Skipped:     0, Total:   450` on both net8.0 and net10.0."
+      },
+      {
+        "test": "AntiCollisionLightingEntryPointTests.Extinguished_lighting_does_not_meet_it_whatever_the_remote_pilot_in_command_determined",
+        "mutation": "AntiCollisionLightingFinding.WithinTheBound stopped reading the half of the sentence that says \"may not extinguish\" (`!LightingStated.IntensityReduced || Reduction is { Holds: true }` for `Lighted && (!LightingStated.IntensityReduced || Reduction is { Holds: true })`), so extinguishing the lighting became something the clause's second sentence permits; this test went red alone -- `Failed!  - Failed:     1, Passed:   449, Skipped:     0, Total:   450` on both net8.0 and net10.0. It went red too with the flash rate asked before the lighting was read (`Failed!  - Failed:     2, Passed:   448, Skipped:     0, Total:   450` on both net8.0 and net10.0), which demanded an assertion about extinguished lighting's flash rate."
+      },
+      {
+        "test": "AntiCollisionLightingEntryPointTests.A_reduced_intensity_the_remote_pilot_in_command_determined_to_be_in_the_interest_of_safety_is_within_the_bound",
+        "mutation": "AntiCollisionLightingFinding.WithinTheBound refused the reduction the sentence permits (`Lighted && !LightingStated.IntensityReduced` for `Lighted && (!LightingStated.IntensityReduced || Reduction is { Holds: true })`), so a reduction the remote pilot in command determined to be in the interest of safety -- the one thing \"may reduce the intensity of\" allows -- was answered as outside the bound; this test went red with the constituents test, which resolves the same reduced situation -- `Failed!  - Failed:     2, Passed:   448, Skipped:     0, Total:   450` on both net8.0 and net10.0. The test for a reduction without that determination stayed green, which is the pair: the mutation is wrong in one direction only."
+      },
+      {
+        "test": "AntiCollisionLightingEntryPointTests.A_reduction_without_that_determination_is_outside_the_bound_and_does_not_meet_the_clause",
+        "mutation": "AntiCollisionLightingFinding.WithinTheBound took the determination's presence for its answer (`Reduction is not null` for `Reduction is { Holds: true }`), so a remote pilot in command who reported that reducing the intensity was *not* in the interest of safety had the reduction treated as the one the clause permits -- the constituent entry's \"no\" read as a \"yes\"; this test went red alone -- `Failed!  - Failed:     1, Passed:   449, Skipped:     0, Total:   450` on both net8.0 and net10.0."
+      },
+      {
+        "test": "AntiCollisionLightingEntryPointTests.The_determination_is_asked_only_where_the_intensity_was_reduced",
+        "mutation": "Lights.AsRequired asked intensity-reduction-in-interest-of-safety whether or not the intensity had been reduced (`rate => lighting.Lighted` for `rate => lighting.IntensityReduced`), so every caller whose lighting was simply lit was required to assert the remote pilot in command's determination about a reduction nobody made: `FaaPart107.AssertionRequiredException : the map entry 'intensity-reduction-in-interest-of-safety' is an assertion; the caller must supply its value`. This test went red with ten more of this entry's -- every one that states lit, unreduced lighting -- and none of any other entry's: `Failed!  - Failed:    11, Passed:   439, Skipped:     0, Total:   450` on both net8.0 and net10.0."
+      },
+      {
+        "test": "AntiCollisionLightingEntryPointTests.The_constituents_answers_are_their_own_entries_and_the_verdict_follows_what_they_returned",
+        "mutation": "Lights.AsRequired answered the flash rate itself instead of asking the entry that holds it (`Resolution<FlashRateSufficientFinding>.FromValue(new FlashRateSufficientFinding(new Assertion(MapEntries.FlashRateSufficient, Holds: true, \"the engine\"), waiver)).Match(` for `FlashRate.SufficientToAvoidACollision(waiver, assertions).Match(`), which is a constituent's answer asserted from a constant -- the defect #78 records -- and made this entry answer \"met\" for a caller who had reported the flash rate insufficient. This test went red alone -- `Failed!  - Failed:     1, Passed:   449, Skipped:     0, Total:   450` on both net8.0 and net10.0."
+      },
+      {
+        "test": "AntiCollisionLightingEntryPointTests.While_a_waiver_of_107_29_a_2_and_b_is_stated_in_force_it_declines_OutsideCurrentScope_citing_107_205_naming_this_entry",
+        "mutation": "Lights.AsRequired skipped its own gate (`is { } suspended && suspended.Reason == UnresolvedReason.UnsupportedRule`, never true, for `is { } suspended`), so a stated waiver of § 107.29(a)(2) and (b) was answered by whichever constituent was asked first: the decline cited § 107.29(a)(2), (b) rather than waivable-regulations' § 107.205, and named the constituent rather than this entry. This test went red with the shared-locator test -- `Failed!  - Failed:     2, Passed:   448, Skipped:     0, Total:   450` on both net8.0 and net10.0."
+      },
+      {
+        "test": "AntiCollisionLightingEntryPointTests.The_three_entries_on_this_locator_are_told_apart_by_what_was_attempted_and_not_by_the_citation",
+        "mutation": "Lights.AsRequired read its gate on a constituent's entry (`Waivers.Suspension(MapEntries.FlashRateSufficient, Regulation, waiver)` for `Waivers.Suspension(MapEntries.AntiCollisionLighting, Regulation, waiver)`), so this entry's decline said flash-rate-sufficient had been attempted -- the confusion the shared locator § 107.29(a)(2), (b) cannot catch, because all three entries carry it and all three declines cite § 107.205. This test went red with the waiver-gate test and the wrong-regulation test, whose refusal message names the entry -- `Failed!  - Failed:     3, Passed:   447, Skipped:     0, Total:   450` on both net8.0 and net10.0."
+      },
+      {
+        "test": "AntiCollisionLightingEntryPointTests.The_clause_is_stated_twice_for_night_and_for_civil_twilight_and_this_entry_answers_one_requirement",
+        "mutation": "A `public bool? DuringCivilTwilight { get; init; }` was added to AntiCollisionLightingRequest in the Requests partial beside the handler -- surface for a question this entry does not ask, since § 107.29(a)(2) and (b) state the same requirement and which period an operation is in is night-operation's and civil-twilight-operation's. This test went red alone with `Assert.Equal() Failure: Collections differ; Expected: [\"Assertions\", \"EntryId\", \"Lighting\", \"Waiver\"]; Actual: [\"Assertions\", \"DuringCivilTwilight\", \"EntryId\", \"Lighting\", \"Waiver\"]` -- `Failed!  - Failed:     1, Passed:   449, Skipped:     0, Total:   450` on both net8.0 and net10.0. It went red too with the finding citing § 107.29(a) (`Failed!  - Failed:     5, Passed:   445, Skipped:     0, Total:   450` on both net8.0 and net10.0)."
+      },
+      {
+        "test": "AntiCollisionLightingEntryPointTests.A_waiver_statement_about_another_regulation_is_refused",
+        "mutation": "Lights.Regulation named the section rather than what § 107.205(b) designates (`\"§ 107.29\"` for `\"§ 107.29(a)(2) and (b)\"`), so this entry accepted a statement about § 107.29 whole -- a waiver of paragraphs (c) and (d) as well, which § 107.205 does not list -- and refused every statement about the regulation the list actually carries, including the ones its two constituents check against. This test went red with thirteen of this entry's fourteen (eighteen cases counting the boundary theory's rows) -- `Failed!  - Failed:    18, Passed:   432, Skipped:     0, Total:   450` on both net8.0 and net10.0 -- every one but the demanded-inputs test, which refuses before the regulation is compared. It went red alone on a second mutation, the gate read on a constituent's entry (`Failed!  - Failed:     3, Passed:   447, Skipped:     0, Total:   450` on both net8.0 and net10.0), whose refusal named flash-rate-sufficient."
+      },
+      {
+        "test": "AntiCollisionLightingEntryPointTests.Without_the_facts_the_clause_turns_on_it_refuses_rather_than_assume_them_including_through_the_dictionary_dispatch",
+        "mutation": "Handlers.AntiCollisionLighting invented the lighting when it was not given (`request.Lighting ?? LightingStatement.NoneFitted(\"the engine\")` for `Demand(request.Lighting, request.EntryId, nameof(request.Lighting))`), so a request that described no aircraft was answered as an aircraft with no anti-collision lighting -- a conviction from silence, and through `Registry.Resolve(id, RuleRequest)`, which can carry neither input, the only thing between the dictionary dispatch and an invented answer. This test went red alone with `Assert.Throws() Failure: No exception was thrown` -- `Failed!  - Failed:     1, Passed:   449, Skipped:     0, Total:   450` on both net8.0 and net10.0."
+      }
+    ]
   }
 }
