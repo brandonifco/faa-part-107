@@ -47,10 +47,23 @@ public sealed record OperationFacts
 
     /// <summary>Facts about no operation at all: nothing stated, nothing asserted, no waiver named.</summary>
     /// <remarks>
+    /// <para>
     /// Evaluating these is meaningful and is the honest starting point: every entry that demands an
-    /// input reports <see cref="RequirementState.FactRequired"/>, every assertion entry reports
-    /// <see cref="RequirementState.HumanAssertionRequired"/>, and every entry this engine has not
-    /// built reports what its correspondence row gives.
+    /// input reports <see cref="RequirementState.FactRequired"/>, an assertion entry that demands no
+    /// input of its own reports <see cref="RequirementState.HumanAssertionRequired"/>, and every
+    /// entry this engine has not built reports what its correspondence row gives.
+    /// </para>
+    /// <para>
+    /// <b>Six of the ten assertion entries do demand an input first</b>, and so report
+    /// <see cref="RequirementState.FactRequired"/> here rather than
+    /// <see cref="RequirementState.HumanAssertionRequired"/>: the five § 107.205-gated ones want the
+    /// waiver statement, and <c>sufficient-available-power</c> wants § 107.49(d)'s own condition
+    /// (<c>#95</c>). That is the order those entries owe their caller facts in and not an accident of
+    /// this value. Which entries fall which way is measured rather than stated here —
+    /// <c>OperationEvaluatorTests
+    /// .An_assertion_is_wrapped_exactly_where_a_caller_fact_is_demanded_ahead_of_it</c>, and
+    /// <c>docs/decisions/0004-an-assertion-is-recorded-and-not-scored.md</c>.
+    /// </para>
     /// </remarks>
     public static OperationFacts Nothing { get; } = new();
 

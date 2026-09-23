@@ -126,13 +126,24 @@ public sealed record SufficientAvailablePowerFinding : IConditionalAssertion
 /// </para>
 /// <para>
 /// <b>The antecedent is this entry's, because it is in this entry's evidence.</b> The map quotes the
-/// paragraph whole, "If the small unmanned aircraft is powered" included, and no other entry quotes
-/// it: <see cref="MapEntries.PreflightActions"/>' evidence carries § 107.49's lead-in and its
-/// paragraphs' text, and takes § 107.49(f)'s condition for the opposite reason —
-/// <see cref="SubpartDOperation"/> is in the composite's evidence and in no constituent's. So the
-/// condition belongs here (<c>#95</c>), and where it is not satisfied the paragraph states no
-/// obligation about the operation: that is not the obligation being met, and it is not its being
-/// unmet.
+/// paragraph whole, "If the small unmanned aircraft is powered" included. So the condition belongs
+/// here (<c>#95</c>), and where it is not satisfied the paragraph states no obligation about the
+/// operation: that is not the obligation being met, and it is not its being unmet.
+/// </para>
+/// <para>
+/// <b>It is also in the composite's evidence, and that is the asymmetry with § 107.49(f)</b> — the
+/// reverse of the one those two entries' notes are often read as drawing.
+/// <see cref="MapEntries.PreflightActions"/>' evidence quotes § 107.49 entire, lead-in and (a)
+/// through (f), so "If the small unmanned aircraft is powered" stands in the composite's evidence as
+/// well as this constituent's: it is the only antecedent in this map that appears in two entries.
+/// § 107.49(f)'s runs the other way — <see cref="SubpartDOperation"/>'s condition is in the
+/// composite's evidence and in no constituent's, <c>subpart-d-categories</c>' evidence being
+/// subpart D's own scope sentence, which does not carry it — which is why the composite takes that
+/// one as an input of its own. The evidence therefore does not by itself make the composite follow
+/// this entry, and today it does not: <see cref="Preflight"/> reaches § 107.49(d) through the shared
+/// <see cref="Assertions.Stated"/> and never sees the condition, so an unpowered aircraft put to
+/// <c>preflight-actions</c> is still asked for this assertion. That gap is <c>#99</c>, which is also
+/// where <i>how</i> the composite should follow is to be settled. Nothing here closes it.
 /// </para>
 /// <para>
 /// <b>The condition comes first, and the assertion only past it</b>, the order

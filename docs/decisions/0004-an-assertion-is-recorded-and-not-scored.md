@@ -75,11 +75,26 @@ Three consequences of that sentence, and each is deliberate:
   no" distinction the issue exists to protect, at the one place it is easiest to lose.
 - **The test is the map's, not a list of types this engine keeps.** An entry whose first
   correspondence row is row 8 (`RegisteredEntry.Row == CorrespondenceRow.Assertion`) is
-  `kind: assertion`, and a value it resolved to is recorded. Five of the ten answer with a bare
-  `Assertion`; the other five wrap it in a finding of their own so that the § 107.205 waiver
-  statement travels beside it — `UnaidedVisualContactFinding.Contact`,
-  `ObserverCoordinationFinding.Coordination`, `IntensityReductionFinding.Determination`,
-  `FlashRateSufficientFinding.Sufficiency`, `ReasonableProtectionFinding.Protection`. The row test
+  `kind: assertion`, and a value it resolved to is recorded. Four of the ten answer with a bare
+  `Assertion` — `collision-hazard-proximity`, `preflight-risk-assessment`, `participant-briefing`,
+  `attached-object-no-adverse-effect`. The other six wrap it in a finding of their own, so that the
+  caller fact the entry demanded *ahead* of the assertion travels beside it:
+  `UnaidedVisualContactFinding.Contact`, `ObserverCoordinationFinding.Coordination`,
+  `IntensityReductionFinding.Determination`, `FlashRateSufficientFinding.Sufficiency` and
+  `ReasonableProtectionFinding.Protection` carry the § 107.205 waiver statement, and
+  `SufficientAvailablePowerFinding.Availability` carries § 107.49(d)'s own condition (#95).
+  **Wrapping therefore does not mean a waiver gate.** It means a fact was owed before the assertion
+  could be asked for, and § 107.205 is only the commonest such fact: `sufficient-available-power`
+  has no `suspendedBy` in the map at all, and nothing about a waiver is demanded or read for it.
+
+  **This census is checked too, and for the reason the one below states.** It was written without a
+  test and was wrong inside a single change: #95 made the sixth wrapper and left "five" and "so that
+  the § 107.205 waiver statement travels beside it" standing, both false, in the record that is
+  authority for how this engine reads an assertion.
+  `OperationEvaluatorTests.An_assertion_is_wrapped_exactly_where_a_caller_fact_is_demanded_ahead_of_it`
+  now measures the split from the engine — an entry wraps exactly where `OperationFacts.Nothing`
+  makes it report `FactRequired` rather than `HumanAssertionRequired` — and fails naming this record
+  when either half moves. The row test
   covers all ten without naming any of them or any of their types, so an assertion entry a later
   map version adds is covered the day it is built rather than the day somebody remembers this
   record. The gate decides whether the entry is reachable; it does not add a polarity the corpus

@@ -375,6 +375,10 @@
       {
         "test": "SufficientAvailablePowerEntryPointTests.The_paragraph_is_carried_verbatim_condition_and_all",
         "mutation": "AvailablePower.Paragraph dropped the antecedent from the quotation (\"(d) Ensure that there is enough available power ...\" for the map's own \"(d) If the small unmanned aircraft is powered, ensure ...\"), so what the engine prints beside the answer no longer showed the condition it tested; this test went red alone (`Failed!  - Failed:     1, Passed:   652, Skipped:     0, Total:   653`)."
+      },
+      {
+        "test": "OperationEvaluatorTests.An_assertion_is_wrapped_exactly_where_a_caller_fact_is_demanded_ahead_of_it",
+        "mutation": "Handlers.SufficientAvailablePower answered row 8's own shape — `Answer(Assertions.Stated(MapEntries.SufficientAvailablePower, request.Assertions))` for `Answer(AvailablePower.Enough(Demand(request.Power, ...), request.Assertions))` — so this entry became a bare `Assertion` again, the fifth wrapper rather than the sixth, and `OperationFacts.Nothing` reported it `HumanAssertionRequired` rather than `FactRequired`. That is exactly the pair of prose statements this test exists to hold: it went red on the membership half (`Assert.Equal() Failure: Values differ / Expected: False / Actual: True`), with eleven others (`Failed!  - Failed:    12, Passed:   650, Skipped:     0, Total:   662`). It went red too on the other half alone, with the condition defaulted rather than demanded (`request.Power ?? AircraftPower.Powered` for the `Demand`), which keeps the wrapper but stops `Nothing` demanding the condition — three red (`Failed!  - Failed:     3, Passed:   659, Skipped:     0, Total:   662`)."
       }
     ]
   },

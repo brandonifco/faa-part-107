@@ -483,6 +483,78 @@ public class OperationEvaluatorTests
     }
 
     [Fact]
+    public void An_assertion_is_wrapped_exactly_where_a_caller_fact_is_demanded_ahead_of_it()
+    {
+        // Two prose censuses say this, and they are the same partition measured from two ends:
+        // docs/decisions/0004 says which row-8 entries answer with a bare Assertion and which wrap
+        // it in a finding of their own, and OperationFacts.Nothing's remarks say which report
+        // HumanAssertionRequired and which report FactRequired. Both were written without a test
+        // and both were false the moment #95 gave sufficient-available-power a condition of its
+        // own — a sixth wrapper, and one that wraps for no waiver reason at all. So the partition
+        // is measured here, and moving either end goes red naming the record.
+        string[] bare =
+        [
+            "collision-hazard-proximity",
+            "preflight-risk-assessment",
+            "participant-briefing",
+            "attached-object-no-adverse-effect",
+        ];
+
+        var rowEight = Registry.Entries
+            .Where(entry => entry.Row == CorrespondenceRow.Assertion && entry.Status == EntryStatus.Implemented)
+            .ToArray();
+        Assert.Equal(10, rowEight.Length);
+
+        var answered = OperationEvaluator.Evaluate(Complete());
+        var asked = OperationEvaluator.Evaluate(OperationFacts.Nothing);
+
+        foreach (var entry in rowEight)
+        {
+            // Supplied, every one of them records the assertion. What differs is only what carries
+            // it, which is what this measures.
+            var outcome = answered.Requirement(entry.Id);
+            Assert.Equal(RequirementState.HumanAssertionRecorded, outcome.State);
+
+            var isBare = outcome.Finding is Assertion;
+            Assert.Equal(bare.Contains(entry.Id, StringComparer.Ordinal), isBare);
+
+            // The same partition from the other end. A bare answer is one nothing was owed ahead
+            // of, so facts about no operation at all still reach the assertion and demand it. A
+            // wrapper is one a caller fact gates — § 107.205's waiver statement for five of them,
+            // § 107.49(d)'s condition for sufficient-available-power — so the same facts stop at
+            // that fact first and never reach the assertion.
+            Assert.Equal(
+                isBare ? RequirementState.HumanAssertionRequired : RequirementState.FactRequired,
+                asked.Requirement(entry.Id).State);
+        }
+
+        // The counts decision 0004 states in words, measured rather than transcribed.
+        var wrapped = rowEight.Count(entry => answered.Requirement(entry.Id).Finding is not Assertion);
+        Assert.Equal(4, rowEight.Length - wrapped);
+        Assert.Equal(6, wrapped);
+
+        // And the six types that record names, so that a rename cannot leave it stale while the
+        // partition above still holds.
+        string[] wrappers =
+        [
+            "FlashRateSufficientFinding",
+            "IntensityReductionFinding",
+            "ObserverCoordinationFinding",
+            "ReasonableProtectionFinding",
+            "SufficientAvailablePowerFinding",
+            "UnaidedVisualContactFinding",
+        ];
+
+        Assert.Equal(
+            wrappers,
+            rowEight
+                .Select(entry => answered.Requirement(entry.Id).Finding)
+                .Where(finding => finding is not Assertion)
+                .Select(finding => finding!.GetType().Name)
+                .Order(StringComparer.Ordinal));
+    }
+
+    [Fact]
     public void No_assertion_entry_is_ever_reported_as_satisfied_or_violated()
     {
         // Registry-driven: every entry the map records as kind: assertion (correspondence row 8)
