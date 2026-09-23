@@ -103,6 +103,14 @@ public sealed record OperationFacts
     /// </summary>
     public Shelter? Shelter { get; init; }
 
+    /// <summary>
+    /// What the caller states about the small unmanned aircraft's anti-collision lighting —
+    /// fitted or not, lighted or extinguished, its intensity reduced or not, and how far it is
+    /// visible (<c>anti-collision-lighting</c>, § 107.29(a)(2) and (b)). Never assumed in either
+    /// direction.
+    /// </summary>
+    public LightingStatement? Lighting { get; init; }
+
     /// <summary>The airspace the operation is in (<c>airspace-authorized</c>, § 107.41).</summary>
     public AirspaceClass? Airspace { get; init; }
 

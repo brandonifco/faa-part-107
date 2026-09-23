@@ -218,6 +218,12 @@ public static class OperationEvaluator
             new Requests.ObserverCoordinationRequest(facts.Assertions) { Waiver = facts.WaiverOf(Coordination.Regulation) }),
         "intensity-reduction-in-interest-of-safety" => EntryPoints.IntensityReductionInInterestOfSafety.Resolve(
             new Requests.IntensityReductionInInterestOfSafetyRequest(facts.Assertions) { Waiver = facts.WaiverOf(Lighting.Regulation) }),
+        "anti-collision-lighting" => EntryPoints.AntiCollisionLighting.Resolve(
+            new Requests.AntiCollisionLightingRequest(facts.Assertions)
+            {
+                Lighting = facts.Lighting,
+                Waiver = facts.WaiverOf(Lights.Regulation),
+            }),
         "flash-rate-sufficient" => EntryPoints.FlashRateSufficient.Resolve(
             new Requests.FlashRateSufficientRequest(facts.Assertions) { Waiver = facts.WaiverOf(FlashRate.Regulation) }),
         "visual-line-of-sight" => EntryPoints.VisualLineOfSight.Resolve(
@@ -275,6 +281,10 @@ public static class OperationEvaluator
         // § 107.51 as a whole: the conjunction of its constituent limitations, as the rule made
         // it from what each constituent entry answered. This orchestrator does not re-derive it.
         OperatingLimitationsFinding finding => Met(finding.CompliedWith),
+
+        // § 107.29(a)(2) and (b): true when the lighting the clause requires is there. The rule
+        // makes that conjunction from the caller's statement and two assertions; this reads it.
+        AntiCollisionLightingFinding finding => Met(finding.Met),
 
         // § 107.31 as a whole: true when paragraph (a)'s ability is there and paragraph (b)'s
         // requirement that it be exercised is satisfied. The rule makes that conjunction, not

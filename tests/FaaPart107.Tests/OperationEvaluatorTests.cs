@@ -44,6 +44,7 @@ public class OperationEvaluatorTests
         FeetBelowCloud = 100m,
         FeetHorizontallyFromCloud = 100m,
         BoundPerson = BoundPerson.RemotePilotInCommand,
+        Lighting = LightingStatement.LightedAndVisibleFor(5m, Caller),
         Shelter = Shelter.CoveredStructure,
         Airspace = AirspaceClass.ClassG,
         AtcAuthorization = AtcAuthorization.None(Caller),
@@ -491,6 +492,27 @@ public class OperationEvaluatorTests
 
             // § 107.51(c)-(d): the one finding the engine can resolve is that they are not met.
             { "weather-minimums-met", RequirementState.Violated, f => f },
+
+            // § 107.29(a)(2) and (b): lighting lighted and visible far enough, and none fitted.
+            {
+                "anti-collision-lighting", RequirementState.Satisfied,
+                f => f with { Lighting = LightingStatement.LightedAndVisibleFor(5m, Caller) }
+            },
+            {
+                "anti-collision-lighting", RequirementState.Violated,
+                f => f with { Lighting = LightingStatement.NoneFitted(Caller) }
+            },
+            {
+                // Fitted, and extinguished: the clause is not met, and an arm reading "fitted"
+                // alone would say it was.
+                "anti-collision-lighting", RequirementState.Violated,
+                f => f with { Lighting = LightingStatement.FittedButExtinguished(Caller) }
+            },
+            {
+                // Lighted, and not visible for the printed distance: likewise.
+                "anti-collision-lighting", RequirementState.Violated,
+                f => f with { Lighting = LightingStatement.LightedAndVisibleFor(1m, Caller) }
+            },
 
             // § 107.31 as a whole: paragraph (b)'s first combination, and nobody at all.
             {
