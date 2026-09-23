@@ -166,8 +166,8 @@ public sealed class CorrespondenceTests
         Assert.True(Registry.HasImplementation("altitude-within-limit"), "altitude-within-limit is implemented in the overlay and has no [Implements] handler");
 
     [Fact]
-    public void weather_minimums_met__declines_UnsupportedRule_row_2() =>
-        AssertDeclines("weather-minimums-met", UnresolvedReason.UnsupportedRule, EntryPoints.WeatherMinimumsMet.Resolve(global::FaaPart107.Requests.WeatherMinimumsMetRequest.Empty), new SourceLocator("cfr-14-107", "§ 107.51(c)-(d)"));
+    public void weather_minimums_met__is_implemented_so_a_hand_written_handler_answers_it() =>
+        Assert.True(Registry.HasImplementation("weather-minimums-met"), "weather-minimums-met is implemented in the overlay and has no [Implements] handler");
 
     [Fact]
     public void operating_limitations__declines_UnsupportedRule_row_2() =>

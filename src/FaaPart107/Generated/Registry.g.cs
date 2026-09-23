@@ -144,7 +144,7 @@ public static class Registry
         new("civil-twilight-window", EntryStatus.Implemented, CorrespondenceRow.None, [MapEntries.CivilTwilightWindow.Locator]),
         new("speed-within-limit", EntryStatus.Implemented, CorrespondenceRow.None, [MapEntries.SpeedWithinLimit.Locator]),
         new("altitude-within-limit", EntryStatus.Implemented, CorrespondenceRow.None, [MapEntries.AltitudeWithinLimit.Locator]),
-        new("weather-minimums-met", EntryStatus.Mapped, CorrespondenceRow.NotBuilt, [MapEntries.WeatherMinimumsMet.Locator]),
+        new("weather-minimums-met", EntryStatus.Implemented, CorrespondenceRow.None, [MapEntries.WeatherMinimumsMet.Locator]),
         new("operating-limitations", EntryStatus.Mapped, CorrespondenceRow.NotBuilt, [MapEntries.OperatingLimitations.Locator]),
         new("prominent-objects", EntryStatus.Implemented, CorrespondenceRow.UnresolvedAmbiguity, [MapEntries.ProminentObjects.Locator]),
         new("single-aircraft", EntryStatus.Implemented, CorrespondenceRow.None, [MapEntries.SingleAircraft.Locator]),

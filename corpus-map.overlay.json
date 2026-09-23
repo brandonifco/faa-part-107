@@ -956,5 +956,50 @@
         "mutation": "Handlers.CollisionHazardProximity borrowed the neighbour's answer (`Resolution<object>.FromUnresolved(new UnresolvedResult(UnresolvedReason.RequiresInterpretation, ..., MapEntries.WellClear.Locator))` for `Answer(Assertions.Stated(...))`), so § 107.37(b)'s assertion declined under § 107.37(a)'s undefined term instead of being answered; this test went red with all ten of this entry's (`Failed!  - Failed:    10, Passed:   251, Skipped:     0, Total:   261`). The distance half went red on its own mutation: a `public decimal? SeparationFeet { get; init; }` added to CollisionHazardProximityRequest in a Requests partial beside the handler — surface for the number the entry's note says an engine resolving this to a distance \"would substitute its own rule for the corpus's\" to reach. That reddened this test alone (`Failed!  - Failed:     1, Passed:   260, Skipped:     0, Total:   261`)."
       }
     ]
+  },
+  "weather-minimums-met": {
+    "status": "implemented",
+    "implementedIn": {
+      "ruleset": "faa-part-107",
+      "version": 1
+    },
+    "tests": [
+      {
+        "test": "WeatherMinimumsMetEntryPointTests.Neither_cloud_minimum_met_resolves_the_minimums_not_met_whatever_the_stated_visibility_citing_107_51_c_d",
+        "mutation": "Weather.MinimumsMet resolved where both cloud minimums are met instead of where neither is (`finding.BelowCloudMinimumMet && finding.HorizontallyFromCloudMinimumMet` for `!finding.BelowCloudMinimumMet && !finding.HorizontallyFromCloudMinimumMet`), so a situation that breaks § 107.51(d) on either reading of how its two figures combine declined instead of resolving; this test went red -- `Failed!  - Failed:     3, Passed:     0, Skipped:     0, Total:     3`."
+      },
+      {
+        "test": "WeatherMinimumsMetEntryPointTests.Both_cloud_minimums_met_declines_RequiresInterpretation_citing_prominent_objects_107_51_c_whatever_the_stated_visibility",
+        "mutation": "Weather.MinimumsMet answered from the caller's stated flight visibility (`flightVisibilityStatuteMiles < minimum.StatuteMiles || (!finding.BelowCloudMinimumMet && !finding.HorizontallyFromCloudMinimumMet)` for `!finding.BelowCloudMinimumMet && !finding.HorizontallyFromCloudMinimumMet`), so a stated 0 and 2.99 statute miles resolved the minimums not met instead of declining -- the engine fixing the degree of prominence the corpus does not fix; this test went red -- `Failed!  - Failed:     2, Passed:     3, Skipped:     0, Total:     5`, exactly the two stated visibilities below the figure, while 3, 3.01 and 10 stayed green, so the mutation is pinned at the figure and not near it. It went red at all five with the decline citing cloud-clearance's `§ 107.51(d)` (`MapEntries.CloudClearance.Locator` for `MapEntries.ProminentObjects.Locator`) -- `Failed!  - Failed:     5, Passed:     0, Skipped:     0, Total:     5`. Citing visibility-minimum's locator did NOT turn it red: prominent-objects and visibility-minimum both cite `§ 107.51(c)`, so the locator cannot tell them apart and only Attempted names prominent-objects (decision 0001 records the same shared-locator blind spot for speed)."
+      },
+      {
+        "test": "WeatherMinimumsMetEntryPointTests.Exactly_one_cloud_minimum_met_declines_and_names_cloud_clearances_open_question_too",
+        "mutation": "Weather.Undetermined never named the cloud half (`var cloudHalf = true` for `var cloudHalf = finding.BelowCloudMinimumMet == finding.HorizontallyFromCloudMinimumMet`), so a situation meeting one of § 107.51(d)'s two minimums and not the other declined citing only the visibility gap and said nothing of cloud-clearance's open question; this test went red -- `Failed!  - Failed:     4, Passed:     0, Skipped:     0, Total:     4`. It went red too with CloudClearance.BelowCloudFeet printed 501 feet (`= 501m` for `= 500m`) -- `Failed!  - Failed:     2, Passed:     2, Skipped:     0, Total:     4`, exactly the two cases stated at 500 feet below the cloud, which then met neither minimum and resolved not-met instead of declining: the boundary this entry applies moved with the dependency, which is the evidence that it reads cloud-clearance's figure rather than restating 500 here."
+      },
+      {
+        "test": "WeatherMinimumsMetEntryPointTests.While_a_waiver_of_107_51_is_stated_in_force_it_declines_OutsideCurrentScope_citing_107_205_and_records_the_statement",
+        "mutation": "Weather.MinimumsMet skipped its own gate check (`is { } suspended && suspended.Reason == UnresolvedReason.UnsupportedRule`, never true, for `is { } suspended`), so the OutsideCurrentScope decline came from visibility-minimum's gate further in and Attempted read `resolve the map entry 'visibility-minimum ...` rather than naming weather-minimums-met; this test went red -- `Failed!  - Failed:     4, Passed:     0, Skipped:     0, Total:     4`."
+      },
+      {
+        "test": "WeatherMinimumsMetEntryPointTests.Stated_that_no_waiver_is_in_force_the_rule_is_evaluated_and_the_statement_recorded",
+        "mutation": "Waivers.Suspension treated every statement as a waiver in force (`return true ? ...` for `return statement.InForce ? ...`), so a statement that none is held still declined OutsideCurrentScope and there was no finding to record it on; this test went red -- `Failed!  - Failed:     1, Passed:     0, Skipped:     0, Total:     1`."
+      },
+      {
+        "test": "WeatherMinimumsMetEntryPointTests.Without_a_waiver_statement_it_refuses_rather_than_infer_one",
+        "mutation": "Handlers.WeatherMinimumsMet defaulted a missing statement to none held (`request.Waiver ?? WaiverStatement.NoneHeld(Weather.Regulation, \"the engine\")` for `Demand(request.Waiver, ...)`); this test went red -- `Failed!  - Failed:     1, Passed:     0, Skipped:     0, Total:     1`."
+      },
+      {
+        "test": "WeatherMinimumsMetEntryPointTests.Without_a_stated_figure_it_refuses_rather_than_assume_one",
+        "mutation": "Handlers.WeatherMinimumsMet defaulted a missing flight visibility to zero (`request.FlightVisibilityStatuteMiles ?? 0m` for `Demand(request.FlightVisibilityStatuteMiles, ...)`), so a request that stated no visibility was answered as though the caller had stated none of it; this test went red -- `Failed!  - Failed:     1, Passed:     0, Skipped:     0, Total:     1`. It went red too with the same default on the distance below the cloud (`request.FeetBelowCloud ?? 0m` for its Demand) -- `Failed!  - Failed:     1, Passed:     0, Skipped:     0, Total:     1`."
+      },
+      {
+        "test": "WeatherMinimumsMetEntryPointTests.A_negative_stated_figure_is_refused",
+        "mutation": "Weather.MinimumsMet dropped the guard on the distance below the cloud (the line `ArgumentOutOfRangeException.ThrowIfNegative(feetBelowCloud);` removed), so a stated -1 feet below the cloud was compared with the printed minimum instead of being refused; this test went red -- `Failed!  - Failed:     1, Passed:     2, Skipped:     0, Total:     3`, exactly the negative below-cloud case, the other two guards still holding."
+      },
+      {
+        "test": "WeatherMinimumsMetEntryPointTests.The_dictionary_dispatch_refuses_rather_than_answering_from_defaults",
+        "mutation": "Handlers.WeatherMinimumsMet defaulted every input (`request.FlightVisibilityStatuteMiles ?? 0m`, `request.FeetBelowCloud ?? 0m`, `request.FeetHorizontallyFromCloud ?? 0m` and `request.Waiver ?? WaiverStatement.NoneHeld(Weather.Regulation, \"the engine\")` for their four `Demand(...)` calls), so `Registry.Resolve(\"weather-minimums-met\", RuleRequest.Empty)` -- which builds a request with every input at its default -- resolved a finding that the minimums are not met, from zero feet below and zero feet horizontally from a cloud the caller never mentioned, instead of refusing; this test went red -- `Failed!  - Failed:     1, Passed:     0, Skipped:     0, Total:     1` on `Assert.Throws() Failure: No exception was thrown`. Defaulting the flight visibility alone still refused, on the next input, so this test's mutation is the whole set: the dictionary dispatch cannot carry typed inputs, and nothing but the handler's Demands stands between it and an invented answer."
+      }
+    ]
   }
 }
