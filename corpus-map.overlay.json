@@ -131,5 +131,34 @@
         "mutation": "Visibility.Minimum compared the statement's regulation with itself (`waiver.Regulation` for `Regulation` in the call to Waivers.Suspension), so a waiver of § 107.41 suspended § 107.51(c); this test went red."
       }
     ]
+  },
+  "cloud-clearance": {
+    "status": "implemented",
+    "implementedIn": {
+      "ruleset": "faa-part-107",
+      "version": 1
+    },
+    "tests": [
+      {
+        "test": "CloudClearanceEntryPointTests.The_minimum_resolves_as_printed_500_feet_below_the_cloud_and_2000_feet_horizontally_from_it_citing_107_51_d",
+        "mutation": "CloudClearance.BelowCloudFeet printed 501 feet (`= 501m` for `= 500m`); this test went red. It went red too with HorizontallyFromCloudFeet alone printed 2001 (`= 2001m` for `= 2000m`), so each of the two figures is asserted distinctly, and with CloudClearance.Authority citing visibility-minimum's `§ 107.51(c)` (`MapEntries.VisibilityMinimum.Locator` for `MapEntries.CloudClearance.Locator`), so the minimum named the wrong constituent of § 107.51."
+      },
+      {
+        "test": "CloudClearanceEntryPointTests.Asked_for_the_minimum_as_one_distance_it_declines_RequiresInterpretation_citing_107_51_d",
+        "mutation": "Handlers.CloudClearance never passed the caller's request for one distance (`asOneDistance: false` for `request.AsOneDistance`), so asking for the minimum as one distance resolved to the two printed figures instead of declining; this test went red. It went red too with the reason wrong (`UnresolvedReason.UnsupportedRule` for `UnresolvedReason.RequiresInterpretation`), with the decline citing visibility-minimum's `§ 107.51(c)` (`MapEntries.VisibilityMinimum.Locator` for `MapEntries.CloudClearance.Locator`), and with the message reduced to the correspondence row's bare wording (`$\"resolve the map entry '{MapEntries.CloudClearance.Id}'\"` for the message naming the \"and\", the unstated clearance above a cloud, and that the corpus does not say whether both minimums must hold or either suffices), so the decline cited where without saying why."
+      },
+      {
+        "test": "CloudClearanceEntryPointTests.While_a_waiver_of_107_51_is_stated_in_force_it_declines_OutsideCurrentScope_citing_107_205_and_records_the_statement",
+        "mutation": "Clouds.Clearance handed the gate a statement that no waiver is in force (`waiver with { InForce = false }` for `waiver`), so a stated waiver was not honoured and the minimum resolved; this test went red. It went red too with Clouds.Clearance naming visibility-minimum as the suspended entry (`MapEntries.VisibilityMinimum` for `MapEntries.CloudClearance`), so Attempted named visibility-minimum rather than cloud-clearance."
+      },
+      {
+        "test": "CloudClearanceEntryPointTests.Without_a_waiver_statement_it_refuses_rather_than_infer_one",
+        "mutation": "Handlers.CloudClearance defaulted a missing statement to none held (`request.Waiver ?? WaiverStatement.NoneHeld(Clouds.Regulation, \"the engine\")` for `Demand(request.Waiver, ...)`); this test went red."
+      },
+      {
+        "test": "CloudClearanceEntryPointTests.A_waiver_statement_about_another_regulation_is_refused",
+        "mutation": "Clouds.Clearance compared the statement's regulation with itself (`waiver.Regulation` for `Regulation` in the call to Waivers.Suspension), so a waiver of § 107.41 suspended § 107.51(d); this test went red."
+      }
+    ]
   }
 }

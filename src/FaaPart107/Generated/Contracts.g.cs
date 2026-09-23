@@ -263,8 +263,8 @@ internal static partial class Handlers
     /// <summary>Minimum flight visibility (<c>visibility-minimum</c>): required, the entry is implemented.</summary>
     internal static partial Resolution<object> VisibilityMinimum(global::FaaPart107.Requests.VisibilityMinimumRequest request);
 
-    /// <summary>Minimum distance from clouds (<c>cloud-clearance</c>): optional.</summary>
-    static partial void CloudClearance(global::FaaPart107.Requests.CloudClearanceRequest request, ref Resolution<object>? resolution);
+    /// <summary>Minimum distance from clouds (<c>cloud-clearance</c>): required, the entry is implemented.</summary>
+    internal static partial Resolution<object> CloudClearance(global::FaaPart107.Requests.CloudClearanceRequest request);
 
     /// <summary>Civil twilight, outside Alaska (<c>civil-twilight-window</c>): optional.</summary>
     static partial void CivilTwilightWindow(global::FaaPart107.Requests.CivilTwilightWindowRequest request, ref Resolution<object>? resolution);
@@ -415,7 +415,7 @@ internal static partial class Handlers
                 resolution = VisibilityMinimum(request as global::FaaPart107.Requests.VisibilityMinimumRequest ?? new(assertions));
                 break;
             case "cloud-clearance":
-                CloudClearance(request as global::FaaPart107.Requests.CloudClearanceRequest ?? new(assertions), ref resolution);
+                resolution = CloudClearance(request as global::FaaPart107.Requests.CloudClearanceRequest ?? new(assertions));
                 break;
             case "civil-twilight-window":
                 CivilTwilightWindow(request as global::FaaPart107.Requests.CivilTwilightWindowRequest ?? new(assertions), ref resolution);
@@ -558,7 +558,7 @@ internal static partial class Handlers
         "speed-limit" => true,
         "altitude-limit" => true,
         "visibility-minimum" => true,
-        "cloud-clearance" => Hooked("CloudClearance", typeof(global::FaaPart107.Requests.CloudClearanceRequest)),
+        "cloud-clearance" => true,
         "civil-twilight-window" => Hooked("CivilTwilightWindow", typeof(global::FaaPart107.Requests.CivilTwilightWindowRequest)),
         "speed-within-limit" => true,
         "altitude-within-limit" => Hooked("AltitudeWithinLimit", typeof(global::FaaPart107.Requests.AltitudeWithinLimitRequest)),

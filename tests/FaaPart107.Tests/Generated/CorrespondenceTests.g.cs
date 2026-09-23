@@ -150,8 +150,8 @@ public sealed class CorrespondenceTests
         Assert.True(Registry.HasImplementation("visibility-minimum"), "visibility-minimum is implemented in the overlay and has no [Implements] handler");
 
     [Fact]
-    public void cloud_clearance__declines_UnsupportedRule_row_2() =>
-        AssertDeclines("cloud-clearance", UnresolvedReason.UnsupportedRule, EntryPoints.CloudClearance.Resolve(global::FaaPart107.Requests.CloudClearanceRequest.Empty), new SourceLocator("cfr-14-107", "§ 107.51(d)"));
+    public void cloud_clearance__is_implemented_so_a_hand_written_handler_answers_it() =>
+        Assert.True(Registry.HasImplementation("cloud-clearance"), "cloud-clearance is implemented in the overlay and has no [Implements] handler");
 
     [Fact]
     public void civil_twilight_window__declines_UnsupportedRule_row_2() =>
