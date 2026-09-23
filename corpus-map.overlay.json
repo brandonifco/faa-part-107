@@ -160,5 +160,30 @@
         "mutation": "Clouds.Clearance compared the statement's regulation with itself (`waiver.Regulation` for `Regulation` in the call to Waivers.Suspension), so a waiver of § 107.41 suspended § 107.51(d); this test went red."
       }
     ]
+  },
+  "civil-twilight-window": {
+    "status": "implemented",
+    "implementedIn": {
+      "ruleset": "faa-part-107",
+      "version": 1
+    },
+    "tests": [
+      {
+        "test": "CivilTwilightWindowEntryPointTests.The_two_periods_resolve_as_printed_30_minutes_before_official_sunrise_to_sunrise_and_sunset_to_30_minutes_after_citing_107_29_c_1_2",
+        "mutation": "CivilTwilightWindows.BeforeSunrise began 31 minutes before official sunrise (`TwilightBoundary.MinutesBefore(31m, OfficialEvent.Sunrise)` for `MinutesBefore(30m, ...)`); this test went red. It went red too with AfterSunset alone ending 31 minutes after official sunset (`TwilightBoundary.MinutesAfter(31m, OfficialEvent.Sunset)` for `MinutesAfter(30m, ...)`), so the two printed 30-minute figures are asserted distinctly, and with CivilTwilightWindows.Authority citing civil-twilight-operation's `§ 107.29(b)-(c)` (`MapEntries.CivilTwilightOperation.Locator` for `MapEntries.CivilTwilightWindow.Locator`)."
+      },
+      {
+        "test": "CivilTwilightWindowEntryPointTests.Each_period_is_bounded_by_its_own_official_event_and_the_corpus_prints_no_offset_at_sunrise_or_at_sunset",
+        "mutation": "CivilTwilightWindows.BeforeSunrise ended at official sunset (`TwilightBoundary.At(OfficialEvent.Sunset)` for `At(OfficialEvent.Sunrise)`), so (c)(1)'s period was bounded by the wrong official event; this test went red. It went red too with AfterSunset beginning 30 minutes after official sunset (`TwilightBoundary.MinutesAfter(30m, OfficialEvent.Sunset)` for `TwilightBoundary.At(OfficialEvent.Sunset)`), so an offset the corpus does not print at official sunset is refused."
+      },
+      {
+        "test": "CivilTwilightWindowEntryPointTests.The_periods_are_stated_except_for_Alaska_and_the_value_prints_the_corpus_wording",
+        "mutation": "CivilTwilightWindows.ExceptFor named the wrong place (`= \"Hawaii\"` for `= \"Alaska\"`); this test went red. It went red too with TwilightBoundary.ToString swapping the corpus's own words for the sign of the offset (`OffsetMinutes < 0m ? \"after\" : \"before\"` for `? \"before\" : \"after\"`), so the value printed \"30 minutes after official sunrise\"."
+      },
+      {
+        "test": "CivilTwilightWindowEntryPointTests.It_resolves_through_the_dictionary_dispatch_demanding_no_input_and_gating_on_no_waiver",
+        "mutation": "Handlers.CivilTwilightWindow gated the entry on a demanded waiver statement of § 107.29, by analogy with altitude-limit (a `Waiver` init property on CivilTwilightWindowRequest, then `Demand(request.Waiver, ...)` and `Waivers.Suspension(MapEntries.CivilTwilightWindow, \"§ 107.29\", waiver)` for `Resolution<object>.FromValue(CivilTwilight.Windows())`), so the dictionary dispatch's input-free request threw ArgumentException instead of resolving; this test went red, and so did the other three — the entry's map row has no suspendedBy, so no request of it may be refused for want of a waiver. Red on its own, with the other three still passing, with CivilTwilightWindows given reference equality (`public bool Equals(CivilTwilightWindows? other) => ReferenceEquals(this, other);` plus `GetHashCode`), so the value resolved through the dictionary dispatch no longer equalled the one resolved through the entry point."
+      }
+    ]
   }
 }

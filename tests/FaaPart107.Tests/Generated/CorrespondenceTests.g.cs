@@ -154,8 +154,8 @@ public sealed class CorrespondenceTests
         Assert.True(Registry.HasImplementation("cloud-clearance"), "cloud-clearance is implemented in the overlay and has no [Implements] handler");
 
     [Fact]
-    public void civil_twilight_window__declines_UnsupportedRule_row_2() =>
-        AssertDeclines("civil-twilight-window", UnresolvedReason.UnsupportedRule, EntryPoints.CivilTwilightWindow.Resolve(global::FaaPart107.Requests.CivilTwilightWindowRequest.Empty), new SourceLocator("cfr-14-107", "§ 107.29(c)(1)-(2)"));
+    public void civil_twilight_window__is_implemented_so_a_hand_written_handler_answers_it() =>
+        Assert.True(Registry.HasImplementation("civil-twilight-window"), "civil-twilight-window is implemented in the overlay and has no [Implements] handler");
 
     [Fact]
     public void speed_within_limit__is_implemented_so_a_hand_written_handler_answers_it() =>
