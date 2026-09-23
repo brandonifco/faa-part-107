@@ -178,8 +178,8 @@ public sealed class CorrespondenceTests
         AssertDeclines("prominent-objects", UnresolvedReason.UnsupportedRule, EntryPoints.ProminentObjects.Resolve(global::FaaPart107.Requests.ProminentObjectsRequest.Empty), new SourceLocator("cfr-14-107", "§ 107.51(c)"));
 
     [Fact]
-    public void single_aircraft__declines_UnsupportedRule_row_2() =>
-        AssertDeclines("single-aircraft", UnresolvedReason.UnsupportedRule, EntryPoints.SingleAircraft.Resolve(global::FaaPart107.Requests.SingleAircraftRequest.Empty), new SourceLocator("cfr-14-107", "§ 107.35"));
+    public void single_aircraft__is_implemented_so_a_hand_written_handler_answers_it() =>
+        Assert.True(Registry.HasImplementation("single-aircraft"), "single-aircraft is implemented in the overlay and has no [Implements] handler");
 
     [Fact]
     public void airspace_authorized__declines_UnsupportedRule_row_2() =>

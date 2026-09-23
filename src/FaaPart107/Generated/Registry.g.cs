@@ -147,7 +147,7 @@ public static class Registry
         new("weather-minimums-met", EntryStatus.Mapped, CorrespondenceRow.NotBuilt, [MapEntries.WeatherMinimumsMet.Locator]),
         new("operating-limitations", EntryStatus.Mapped, CorrespondenceRow.NotBuilt, [MapEntries.OperatingLimitations.Locator]),
         new("prominent-objects", EntryStatus.Mapped, CorrespondenceRow.NotBuilt, [MapEntries.ProminentObjects.Locator]),
-        new("single-aircraft", EntryStatus.Mapped, CorrespondenceRow.NotBuilt, [MapEntries.SingleAircraft.Locator]),
+        new("single-aircraft", EntryStatus.Implemented, CorrespondenceRow.None, [MapEntries.SingleAircraft.Locator]),
         new("airspace-authorized", EntryStatus.Mapped, CorrespondenceRow.NotBuilt, [MapEntries.AirspaceAuthorized.Locator]),
         new("restricted-area-permitted", EntryStatus.Mapped, CorrespondenceRow.NotBuilt, [MapEntries.RestrictedAreaPermitted.Locator]),
         new("moving-vehicle-operation", EntryStatus.Mapped, CorrespondenceRow.NotBuilt, [MapEntries.MovingVehicleOperation.Locator]),

@@ -234,5 +234,50 @@
         "mutation": "Handlers.AltitudeWithinLimit defaulted a missing altitude to ground level (`request.AltitudeAboveGroundLevelFeet ?? 0m` for `Demand(request.AltitudeAboveGroundLevelFeet, ...)`), so a request that stated no altitude resolved within the limit; this test went red."
       }
     ]
+  },
+  "single-aircraft": {
+    "status": "implemented",
+    "implementedIn": {
+      "ruleset": "faa-part-107",
+      "version": 1
+    },
+    "tests": [
+      {
+        "test": "SingleAircraftEntryPointTests.Not_more_than_one_unmanned_aircraft_at_the_same_time_resolves_permitted_citing_107_35",
+        "mutation": "MultipleAircraft.AtTheSameTime prohibited the person who is in a role for one aircraft (`aircraft.Length <= 0` for `aircraft.Length <= 1`, the finding's Permitted), so none and one unmanned aircraft came back prohibited; this test went red, 4 of its 5 findings failing Assert.True. It went red too with MultipleAircraftFinding.Authority citing waivable-regulations' `§ 107.205` instead of single-aircraft's `§ 107.35`."
+      },
+      {
+        "test": "SingleAircraftEntryPointTests.More_than_one_unmanned_aircraft_at_the_same_time_resolves_prohibited_citing_107_35",
+        "mutation": "MultipleAircraft.AtTheSameTime permitted two unmanned aircraft (`aircraft.Length <= 2` for `aircraft.Length <= 1`), so a person in one of the three roles for N1 and N2 at the same time came back permitted; this test went red."
+      },
+      {
+        "test": "SingleAircraftEntryPointTests.The_same_person_acting_as_visual_observer_for_a_second_aircraft_is_prohibited",
+        "mutation": "MultipleAircraft.DistinctAircraft stopped counting the aircraft a person only observes (`engagement.Role != AircraftRole.VisualObserver && seen.Add(engagement.Aircraft)` for `seen.Add(engagement.Aircraft)`), so a remote pilot in command of N1 acting as visual observer for N2 counted one aircraft and came back permitted; this test went red."
+      },
+      {
+        "test": "SingleAircraftEntryPointTests.While_a_waiver_of_107_35_is_stated_in_force_it_declines_OutsideCurrentScope_citing_107_205_and_names_single_aircraft",
+        "mutation": "MultipleAircraft.AtTheSameTime skipped its own gate check (`is { } suspended && suspended.Reason == UnresolvedReason.UnsupportedRule` for `is { } suspended`), so a stated waiver of § 107.35 resolved to a finding instead of declining OutsideCurrentScope -- and with dependsOn empty there is no other entry's gate to decline in its place; this test went red."
+      },
+      {
+        "test": "SingleAircraftEntryPointTests.Stated_that_no_waiver_is_in_force_the_rule_is_evaluated_and_the_statement_recorded",
+        "mutation": "Waivers.Suspension treated every statement as a waiver in force (`return true` for `return statement.InForce`), so a statement that none is held still declined OutsideCurrentScope instead of resolving; this test went red."
+      },
+      {
+        "test": "SingleAircraftEntryPointTests.A_waiver_statement_about_another_regulation_is_refused",
+        "mutation": "Waivers.Suspension compared the statement's regulation with itself (`statement.Regulation, statement.Regulation` for `statement.Regulation, regulation`), so a waiver of § 107.51 was accepted as one of § 107.35; this test went red, no exception being thrown."
+      },
+      {
+        "test": "SingleAircraftEntryPointTests.Without_a_waiver_statement_it_refuses_rather_than_infer_one",
+        "mutation": "Handlers.SingleAircraft defaulted a missing statement to none held (`request.Waiver ?? WaiverStatement.NoneHeld(MultipleAircraft.Regulation, \"the engine\")` for `Demand(request.Waiver, ...)`); this test went red."
+      },
+      {
+        "test": "SingleAircraftEntryPointTests.Without_the_aircraft_the_person_is_engaged_with_it_refuses_rather_than_infer_them",
+        "mutation": "Handlers.SingleAircraft defaulted missing engagements to none (`request.Engagements ?? []` for `Demand(request.Engagements, ...)`), so a request that said nothing about the aircraft resolved as though the person were in no role for any; this test went red."
+      },
+      {
+        "test": "SingleAircraftEntryPointTests.Without_the_person_it_refuses_rather_than_infer_one",
+        "mutation": "Handlers.SingleAircraft defaulted a missing person (`request.Person ?? \"a person\"` for `Demand(request.Person, ...)`); this test went red."
+      }
+    ]
   }
 }
