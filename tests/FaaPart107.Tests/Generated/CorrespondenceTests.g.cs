@@ -282,8 +282,8 @@ public sealed class CorrespondenceTests
         AssertDeclines("visual-observer-conditions", UnresolvedReason.UnsupportedRule, EntryPoints.VisualObserverConditions.Resolve(global::FaaPart107.Requests.VisualObserverConditionsRequest.Empty), new SourceLocator("cfr-14-107", "§ 107.33"));
 
     [Fact]
-    public void effective_communication__declines_UnsupportedRule_row_2() =>
-        AssertDeclines("effective-communication", UnresolvedReason.UnsupportedRule, EntryPoints.EffectiveCommunication.Resolve(global::FaaPart107.Requests.EffectiveCommunicationRequest.Empty), new SourceLocator("cfr-14-107", "§ 107.33(a)"));
+    public void effective_communication__is_implemented_so_a_hand_written_handler_answers_it() =>
+        Assert.True(Registry.HasImplementation("effective-communication"), "effective-communication is implemented in the overlay and has no [Implements] handler");
 
     [Fact]
     public void observer_coordination__declines_UnsupportedRule_row_2() =>

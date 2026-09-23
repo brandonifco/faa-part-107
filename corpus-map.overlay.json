@@ -591,5 +591,34 @@
         "mutation": "NightTraining.Completed declined with correspondence row 5's answer instead of row 6's (`UnresolvedReason.MissingRulesData` for `UnresolvedReason.RequiresInterpretation`), as if the out-of-scope dependency knowledge-recency were an unimplemented value dependency; this test went red: `Assert.NotEqual() Failure: Values are equal` — `Failed FaaPart107.Tests.NightTrainingCompletedEntryPointTests.The_out_of_scope_dependency_declines_on_its_own_terms_and_this_entry_does_not_borrow_that_answer`, `Failed!  - Failed:     1, Passed:     0, Skipped:     0, Total:     1` on net8.0 and net10.0. It went red too with the entry borrowing its dependency's own answer (`UnresolvedReason.OutsideCurrentScope` for `UnresolvedReason.RequiresInterpretation`), the same `Assert.NotEqual() Failure: Values are equal` and `Failed!  - Failed:     1, Passed:     0, Skipped:     0, Total:     1` on both frameworks."
       }
     ]
+  },
+  "effective-communication": {
+    "status": "implemented",
+    "implementedIn": {
+      "ruleset": "faa-part-107",
+      "version": 1
+    },
+    "tests": [
+      {
+        "test": "EffectiveCommunicationEntryPointTests.Stated_that_no_waiver_is_in_force_it_declines_RequiresInterpretation_citing_107_33_a",
+        "mutation": "Communication.Effective cited visual-observer-conditions' `§ 107.33` (`MapEntries.VisualObserverConditions.Locator` for `MapEntries.EffectiveCommunication.Locator`), so the decline named the whole section rather than the constituent this entry states; this test went red. It went red too with the reason wrong (`UnresolvedReason.UnsupportedRule` for `UnresolvedReason.RequiresInterpretation`), and with Handlers.EffectiveCommunication answering the open question instead of declining (`Resolution<object>.FromValue(true)` for the call to `Communication.Effective(...)`)."
+      },
+      {
+        "test": "EffectiveCommunicationEntryPointTests.The_decline_is_the_rules_own_naming_the_undefined_term_and_the_three_persons_107_33_a_names",
+        "mutation": "Communication.Effective declined with the correspondence row's bare wording, naming no reason (`$\"resolve the map entry '{MapEntries.EffectiveCommunication.Id}'\"` for the message naming \"effective\" as undefined and the three persons § 107.33(a) names), so the decline cited where without saying why; this test went red. It went red too with § 107.31(a)'s singular wording borrowed into § 107.33(a)'s decline (`the person manipulating the flight control of the small` for `the person manipulating the flight controls of the small`) — the corpus prints \"flight control\" in § 107.31(a) and \"flight controls\" in § 107.33(a), and this entry states § 107.33(a) — and with Handlers.EffectiveCommunication answering the open question instead of delegating to the rule (`Resolution<object>.FromValue(true)` for the call to `Communication.Effective(...)`), which broke the assertion that the entry point's resolution is exactly `Communication.Effective(NoWaiver)`."
+      },
+      {
+        "test": "EffectiveCommunicationEntryPointTests.While_a_waiver_of_107_33_is_stated_in_force_it_declines_OutsideCurrentScope_citing_107_205_and_records_the_statement",
+        "mutation": "Communication.Effective handed the gate a statement that no waiver is in force (`waiver with { InForce = false }` for `waiver`), so a stated waiver of § 107.33 was not honoured and the entry declined RequiresInterpretation instead of OutsideCurrentScope; this test went red. It went red too with Communication.Effective naming visual-observer-conditions as the suspended entry (`MapEntries.VisualObserverConditions` for `MapEntries.EffectiveCommunication` in the call to Waivers.Suspension), so Attempted named visual-observer-conditions and § 107.33 rather than effective-communication and § 107.33(a)."
+      },
+      {
+        "test": "EffectiveCommunicationEntryPointTests.Without_a_waiver_statement_it_refuses_rather_than_infer_one",
+        "mutation": "Handlers.EffectiveCommunication defaulted a missing statement to none held (`request.Waiver ?? WaiverStatement.NoneHeld(Communication.Regulation, \"the engine\")` for `Demand(request.Waiver, ...)`), so an input-free request resolved to the interpretation decline instead of throwing; this test went red with `Assert.Throws() Failure: No exception was thrown`."
+      },
+      {
+        "test": "EffectiveCommunicationEntryPointTests.A_waiver_statement_about_another_regulation_is_refused",
+        "mutation": "Communication.Effective compared the statement's regulation with itself (`waiver.Regulation` for `Regulation` in the call to Waivers.Suspension), so a waiver of § 107.31 suspended § 107.33(a); this test went red with `Assert.Throws() Failure: No exception was thrown`."
+      }
+    ]
   }
 }
