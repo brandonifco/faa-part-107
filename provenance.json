@@ -214,16 +214,12 @@
       "sha256": "6da95d24394881865c0153cef534c33a53702d28ca609c8b3712bd9a1191f1ef"
     },
     {
-      "path": "backlog/001-civil-twilight-operation.md",
-      "sha256": "5adc2cf79bcb98c1aa3a8a3a056eddfbc4e64e36719df5a11016b540cb21e692"
-    },
-    {
-      "path": "backlog/002-preflight-actions.md",
-      "sha256": "52b318d78450cfaf626a653c0a879db83c5cc16f1a96d56ae97dbc51d77eda40"
+      "path": "backlog/001-preflight-actions.md",
+      "sha256": "1bb7e54821c5e5f619595190e736e65b78665ba25aaca4771640396ab8529622"
     },
     {
       "path": "backlog/README.md",
-      "sha256": "8557fd4457824e6a351e5bef6e1a6e22590c3ab4d9a62bd208b9c4824690aef9"
+      "sha256": "767d7c8974166f23d50e58bc5ce26a13222056ce36fc48c887ff03de0f20352a"
     },
     {
       "path": "corpus/part107.xml",
@@ -263,7 +259,7 @@
     },
     {
       "path": "src/FaaPart107/Generated/Contracts.g.cs",
-      "sha256": "963c3f6620f09b026eb8581d0d9c11979e6f212449ed245277e360d6345ea715"
+      "sha256": "f7c4144f8732ab5f848ea8e5ef38a17f6e48e60fe4ae5a26c24d474f44c3a3ca"
     },
     {
       "path": "src/FaaPart107/Generated/MapEntries.g.cs",
@@ -275,7 +271,7 @@
     },
     {
       "path": "src/FaaPart107/Generated/Registry.g.cs",
-      "sha256": "d215a9e93d900826b85d1c592e944e89b6458482d159b2c8fed2947f590c25c8"
+      "sha256": "3002cac4d600b089a3f5cc08fef05bbf84fd45ed6c510f5baab5f1a39a5a58e2"
     },
     {
       "path": "src/FaaPart107/Generated/Requests.g.cs",
@@ -283,7 +279,7 @@
     },
     {
       "path": "tests/FaaPart107.Tests/Generated/CorrespondenceTests.g.cs",
-      "sha256": "0f76df390e1f19aff6b195edb7886aa6beb29e5a4d57acc03eb084ecc9c63a77"
+      "sha256": "8617bde0371dbbebb0a111600c5f3c2c3c71858b77f8906cf6d26d27394b94c8"
     },
     {
       "path": "tests/FaaPart107.Tests/Generated/ProvenanceTests.g.cs",
@@ -471,7 +467,7 @@
     },
     {
       "path": "corpus-map.overlay.json",
-      "sha256": "a1dc783643d6e522a65797efbe860d5e398e86ba1aba80b63d79f539f76544d2"
+      "sha256": "8b36681e350fd19d6150cb8e2cd9b6e95cb59178db4d1c9709dca835e86c0f59"
     },
     {
       "path": "src/FaaPart107/FaaPart107.csproj",
