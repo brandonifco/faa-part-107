@@ -158,8 +158,8 @@ is the engine working, not the engine failing — the same posture §6 records f
 - **What this costs a caller, measured rather than asserted.** A consuming entry supplies the
   polarity by *using* the fact: where a built entry's own verdict requires an assertion to hold,
   that entry has said which way the assertion points, and a product reads compliance off the
-  consumer's finding rather than off the assertion. Of the ten implemented row-8 entries,
-  **five** have such a consumer today:
+  consumer's finding rather than off the assertion. The map is now fully built, and of the ten
+  implemented row-8 entries **nine** have such a consumer:
 
   | assertion entry | built consumer | how the consumer fixes the polarity |
   |---|---|---|
@@ -169,13 +169,23 @@ is the engine working, not the engine failing — the same posture §6 records f
   | `flash-rate-sufficient` | `anti-collision-lighting` | `Met` requires `FlashRate is { Holds: true }` |
   | `intensity-reduction-in-interest-of-safety` | `anti-collision-lighting` | `WithinTheBound` requires `Reduction is { Holds: true }`, **and only where the intensity is stated reduced** — the clause bounds what may be done to the lighting, so where nothing was done the determination is not read |
   | `observer-coordination` | `visual-observer-conditions` | § 107.33(c), `finding => finding.Holds`, **and only where a visual observer is used** — § 107.33's chapeau is a condition |
+  | `preflight-risk-assessment` | `preflight-actions` | § 107.49(a): an obligation answered **not done** settles the section's conjunction against the operation |
+  | `participant-briefing` | `preflight-actions` | § 107.49(b), the same way |
+  | `sufficient-available-power` | `preflight-actions` | § 107.49(d), the same way |
+  | `attached-object-no-adverse-effect` | `preflight-actions` | § 107.49(e)'s second conjunct, the same way |
 
-  **Five have none**, and for two different reasons. `collision-hazard-proximity` has no consumer
-  **in the map at all**: § 107.37(b) is a prohibition standing on its own, and nothing entails
-  anything from it. The four § 107.49 constituents — `preflight-risk-assessment`,
-  `participant-briefing`, `sufficient-available-power`, `attached-object-no-adverse-effect` — each
-  have a consumer the map records, `preflight-actions`, that **this engine has not built yet**. So
-  the cost is temporary for four and structural for one.
+  The four § 107.49 constituents are worth one qualification, because it is the difference between
+  a direction and a verdict. `preflight-actions` can never resolve *complete* — § 107.49(c) and the
+  "is secure" half of (e) state no measure, so an obligation left undetermined makes the whole entry
+  decline — so what it establishes is that an assertion answered **false** settles § 107.49 against
+  the operation. It never confirms the other direction. That is enough to tell a product which way
+  the fact points, which is what this bullet measures, and it is less than a full verdict.
+
+  **One has none, and it is the structural case**: `collision-hazard-proximity` has no consumer
+  **in the map at all**, because § 107.37(b) is a prohibition standing on its own and nothing
+  entails anything from it. The temporary half of this cost is now zero — every assertion entry the
+  map gives a consumer has that consumer built — so what remains is exactly the gap rules-factory#453
+  asks about, and nothing that building more entries would close.
 
   So today a product that wants to know whether an asserted `collision-hazard-proximity = true` is
   good news or bad has nowhere in this engine to read it, and would have to go to the CFR itself —
@@ -188,10 +198,11 @@ is the engine working, not the engine failing — the same posture §6 records f
   `OperationEvaluatorTests.The_cost_recorded_in_decision_0004_is_the_cost_the_engine_actually_has`
   now measures it from the engine — an assertion entry has a built consumer exactly when flipping
   the asserted fact moves some other entry's answer — and fails naming this record when the answer
-  changes. It has already earned itself: `over-human-beings` landed while this change was in
-  review, and the test turned red naming `reasonable-protection`, which had moved from the second
-  list to the first without anybody noticing. Building `preflight-actions` is what will change it
-  next.
+  changes. It earned itself twice while this change was in review: `over-human-beings` landing
+  moved `reasonable-protection` from the second list to the first, and `preflight-actions` landing
+  moved the four § 107.49 constituents, taking the count from one to five to nine. Neither was
+  noticed by reading; both were the test going red. Nothing in the map will move it again — every
+  entry is built — so the next thing that could is a new map version.
 - **Nothing in any handler or rule changes.** This record is about how the orchestrator reads what
   the handlers already return; every regulatory answer in the output is still a handler's.
 - **`docs/decisions/**` is on this engine's semantic surface** (`.github/agent-policy.json`), so

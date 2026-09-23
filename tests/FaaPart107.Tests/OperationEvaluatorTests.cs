@@ -39,6 +39,18 @@ public class OperationEvaluatorTests
         Registry.Entries
             .Where(entry => entry.Row == CorrespondenceRow.Assertion && entry.Status == EntryStatus.Implemented)
             .Aggregate(Stated(), (facts, entry) => facts.Asserting(new Assertion(MapEntry(entry.Id), true, entry.AssertedBy[0])))
+
+            // The one entry the fold gets backwards, and the only semantic thing hand-written here.
+            // § 107.37(b)'s proposition is "operating so close to another aircraft as to create a
+            // collision hazard", so it HOLDING is the prohibited state: an operation these facts
+            // describe as compliant asserts it false, where every other row-8 entry's proposition
+            // holding is the required state. The engine records no polarity to derive this from —
+            // that is docs/decisions/0004 and rules-factory#453 — so it is stated here, once.
+            //
+            // What keeps the fold honest if the map ever adds a second prohibition-shaped entry is
+            // the count pinned in The_cost_recorded_in_decision_0004_is_the_cost_the_engine
+            // _actually_has: an eleventh row-8 entry turns it red, and whoever adds it has to come
+            // and decide which way round this one goes.
             .Asserting(new Assertion(MapEntries.CollisionHazardProximity, false, RemotePilotInCommand));
 
     /// <summary>
@@ -57,6 +69,7 @@ public class OperationEvaluatorTests
         BoundPerson = BoundPerson.RemotePilotInCommand,
         Lighting = LightingStatement.LightedAndVisibleFor(5m, Caller),
         VisualObserverUse = VisualObserverUse.NotUsed,
+        SubpartDOperation = SubpartDOperation.NotOverHumanBeings,
         OperationPlace = OperationPlace.OutsideAlaska,
         OperationPeriod = OperationPeriod.BeforeOfficialSunrise,
         Shelter = Shelter.CoveredStructure,
@@ -394,6 +407,10 @@ public class OperationEvaluatorTests
             "intensity-reduction-in-interest-of-safety",
             "unaided-visual-contact",
             "observer-coordination",
+            "preflight-risk-assessment",
+            "participant-briefing",
+            "sufficient-available-power",
+            "attached-object-no-adverse-effect",
         ];
 
         var measured = AssertionsABuiltConsumerReads();
@@ -409,7 +426,7 @@ public class OperationEvaluatorTests
             .ToArray();
 
         Assert.Equal(10, rowEight.Length);
-        Assert.Equal(5, rowEight.Length - measured.Length);
+        Assert.Equal(1, rowEight.Length - measured.Length);
 
         // The probe is only worth anything where the flip actually takes effect, so check that it
         // does for every entry — including collision-hazard-proximity, which Complete() asserts
@@ -645,33 +662,55 @@ public class OperationEvaluatorTests
             {
                 var what = $"{outcome.EntryId} in {outcome.State}";
 
+                // Every clause is a biconditional — "and nothing else does" is half the point, and
+                // the half that was missing on MissingInput — and every clause names the entry, so
+                // a failure says which one rather than "Expected: True, Actual: False".
+
+                var declined = outcome.State is RequirementState.RequiresInterpretation
+                    or RequirementState.OutsideCurrentScope or RequirementState.NotBuilt
+                    or RequirementState.MissingRulesData or RequirementState.UnresolvedInteraction;
+                var answered = outcome.State is RequirementState.Satisfied or RequirementState.Violated
+                    or RequirementState.ActionRequired or RequirementState.Informational
+                    or RequirementState.HumanAssertionRecorded;
+
                 // A decline names why and where the real rule lives; nothing else does.
                 Assert.True((outcome.Reason is not null) == (outcome.DeclineCites is not null), what);
-                Assert.Equal(outcome.Reason is not null, outcome.State is RequirementState.RequiresInterpretation
-                    or RequirementState.OutsideCurrentScope or RequirementState.NotBuilt
-                    or RequirementState.MissingRulesData or RequirementState.UnresolvedInteraction);
+                Assert.True((outcome.Reason is not null) == declined, what);
 
                 // An assertion owed names which, where, and who may make it; nothing else does.
-                Assert.Equal(outcome.State == RequirementState.HumanAssertionRequired, outcome.AssertionOwed is not null);
+                Assert.True(
+                    (outcome.State == RequirementState.HumanAssertionRequired) == (outcome.AssertionOwed is not null),
+                    what);
                 Assert.True((outcome.AssertionOwed is not null) == (outcome.AssertionCites is not null), what);
+
+                // AssertedBy is "who may assert the fact this outcome is about", which is in play
+                // in two cases and exactly two: the entry evaluated is itself kind: assertion — and
+                // then it is non-empty whatever the state, because who may assert § 107.39(b) does
+                // not depend on the caller having stated a Shelter — or an assertion is owed, and
+                // then it is the owed entry's. Empty otherwise.
+                Assert.True(
+                    !outcome.AssertedBy.IsEmpty
+                        == (outcome.Row == CorrespondenceRow.Assertion || outcome.AssertionOwed is not null),
+                    what);
                 if (outcome.State == RequirementState.HumanAssertionRequired)
                 {
-                    Assert.NotEmpty(outcome.AssertedBy);
+                    Assert.False(outcome.AssertedBy.IsEmpty, what);
                 }
 
-                // A fact owed names which input.
+                // A fact owed names which input; nothing else carries one.
+                Assert.True((outcome.State == RequirementState.FactRequired) == (outcome.MissingInput is not null), what);
                 if (outcome.State == RequirementState.FactRequired)
                 {
                     Assert.False(string.IsNullOrWhiteSpace(outcome.MissingInput), what);
                 }
 
                 // An answer carries the rule's own finding, and the engine's own words always.
-                Assert.Equal(
-                    outcome.State is RequirementState.Satisfied or RequirementState.Violated
-                        or RequirementState.ActionRequired or RequirementState.Informational
-                        or RequirementState.HumanAssertionRecorded,
-                    outcome.Finding is not null);
+                Assert.True(answered == (outcome.Finding is not null), what);
                 Assert.NotEmpty(outcome.Explanation);
+
+                // The five states partition: every outcome is a decline, an answer, or something
+                // the caller owes, and never two of those.
+                Assert.False(declined && answered, what);
             }
         }
     }
@@ -733,6 +772,36 @@ public class OperationEvaluatorTests
         {
             Assert.Equal(outcome.Reason is not null, outcome.DeclineCites is not null);
         }
+    }
+
+    [Fact]
+    public void A_section_that_can_never_resolve_complete_still_answers_when_an_obligation_is_not_done()
+    {
+        // § 107.49 conjoins obligations two of which state no measure — (c) "working properly" and
+        // the "is secure" half of (e) — so with every assertion answered true the section still
+        // cannot be resolved complied with, and the entry declines rather than inventing a verdict.
+        var undetermined = Outcome("preflight-actions", Complete());
+
+        Assert.Equal(RequirementState.RequiresInterpretation, undetermined.State);
+        Assert.NotNull(undetermined.DeclineCites);
+        Assert.Null(undetermined.Finding);
+
+        // And one obligation answered not done settles the conjunction against the operation,
+        // whatever the undetermined ones would have said. That is the rule's own reading, and this
+        // arm reads AllDone forward like every other.
+        var notDone = Outcome(
+            "preflight-actions",
+            Complete().Asserting(new Assertion(MapEntries.SufficientAvailablePower, false, RemotePilotInCommand)));
+        var finding = Assert.IsType<PreflightActionsFinding>(notDone.Finding);
+
+        Assert.Equal(RequirementState.Violated, notDone.State);
+        Assert.False(finding.AllDone);
+        Assert.Null(notDone.Reason);
+
+        // The assertion itself is still recorded and not scored, on its own entry.
+        Assert.Equal(
+            RequirementState.HumanAssertionRecorded,
+            State("sufficient-available-power", Complete().Asserting(new Assertion(MapEntries.SufficientAvailablePower, false, RemotePilotInCommand))));
     }
 
     [Fact]

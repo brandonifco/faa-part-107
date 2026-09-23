@@ -191,6 +191,8 @@ public static class OperationEvaluator
                 FeetHorizontallyFromCloud = facts.FeetHorizontallyFromCloud,
                 Waiver = facts.WaiverOf(Compliance.Regulation),
             }),
+        "preflight-actions" => facts => EntryPoints.PreflightActions.Resolve(
+            new Requests.PreflightActionsRequest(facts.Assertions) { Operation = facts.SubpartDOperation }),
         "over-human-beings" => facts => EntryPoints.OverHumanBeings.Resolve(
             new Requests.OverHumanBeingsRequest(facts.Assertions)
             {
@@ -377,6 +379,19 @@ public static class OperationEvaluator
             false => RequirementState.Violated,
             null => RequirementState.Informational,
         },
+
+        // § 107.49: true when the remote pilot in command did all of them prior to flight, which is
+        // the rule's own conjunction over the section's obligations. One property, read forward,
+        // like § 107.51's composite.
+        //
+        // It resolves only where some obligation was answered NOT done, because § 107.49(c) and the
+        // "is secure" half of (e) state no measure and so answer nothing: an obligation left
+        // undetermined makes the entry decline instead. So the finding this arm ever sees has
+        // AllDone false and reports Violated, and every other case is a decline. That is those
+        // entries' limit and not this arm's — nothing here needs to know it, and if they ever
+        // answer an obligation done this arm follows them unchanged. What varies for a caller is
+        // which reason and which locator come back, and Reason and DeclineCites carry both.
+        PreflightActionsFinding finding => Met(finding.AllDone),
 
         // § 107.39: true when one of the section's excepted cases is met, which is the rule's own
         // conjunction over (a), (b) and (c). False is the section prohibiting the operation.

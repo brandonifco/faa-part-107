@@ -143,6 +143,14 @@ public sealed record OperationFacts
     /// </summary>
     public OperationPeriod? OperationPeriod { get; init; }
 
+    /// <summary>
+    /// Whether the operation will be conducted over human beings under subpart D — § 107.49(f)'s
+    /// condition (<c>preflight-actions</c>). Never inferred in either direction, and not derived
+    /// from <see cref="HumanBeingLocation"/>: § 107.49(f) asks which operation this is, and
+    /// § 107.39 asks where a human being is, and they are different questions.
+    /// </summary>
+    public SubpartDOperation? SubpartDOperation { get; init; }
+
     /// <summary>The airspace the operation is in (<c>airspace-authorized</c>, § 107.41).</summary>
     public AirspaceClass? Airspace { get; init; }
 
