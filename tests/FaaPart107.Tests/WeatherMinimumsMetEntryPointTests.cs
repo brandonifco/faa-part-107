@@ -174,6 +174,68 @@ public class WeatherMinimumsMetEntryPointTests
     }
 
     /// <summary>
+    /// Every situation that reaches § 107.51(c), which is every situation this entry declines on
+    /// the rule rather than on the waiver gate.
+    /// </summary>
+    public static TheoryData<decimal, CloudStatement> EverySituationThatReaches107_51_c => new()
+    {
+        // Both cloud minimums met, so § 107.51(d) is satisfied on either reading and the answer
+        // turns on § 107.51(c) alone.
+        { 10m, CloudStatement.Measured(1000m, 5000m, Caller) },
+
+        // Exactly one of § 107.51(d)'s two minimums met, so the cloud half is open too.
+        { 10m, CloudStatement.Measured(500m, 0m, Caller) },
+
+        // No cloud to measure either minimum from.
+        { 10m, CloudStatement.NoCloud(Caller) },
+    };
+
+    /// <summary>
+    /// The decline follows <c>prominent-objects</c> rather than asserting its openness. The entry
+    /// asks its dependency and reports what that dependency answered on this request — its reason,
+    /// its citation and its account quoted whole — while naming the entry the caller actually asked
+    /// about, so the decline is this entry's own and not the dependency's handed back
+    /// (<c>docs/decisions/0006</c>).
+    /// </summary>
+    /// <remarks>
+    /// The first assertion in the loop is the one that fails if <c>prominent-objects</c> ever
+    /// answers: the wording it pins is chosen at runtime from what that entry returned, so an entry
+    /// that resolved would put the other wording here and no amount of restating the openness in
+    /// this file would keep it green.
+    /// </remarks>
+    [Theory]
+    [MemberData(nameof(EverySituationThatReaches107_51_c))]
+    public void The_decline_follows_prominent_objects_own_answer_and_is_not_that_answer_handed_back(
+        decimal visibility,
+        CloudStatement cloud)
+    {
+        var unresolved = Declined(Resolve(visibility, cloud, NoWaiver));
+
+        // What the dependency actually answered here, in this decline's own words.
+        Assert.Contains("did not answer which objects are \"prominent\"", unresolved.Attempted, StringComparison.Ordinal);
+        Assert.DoesNotContain("has no verdict to read", unresolved.Attempted, StringComparison.Ordinal);
+
+        var prominence = Declined(EntryPoints.ProminentObjects.Resolve(
+            new ProminentObjectsRequest { Waiver = NoWaiver }));
+
+        // It follows: the reason and the citation are the dependency's, as it gave them here.
+        Assert.Equal(prominence.Reason, unresolved.Reason);
+        Assert.Equal(prominence.Locator, unresolved.Locator);
+
+        // It carries that entry's own account forward whole, so a caller sees where the openness
+        // originates rather than being told about it in this entry's paraphrase.
+        Assert.Contains(prominence.Attempted, unresolved.Attempted, StringComparison.Ordinal);
+
+        // And it is this entry's decline, not that one's handed back: the two cite § 107.51(c)
+        // alike, so only what was attempted tells them apart, and it names both entries.
+        Assert.NotEqual(prominence, unresolved);
+        Assert.NotEqual(prominence.Attempted, unresolved.Attempted);
+        Assert.Contains("weather-minimums-met", unresolved.Attempted, StringComparison.Ordinal);
+        Assert.Contains("prominent-objects", unresolved.Attempted, StringComparison.Ordinal);
+        Assert.DoesNotContain("weather-minimums-met", prominence.Attempted, StringComparison.Ordinal);
+    }
+
+    /// <summary>
     /// Every situation the entry answers differently when no waiver is in force — each cloud
     /// statement it can be given, and the visibility at and away from the figure — so that the gate
     /// is shown to run before any of them. The last row is the one <see cref="CloudStatement.NoCloud"/>

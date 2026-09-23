@@ -9,7 +9,7 @@ namespace FaaPart107.Tests;
 /// The entry's two enumerations are finite and closed — three kinds the paragraph names and three
 /// relative positions it prohibits, each with the case the caller states is none of them — so the
 /// sixteen cells are checked exhaustively rather than sampled: which of them the engine decides,
-/// which reach the exception "unless well clear" and so answer with <c>well-clear</c>'s decline,
+/// which reach the exception "unless well clear" and so decline on <c>well-clear</c>'s question,
 /// and that the waiver gate answers first and names this entry rather than that one.
 /// </summary>
 public class RightOfWayEntryPointTests
@@ -113,9 +113,16 @@ public class RightOfWayEntryPointTests
         Assert.Same(NoWaiver, finding.Waiver);
     }
 
+    /// <summary>
+    /// The nine cells that reach the exception. The decline is this entry's own and follows what
+    /// <c>well-clear</c> answered on the same request: its reason, its citation, and its account
+    /// quoted whole — but naming the entry the caller actually asked about, so that a
+    /// <c>right-of-way</c> decline is not a <c>well-clear</c> decline wearing the same bytes
+    /// (<c>docs/decisions/0006</c>).
+    /// </summary>
     [Theory]
     [MemberData(nameof(NamedAndProhibited))]
-    public void An_object_107_37_a_names_passed_over_under_or_ahead_declines_with_well_clears_own_decline(
+    public void An_object_107_37_a_names_passed_over_under_or_ahead_declines_with_this_entrys_own_decline_on_well_clears_question(
         EncounteredObject encountered,
         RelativePosition position)
     {
@@ -127,13 +134,28 @@ public class RightOfWayEntryPointTests
         Assert.Equal("§ 107.37(a)", unresolved.Locator.Citation);
         Assert.Equal(EntryPoints.WellClear.Registered.Locator, unresolved.Locator);
 
-        // The exception is the dependency's, so the decline is the dependency's: the same reason,
-        // the same wording and the same locator well-clear answers with on its own request. Both
-        // entries cite § 107.37(a), so what was attempted is the only thing that names which one
-        // has the open question, and it is not this one.
-        Assert.Equal(Decline(EntryPoints.WellClear.Resolve(new WellClearRequest { Waiver = NoWaiver })), unresolved);
+        // What the dependency actually answered here is what this decline is built from, and the
+        // decline says so in those terms rather than asserting the openness from a constant.
+        Assert.Contains("did not answer whether the pass is well clear", unresolved.Attempted, StringComparison.Ordinal);
+        Assert.DoesNotContain("has no verdict to read", unresolved.Attempted, StringComparison.Ordinal);
+
+        var wellClear = Decline(EntryPoints.WellClear.Resolve(new WellClearRequest { Waiver = NoWaiver }));
+
+        // Not that entry's decline handed back. The reason and the locator are its, because the
+        // question that blocks the answer is its question; both entries cite § 107.37(a), so what
+        // was attempted is the only thing that can tell the two apart -- and it does, naming the
+        // entry the caller asked about as well as the one it reached.
+        Assert.NotEqual(wellClear, unresolved);
+        Assert.NotEqual(wellClear.Attempted, unresolved.Attempted);
+        Assert.Equal(wellClear.Reason, unresolved.Reason);
+        Assert.Equal(wellClear.Locator, unresolved.Locator);
+        Assert.Contains("right-of-way", unresolved.Attempted, StringComparison.Ordinal);
         Assert.Contains("well-clear", unresolved.Attempted, StringComparison.Ordinal);
-        Assert.DoesNotContain("right-of-way", unresolved.Attempted, StringComparison.Ordinal);
+        Assert.DoesNotContain("right-of-way", wellClear.Attempted, StringComparison.Ordinal);
+
+        // And the constituent's account is carried forward whole rather than lost, so a caller
+        // sees where the openness originates without being handed that entry's result instead.
+        Assert.Contains(wellClear.Attempted, unresolved.Attempted, StringComparison.Ordinal);
         Assert.Contains("does not define", unresolved.Attempted, StringComparison.Ordinal);
         Assert.Contains("\"well clear\"", unresolved.Attempted, StringComparison.Ordinal);
 
