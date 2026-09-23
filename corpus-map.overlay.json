@@ -525,5 +525,46 @@
         "mutation": "Yielding.WellClear compared the statement's regulation with itself (`waiver.Regulation` for `Regulation` in the call to Waivers.Suspension), so a waiver of § 107.51 suspended § 107.37(a); this test went red."
       }
     ]
+  },
+  "moving-vehicle-operation": {
+    "status": "implemented",
+    "implementedIn": {
+      "ruleset": "faa-part-107",
+      "version": 1
+    },
+    "tests": [
+      {
+        "test": "MovingVehicleOperationEntryPointTests.Not_from_a_moving_land_or_water_borne_vehicle_it_resolves_not_prohibited_whether_or_not_property_is_carried_for_hire",
+        "mutation": "MovingVehicle.Operation reported an operation that is not from a moving land or water-borne vehicle as prohibited (`Prohibited: true` for `Prohibited: false` in the branch for it), so § 107.25(b) bit an operation it does not reach; this test went red (`Failed: 1, Passed: 7`), and the other seven stayed green."
+      },
+      {
+        "test": "MovingVehicleOperationEntryPointTests.From_a_moving_vehicle_transporting_another_persons_property_for_compensation_or_hire_it_resolves_prohibited_citing_107_25",
+        "mutation": "MovingVehicle.Operation reported the carriage-for-hire case as not prohibited (`Prohibited: false` for `Prohibited: true` in the branch for it), so an operation the exception cannot excuse resolved permitted; this test went red (`Failed: 1, Passed: 7`)."
+      },
+      {
+        "test": "MovingVehicleOperationEntryPointTests.From_a_moving_vehicle_not_transporting_another_persons_property_for_hire_it_declines_RequiresInterpretation_citing_107_25",
+        "mutation": "MovingVehicle.Operation answered the open question instead of declining: the final decline was replaced by `Resolution<MovingVehicleFinding>.FromValue(new MovingVehicleFinding(fromMovingLandOrWaterBorneVehicle, transportingAnotherPersonsPropertyForCompensationOrHire, Prohibited: false, waiver))`, the plausible reading that a sparsely populated area may be presumed, so the case the map leaves open resolved permitted; this test went red (`Failed: 1, Passed: 7`). It went red too with the reason wrong (`UnresolvedReason.UnsupportedRule` for `UnresolvedReason.RequiresInterpretation`). Citing moving-aircraft-operation's locator (`MapEntries.MovingAircraftOperation.Locator` for `MapEntries.MovingVehicleOperation.Locator`) did NOT turn it red: both entries cite § 107.25, the consequence decision 0001 records for the two § 107.51(a) entries, so Attempted naming the entry is what distinguishes them and this test asserts it."
+      },
+      {
+        "test": "MovingVehicleOperationEntryPointTests.While_a_waiver_of_107_25_is_stated_in_force_it_declines_OutsideCurrentScope_citing_107_205_and_records_the_statement",
+        "mutation": "MovingVehicle.Operation handed the gate a statement that no waiver is in force (`waiver with { InForce = false }` for `waiver`), so a stated waiver was not honoured and the entry answered a verdict; this test went red (`Failed: 2, Passed: 6`, with the other waiver test). It went red too with MovingVehicle.Operation naming moving-aircraft-operation as the suspended entry (`MapEntries.MovingAircraftOperation` for `MapEntries.MovingVehicleOperation`), so Attempted named the other § 107.25 entry rather than this one."
+      },
+      {
+        "test": "MovingVehicleOperationEntryPointTests.A_stated_waiver_declines_rather_than_a_verdict_even_transporting_another_persons_property_for_compensation_or_hire",
+        "mutation": "MovingVehicle.Operation evaluated § 107.205(a)'s proviso, running the gate only when nothing is carried for hire (`if (!transportingAnotherPersonsPropertyForCompensationOrHire && Waivers.Suspension(...) is { } suspended)` for `if (Waivers.Suspension(...) is { } suspended)`), so a stated waiver plus carriage for hire resolved prohibited instead of declining, which is the reading waivable-regulations' note rules out — the provisos \"are not evaluated\"; this test went red (`Failed: 1, Passed: 7`) and the other waiver test stayed green, so the gate's place before the verdict is what it pins."
+      },
+      {
+        "test": "MovingVehicleOperationEntryPointTests.Without_a_waiver_statement_it_refuses_rather_than_infer_one",
+        "mutation": "Handlers.MovingVehicleOperation defaulted a missing statement to none held (`request.Waiver ?? WaiverStatement.NoneHeld(MovingVehicle.Regulation, \"the engine\")` for `Demand(request.Waiver, ...)`); this test went red (`Failed: 1, Passed: 7`)."
+      },
+      {
+        "test": "MovingVehicleOperationEntryPointTests.Without_the_facts_the_rule_turns_on_it_refuses_rather_than_infer_them",
+        "mutation": "Handlers.MovingVehicleOperation defaulted the unstated vehicle fact to false (`request.FromMovingLandOrWaterBorneVehicle ?? false` for `Demand(request.FromMovingLandOrWaterBorneVehicle, ...)`), so the engine inferred that the operation was not from a moving vehicle; this test went red (`Failed: 1, Passed: 7`). It went red too with the carriage fact defaulted the same way (`request.TransportingAnotherPersonsPropertyForCompensationOrHire ?? false` for its `Demand(...)`), so the engine inferred the commercial character of the flight."
+      },
+      {
+        "test": "MovingVehicleOperationEntryPointTests.A_waiver_statement_about_another_regulation_is_refused",
+        "mutation": "MovingVehicle.Operation compared the statement's regulation with itself (`waiver.Regulation` for `Regulation` in the call to Waivers.Suspension), so a waiver of § 107.51 suspended § 107.25; this test went red (`Failed: 1, Passed: 7`)."
+      }
+    ]
   }
 }
