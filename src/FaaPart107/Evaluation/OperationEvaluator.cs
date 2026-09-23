@@ -187,6 +187,14 @@ public static class OperationEvaluator
             new Requests.ObserverCoordinationRequest(facts.Assertions) { Waiver = facts.WaiverOf(Coordination.Regulation) }),
         "intensity-reduction-in-interest-of-safety" => EntryPoints.IntensityReductionInInterestOfSafety.Resolve(
             new Requests.IntensityReductionInInterestOfSafetyRequest(facts.Assertions) { Waiver = facts.WaiverOf(Lighting.Regulation) }),
+        "flash-rate-sufficient" => EntryPoints.FlashRateSufficient.Resolve(
+            new Requests.FlashRateSufficientRequest(facts.Assertions) { Waiver = facts.WaiverOf(FlashRate.Regulation) }),
+        "visual-line-of-sight" => EntryPoints.VisualLineOfSight.Resolve(
+            new Requests.VisualLineOfSightRequest(facts.Assertions)
+            {
+                Exercise = facts.Exercise,
+                Waiver = facts.WaiverOf(LineOfSight.Regulation),
+            }),
         _ => null,
     };
 
@@ -232,6 +240,11 @@ public static class OperationEvaluator
 
         // § 107.51(c)-(d): true when both paragraphs are met.
         WeatherMinimumsFinding finding => Met(finding.MinimumsMet),
+
+        // § 107.31 as a whole: true when paragraph (a)'s ability is there and paragraph (b)'s
+        // requirement that it be exercised is satisfied. The rule makes that conjunction, not
+        // this orchestrator, and this arm reads the one property it named.
+        VisualLineOfSightFinding finding => Met(finding.Maintained),
 
         // § 107.35: true when that is not more than one unmanned aircraft, which the section permits.
         MultipleAircraftFinding finding => Met(finding.Permitted),

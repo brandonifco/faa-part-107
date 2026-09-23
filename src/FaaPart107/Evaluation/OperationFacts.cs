@@ -156,6 +156,12 @@ public sealed record OperationFacts
     public RelativePosition? Position { get; init; }
 
     /// <summary>
+    /// Who exercised the ability § 107.31(a) describes, throughout the entire flight, as the
+    /// caller states it (<c>visual-line-of-sight</c>, § 107.31(b)).
+    /// </summary>
+    public ExerciseOfTheAbility? Exercise { get; init; }
+
+    /// <summary>
     /// The certificate of waiver § 107.29(d)'s second sentence is asked about, as the caller
     /// describes it (<c>night-waiver-termination</c>).
     /// </summary>

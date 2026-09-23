@@ -53,6 +53,10 @@ public class OperationEvaluatorTests
         Person = "the remote pilot in command of N123AB",
         Engagements = [new AircraftEngagement("N123AB", AircraftRole.RemotePilotInCommand)],
         Encountered = EncounteredObject.NoneOfThem,
+        Exercise = new ExerciseOfTheAbility(
+            RemotePilotInCommand: true,
+            PersonManipulatingTheFlightControls: true,
+            VisualObserver: false),
         Position = RelativePosition.NoneOfThem,
         NightWaiverCertificate = new WaiverCertificate(new DateOnly(2020, 6, 1), true, Caller),
         AsOf = new DateOnly(2026, 1, 1),
@@ -73,7 +77,8 @@ public class OperationEvaluatorTests
         .Asserting(new Assertion(MapEntries.SufficientAvailablePower, true, RemotePilotInCommand))
         .Asserting(new Assertion(MapEntries.AttachedObjectNoAdverseEffect, true, RemotePilotInCommand))
         .Asserting(new Assertion(MapEntries.ObserverCoordination, true, RemotePilotInCommand))
-        .Asserting(new Assertion(MapEntries.IntensityReductionInInterestOfSafety, true, RemotePilotInCommand));
+        .Asserting(new Assertion(MapEntries.IntensityReductionInInterestOfSafety, true, RemotePilotInCommand))
+        .Asserting(new Assertion(MapEntries.FlashRateSufficient, true, RemotePilotInCommand));
 
     private static RequirementOutcome Outcome(string entryId, OperationFacts facts) =>
         OperationEvaluator.Evaluate(facts).Requirement(entryId);
@@ -92,17 +97,43 @@ public class OperationEvaluatorTests
             evaluation.Requirements.Select(outcome => outcome.EntryId).ToArray());
     }
 
+    /// <summary>
+    /// The state an entry this engine has not built reports, read from the map's own correspondence
+    /// row: row 1 is out of scope, row 2 is not built, and rows 3, 4 and 5 are missing rules data.
+    /// Null where the row does not fix the answer on its own.
+    /// </summary>
+    private static RequirementState? FromItsRow(CorrespondenceRow row) => row switch
+    {
+        CorrespondenceRow.ScopeOut => RequirementState.OutsideCurrentScope,
+        CorrespondenceRow.NotBuilt => RequirementState.NotBuilt,
+        CorrespondenceRow.DefinedElsewhere or CorrespondenceRow.BeyondAdapter
+            or CorrespondenceRow.ValueDependencyUnimplemented => RequirementState.MissingRulesData,
+        _ => null,
+    };
+
     [Fact]
     public void An_entry_this_evaluator_builds_no_request_for_is_still_evaluated_and_answers_from_its_row()
     {
         var evaluation = OperationEvaluator.Evaluate(Complete());
 
-        // Four entries the evaluator has no request builder for at all: each is still in the
-        // answer, and each reports exactly what its correspondence row gives.
-        Assert.Equal(RequirementState.NotBuilt, evaluation.Requirement("visual-line-of-sight").State);
-        Assert.Equal(RequirementState.NotBuilt, evaluation.Requirement("over-human-beings").State);
-        Assert.Equal(RequirementState.OutsideCurrentScope, evaluation.Requirement("waiver-policy").State);
-        Assert.Equal(RequirementState.MissingRulesData, evaluation.Requirement("hazardous-material").State);
+        // Driven from the registry, not from a list of entry ids: an entry built later moves off
+        // this list by itself rather than turning this test red.
+        var unbuilt = Registry.Entries
+            .Where(entry => entry.Status != EntryStatus.Implemented && FromItsRow(entry.Row) is not null)
+            .ToArray();
+
+        Assert.NotEmpty(unbuilt);
+
+        foreach (var entry in unbuilt)
+        {
+            var outcome = evaluation.Requirement(entry.Id);
+            Assert.Equal(FromItsRow(entry.Row), outcome.State);
+            Assert.Equal(RequirementStates.For(outcome.Reason!.Value), outcome.State);
+            Assert.Null(outcome.Finding);
+        }
+
+        // And the three answers it gives are three, not one.
+        Assert.Equal(3, unbuilt.Select(entry => FromItsRow(entry.Row)).Distinct().Count());
     }
 
     [Fact]
@@ -293,9 +324,12 @@ public class OperationEvaluatorTests
 
         // "the engine cannot determine this", from three different causes the map distinguishes;
         // "the engine has not built this"; and "this is outside the engine's scope".
+        var notBuilt = Registry.Entries
+            .First(entry => entry.Status != EntryStatus.Implemented && entry.Row == CorrespondenceRow.NotBuilt);
+
         Assert.Equal(RequirementState.RequiresInterpretation, State("control-links-working", facts));
         Assert.Equal(RequirementState.MissingRulesData, State("night-operation", facts));
-        Assert.Equal(RequirementState.NotBuilt, State("operating-limitations", facts));
+        Assert.Equal(RequirementState.NotBuilt, State(notBuilt.Id, facts));
         Assert.Equal(RequirementState.OutsideCurrentScope, State("knowledge-recency", facts));
 
         // And the two that are demands on the caller, which are neither of those.
@@ -306,7 +340,7 @@ public class OperationEvaluatorTests
         {
             State("control-links-working", facts),
             State("night-operation", facts),
-            State("operating-limitations", facts),
+            State(notBuilt.Id, facts),
             State("knowledge-recency", facts),
             State("sufficient-available-power", OperationFacts.Nothing),
             State("speed-within-limit", OperationFacts.Nothing),
@@ -349,6 +383,16 @@ public class OperationEvaluatorTests
 
             // § 107.51(c)-(d): the one finding the engine can resolve is that they are not met.
             { "weather-minimums-met", RequirementState.Violated, f => f },
+
+            // § 107.31 as a whole: paragraph (b)'s first combination, and nobody at all.
+            {
+                "visual-line-of-sight", RequirementState.Satisfied,
+                f => f with { Exercise = new ExerciseOfTheAbility(true, true, false) }
+            },
+            {
+                "visual-line-of-sight", RequirementState.Violated,
+                f => f with { Exercise = ExerciseOfTheAbility.Nobody }
+            },
 
             // § 107.35, one aircraft and two.
             {
