@@ -359,8 +359,8 @@ internal static partial class Handlers
     /// <summary>The aircraft can be seen unaided throughout the entire flight, for the four stated purposes (<c>unaided-visual-contact</c>): optional.</summary>
     static partial void UnaidedVisualContact(global::FaaPart107.Requests.UnaidedVisualContactRequest request, ref Resolution<object>? resolution);
 
-    /// <summary>Visual observer requirements, when one is used (<c>visual-observer-conditions</c>): optional.</summary>
-    static partial void VisualObserverConditions(global::FaaPart107.Requests.VisualObserverConditionsRequest request, ref Resolution<object>? resolution);
+    /// <summary>Visual observer requirements, when one is used (<c>visual-observer-conditions</c>): required, the entry is implemented.</summary>
+    internal static partial Resolution<object> VisualObserverConditions(global::FaaPart107.Requests.VisualObserverConditionsRequest request);
 
     /// <summary>Effective communication is maintained among the three named persons (<c>effective-communication</c>): required, the entry is implemented.</summary>
     internal static partial Resolution<object> EffectiveCommunication(global::FaaPart107.Requests.EffectiveCommunicationRequest request);
@@ -511,7 +511,7 @@ internal static partial class Handlers
                 UnaidedVisualContact(request as global::FaaPart107.Requests.UnaidedVisualContactRequest ?? new(assertions), ref resolution);
                 break;
             case "visual-observer-conditions":
-                VisualObserverConditions(request as global::FaaPart107.Requests.VisualObserverConditionsRequest ?? new(assertions), ref resolution);
+                resolution = VisualObserverConditions(request as global::FaaPart107.Requests.VisualObserverConditionsRequest ?? new(assertions));
                 break;
             case "effective-communication":
                 resolution = EffectiveCommunication(request as global::FaaPart107.Requests.EffectiveCommunicationRequest ?? new(assertions));
@@ -590,7 +590,7 @@ internal static partial class Handlers
         "anti-collision-lighting" => true,
         "visual-line-of-sight" => true,
         "unaided-visual-contact" => Hooked("UnaidedVisualContact", typeof(global::FaaPart107.Requests.UnaidedVisualContactRequest)),
-        "visual-observer-conditions" => Hooked("VisualObserverConditions", typeof(global::FaaPart107.Requests.VisualObserverConditionsRequest)),
+        "visual-observer-conditions" => true,
         "effective-communication" => true,
         "observer-coordination" => Hooked("ObserverCoordination", typeof(global::FaaPart107.Requests.ObserverCoordinationRequest)),
         "preflight-actions" => Hooked("PreflightActions", typeof(global::FaaPart107.Requests.PreflightActionsRequest)),

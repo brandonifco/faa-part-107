@@ -338,8 +338,8 @@ public sealed class CorrespondenceTests
     }
 
     [Fact]
-    public void visual_observer_conditions__declines_UnsupportedRule_row_2() =>
-        AssertDeclines("visual-observer-conditions", UnresolvedReason.UnsupportedRule, EntryPoints.VisualObserverConditions.Resolve(global::FaaPart107.Requests.VisualObserverConditionsRequest.Empty), new SourceLocator("cfr-14-107", "§ 107.33"));
+    public void visual_observer_conditions__is_implemented_so_a_hand_written_handler_answers_it() =>
+        Assert.True(Registry.HasImplementation("visual-observer-conditions"), "visual-observer-conditions is implemented in the overlay and has no [Implements] handler");
 
     [Fact]
     public void effective_communication__is_implemented_so_a_hand_written_handler_answers_it() =>
