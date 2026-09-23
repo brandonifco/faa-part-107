@@ -19,16 +19,12 @@ namespace FaaPart107.Requests
         public decimal? FlightVisibilityStatuteMiles { get; init; }
 
         /// <summary>
-        /// How far below the cloud the small unmanned aircraft is, in feet, as the caller states it.
-        /// Required, and not negative.
+        /// What the caller states about the cloud § 107.51(d)'s minimums are distances from: how far
+        /// below it and how far horizontally from it the small unmanned aircraft is, or that the
+        /// aircraft is not operated near a cloud at all. Required: the engine neither invents a
+        /// cloud nor assumes there is none.
         /// </summary>
-        public decimal? FeetBelowCloud { get; init; }
-
-        /// <summary>
-        /// How far horizontally from the cloud the small unmanned aircraft is, in feet, as the
-        /// caller states it. Required, and not negative.
-        /// </summary>
-        public decimal? FeetHorizontallyFromCloud { get; init; }
+        public CloudStatement? Cloud { get; init; }
 
         /// <summary>Whether a certificate of waiver authorizing deviation from § 107.51 is in force, as the caller states it. Required.</summary>
         public WaiverStatement? Waiver { get; init; }
@@ -43,8 +39,7 @@ namespace FaaPart107
         internal static partial Resolution<object> WeatherMinimumsMet(Requests.WeatherMinimumsMetRequest request) =>
             Answer(Weather.MinimumsMet(
                 Demand(request.FlightVisibilityStatuteMiles, request.EntryId, nameof(request.FlightVisibilityStatuteMiles)),
-                Demand(request.FeetBelowCloud, request.EntryId, nameof(request.FeetBelowCloud)),
-                Demand(request.FeetHorizontallyFromCloud, request.EntryId, nameof(request.FeetHorizontallyFromCloud)),
+                Demand(request.Cloud, request.EntryId, nameof(request.Cloud)),
                 Demand(request.Waiver, request.EntryId, nameof(request.Waiver))));
     }
 }

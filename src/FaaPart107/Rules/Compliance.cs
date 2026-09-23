@@ -154,8 +154,7 @@ public static class Compliance
     /// <param name="altitudeAboveGroundLevelFeet">The small unmanned aircraft's altitude, in feet above ground level, for § 107.51(b).</param>
     /// <param name="structure">What the caller states about the structure § 107.51(b)'s exception is claimed under.</param>
     /// <param name="flightVisibilityStatuteMiles">The flight visibility the caller states, observed from the location of the control station, in statute miles, for § 107.51(c).</param>
-    /// <param name="feetBelowCloud">How far below the cloud the caller states the small unmanned aircraft is, in feet, for § 107.51(d)(1).</param>
-    /// <param name="feetHorizontallyFromCloud">How far horizontally from the cloud the caller states the small unmanned aircraft is, in feet, for § 107.51(d)(2).</param>
+    /// <param name="cloud">What the caller states about the cloud § 107.51(d)'s two minimums are distances from, or that the aircraft is not operated near one.</param>
     /// <param name="waiver">Whether a waiver of § 107.51 is in force, as the caller states it.</param>
     /// <returns>
     /// The finding; <see cref="UnresolvedReason.OutsideCurrentScope"/> citing § 107.205 while a
@@ -170,12 +169,12 @@ public static class Compliance
         decimal altitudeAboveGroundLevelFeet,
         StructureStatement structure,
         decimal flightVisibilityStatuteMiles,
-        decimal feetBelowCloud,
-        decimal feetHorizontallyFromCloud,
+        CloudStatement cloud,
         WaiverStatement waiver)
     {
         ArgumentNullException.ThrowIfNull(person);
         ArgumentNullException.ThrowIfNull(structure);
+        ArgumentNullException.ThrowIfNull(cloud);
 
         if (Waivers.Suspension(MapEntries.OperatingLimitations, Regulation, waiver) is { } suspended)
         {
@@ -198,7 +197,7 @@ public static class Compliance
                 finding => finding.WithinLimit),
             Outcome(
                 MapEntries.WeatherMinimumsMet,
-                Weather.MinimumsMet(flightVisibilityStatuteMiles, feetBelowCloud, feetHorizontallyFromCloud, waiver),
+                Weather.MinimumsMet(flightVisibilityStatuteMiles, cloud, waiver),
                 finding => finding.MinimumsMet),
         ];
 

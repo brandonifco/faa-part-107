@@ -7,11 +7,13 @@ namespace FaaPart107.Tests;
 /// <summary>
 /// <c>weather-minimums-met</c>, § 107.51(c)-(d), resolved through
 /// <see cref="EntryPoints.WeatherMinimumsMet"/> only: each cloud minimum at, just below and just
-/// above its printed figure and each independently of the other, a stated flight visibility at,
-/// just below and just above 3 statute miles, and the waiver gate in both directions (the entry's
-/// note, and rules-factory decision 0021).
+/// above its printed figure and each independently of the other, the operation the caller states
+/// is not near a cloud at all, a stated flight visibility at, just below and just above 3 statute
+/// miles, and the waiver gate in both directions (the entry's note, and rules-factory decision
+/// 0021).
 /// </summary>
 /// <remarks>
+/// <para>
 /// The entry resolves exactly one outcome, the minimums not met, and only where neither cloud
 /// minimum is met — § 107.51(d) is then broken on either reading of how its two figures combine,
 /// so the conjunction is false whatever the visibility is. Everywhere else § 107.51(c) is reached
@@ -21,6 +23,14 @@ namespace FaaPart107.Tests;
 /// against are never written here as literals expected to come from the entry: they are
 /// <c>visibility-minimum</c>'s and <c>cloud-clearance</c>'s, resolved through their own entry
 /// points.
+/// </para>
+/// <para>
+/// The third case is the one <see cref="CloudStatement.NoCloud"/> exists for, and it is the
+/// ordinary weather: no cloud to measure either minimum from. It is not the resolving outcome —
+/// nothing was measured, so neither minimum was found unmet — and it is not § 107.51(d) met
+/// either, which would be this engine answering a question the map does not settle. It declines,
+/// and the decline says which of those two it is not.
+/// </para>
 /// </remarks>
 public class WeatherMinimumsMetEntryPointTests
 {
@@ -33,11 +43,16 @@ public class WeatherMinimumsMetEntryPointTests
         decimal feetBelowCloud,
         decimal feetHorizontallyFromCloud,
         WaiverStatement waiver) =>
+        Resolve(flightVisibilityStatuteMiles, CloudStatement.Measured(feetBelowCloud, feetHorizontallyFromCloud, Caller), waiver);
+
+    private static Resolution<object> Resolve(
+        decimal flightVisibilityStatuteMiles,
+        CloudStatement cloud,
+        WaiverStatement waiver) =>
         EntryPoints.WeatherMinimumsMet.Resolve(new WeatherMinimumsMetRequest
         {
             FlightVisibilityStatuteMiles = flightVisibilityStatuteMiles,
-            FeetBelowCloud = feetBelowCloud,
-            FeetHorizontallyFromCloud = feetHorizontallyFromCloud,
+            Cloud = cloud,
             Waiver = waiver,
         });
 
@@ -88,8 +103,9 @@ public class WeatherMinimumsMetEntryPointTests
         Assert.False(finding.BelowCloudMinimumMet);
         Assert.False(finding.HorizontallyFromCloudMinimumMet);
         Assert.Equal(visibility, finding.FlightVisibilityStatuteMiles);
-        Assert.Equal(below, finding.FeetBelowCloud);
-        Assert.Equal(horizontal, finding.FeetHorizontallyFromCloud);
+        Assert.Equal(below, finding.Cloud.FeetBelowCloud);
+        Assert.Equal(horizontal, finding.Cloud.FeetHorizontallyFromCloud);
+        Assert.True(finding.Cloud.NamesACloud);
 
         // The figures it applied are its dependencies', reached through dependsOn.
         Assert.Equal(Clearance.BelowCloudFeet, finding.Clearance.BelowCloudFeet);
@@ -207,8 +223,7 @@ public class WeatherMinimumsMetEntryPointTests
             new WeatherMinimumsMetRequest
             {
                 FlightVisibilityStatuteMiles = 10m,
-                FeetBelowCloud = 0m,
-                FeetHorizontallyFromCloud = 0m,
+                Cloud = CloudStatement.Measured(0m, 0m, Caller),
             }));
 
         Assert.Equal(nameof(WeatherMinimumsMetRequest.Waiver), error.ParamName);
@@ -218,17 +233,84 @@ public class WeatherMinimumsMetEntryPointTests
     public void Without_a_stated_figure_it_refuses_rather_than_assume_one()
     {
         var withoutVisibility = Assert.Throws<ArgumentException>(() => EntryPoints.WeatherMinimumsMet.Resolve(
-            new WeatherMinimumsMetRequest { FeetBelowCloud = 0m, FeetHorizontallyFromCloud = 0m, Waiver = NoWaiver }));
-        var withoutBelow = Assert.Throws<ArgumentException>(() => EntryPoints.WeatherMinimumsMet.Resolve(
-            new WeatherMinimumsMetRequest { FlightVisibilityStatuteMiles = 10m, FeetHorizontallyFromCloud = 0m, Waiver = NoWaiver }));
-        var withoutHorizontal = Assert.Throws<ArgumentException>(() => EntryPoints.WeatherMinimumsMet.Resolve(
-            new WeatherMinimumsMetRequest { FlightVisibilityStatuteMiles = 10m, FeetBelowCloud = 0m, Waiver = NoWaiver }));
+            new WeatherMinimumsMetRequest { Cloud = CloudStatement.Measured(0m, 0m, Caller), Waiver = NoWaiver }));
+        var withoutCloud = Assert.Throws<ArgumentException>(() => EntryPoints.WeatherMinimumsMet.Resolve(
+            new WeatherMinimumsMetRequest { FlightVisibilityStatuteMiles = 10m, Waiver = NoWaiver }));
 
         Assert.Equal(nameof(WeatherMinimumsMetRequest.FlightVisibilityStatuteMiles), withoutVisibility.ParamName);
-        Assert.Equal(nameof(WeatherMinimumsMetRequest.FeetBelowCloud), withoutBelow.ParamName);
-        Assert.Equal(nameof(WeatherMinimumsMetRequest.FeetHorizontallyFromCloud), withoutHorizontal.ParamName);
+
+        // And the cloud in particular: an unsupplied statement is not an operation with no cloud.
+        // The engine does not read the absence of the fact as either case of it.
+        Assert.Equal(nameof(WeatherMinimumsMetRequest.Cloud), withoutCloud.ParamName);
     }
 
+    /// <summary>
+    /// The case two bare distances could not express, and the one an ordinary flight is in: the
+    /// caller states that the aircraft is not operated near a cloud. § 107.51(d)'s minimums are
+    /// distances from a cloud and there is none to measure from, so the entry declines — it does
+    /// not read the statement as both minimums broken, which is what a stated zero is, and it does
+    /// not read it as § 107.51(d) met either.
+    /// </summary>
+    [Theory]
+    [MemberData(nameof(StatedVisibilities))]
+    public void Stated_that_the_aircraft_is_not_operated_near_a_cloud_it_declines_and_says_107_51_d_has_no_measured_distance(
+        decimal visibility)
+    {
+        var noCloud = CloudStatement.NoCloud(Caller);
+        var unresolved = Declined(Resolve(visibility, noCloud, NoWaiver));
+
+        Assert.False(noCloud.NamesACloud);
+        Assert.Null(noCloud.FeetBelowCloud);
+        Assert.Null(noCloud.FeetHorizontallyFromCloud);
+
+        Assert.Equal(UnresolvedReason.RequiresInterpretation, unresolved.Reason);
+        Assert.Equal("cfr-14-107", unresolved.Locator.SourceId);
+        Assert.Equal("§ 107.51(c)", unresolved.Locator.Citation);
+        Assert.Equal(EntryPoints.ProminentObjects.Registered.Locator, unresolved.Locator);
+
+        // What happened, in the decline's own words: the caller's statement, that § 107.51(d) has
+        // no measured distance on this operation, that the engine does not decide what the
+        // paragraph requires of one, and that what is left open is prominent-objects'.
+        Assert.Contains("not operated near a cloud", unresolved.Attempted, StringComparison.Ordinal);
+        Assert.Contains("has no measured distance on this operation", unresolved.Attempted, StringComparison.Ordinal);
+        Assert.Contains(
+            "this engine does not decide what that paragraph requires of one",
+            unresolved.Attempted,
+            StringComparison.Ordinal);
+        Assert.Contains("prominent-objects", unresolved.Attempted, StringComparison.Ordinal);
+        Assert.Contains("\"prominent\"", unresolved.Attempted, StringComparison.Ordinal);
+
+        // cloud-clearance's open question is how § 107.51(d)'s two figures combine. Nothing was
+        // measured for them to combine over, so it is not what blocks this answer and is not named.
+        Assert.DoesNotContain("cloud-clearance", unresolved.Attempted, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// The two statements are different statements and get different answers: no cloud declines,
+    /// and a measured zero — the aircraft at the cloud — resolves the minimums not met. This is the
+    /// defect the entry had, stated as a test: before, an operation in clear air had only the
+    /// second to say.
+    /// </summary>
+    [Fact]
+    public void A_measured_zero_is_not_the_same_statement_as_no_cloud_and_is_not_answered_alike()
+    {
+        var clearAir = Declined(Resolve(10m, CloudStatement.NoCloud(Caller), NoWaiver));
+        var atTheCloud = Finding(Resolve(10m, CloudStatement.Measured(0m, 0m, Caller), NoWaiver));
+
+        Assert.Equal(UnresolvedReason.RequiresInterpretation, clearAir.Reason);
+
+        Assert.False(atTheCloud.MinimumsMet);
+        Assert.False(atTheCloud.BelowCloudMinimumMet);
+        Assert.False(atTheCloud.HorizontallyFromCloudMinimumMet);
+        Assert.Equal(0m, atTheCloud.Cloud.FeetBelowCloud);
+        Assert.Equal(0m, atTheCloud.Cloud.FeetHorizontallyFromCloud);
+    }
+
+    /// <summary>
+    /// A negative figure is a malformed value and is refused, not answered. The flight visibility
+    /// is refused by the rule; each cloud distance is refused by <see cref="CloudStatement"/>, one
+    /// step earlier, so a statement carrying a negative distance cannot be made at all.
+    /// </summary>
     [Theory]
     [InlineData(-1, 0, 0)]
     [InlineData(10, -1, 0)]

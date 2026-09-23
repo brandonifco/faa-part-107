@@ -20,29 +20,31 @@ namespace FaaPart107;
 /// holds open, and <see cref="Weather.MinimumsMet"/> declines instead of constructing this.
 /// </remarks>
 /// <param name="FlightVisibilityStatuteMiles">The flight visibility the caller stated, in statute miles, recorded with the outcome.</param>
-/// <param name="FeetBelowCloud">How far below the cloud the caller stated the aircraft is, in feet.</param>
-/// <param name="FeetHorizontallyFromCloud">How far horizontally from the cloud the caller stated the aircraft is, in feet.</param>
+/// <param name="BelowCloudMinimumMet">
+/// Paragraph (d)(1): true while the aircraft is no less than <c>cloud-clearance</c>'s printed
+/// distance below the cloud. "No less than" is met at the figure and broken below it.
+/// </param>
+/// <param name="HorizontallyFromCloudMinimumMet">
+/// Paragraph (d)(2): true while the aircraft is no less than <c>cloud-clearance</c>'s printed
+/// distance horizontally from the cloud. "No less than" is met at the figure and broken below it.
+/// </param>
+/// <param name="Cloud">
+/// What the caller stated about the cloud, recorded with the outcome. A finding is made only from a
+/// statement that names one: where the caller states that the aircraft is not operated near a
+/// cloud there is no measured distance for either minimum to be compared with, and
+/// <see cref="Weather.MinimumsMet"/> declines rather than making a finding — so neither minimum is
+/// ever reported unmet for want of a cloud to measure from.
+/// </param>
 /// <param name="Minimum">§ 107.51(c)'s figure, as <c>visibility-minimum</c> states it.</param>
 /// <param name="Clearance">§ 107.51(d)'s two figures, as <c>cloud-clearance</c> states them, and the waiver statement this was resolved under.</param>
 public sealed record WeatherMinimumsFinding(
     decimal FlightVisibilityStatuteMiles,
-    decimal FeetBelowCloud,
-    decimal FeetHorizontallyFromCloud,
+    bool BelowCloudMinimumMet,
+    bool HorizontallyFromCloudMinimumMet,
+    CloudStatement Cloud,
     VisibilityMinimum Minimum,
     CloudClearance Clearance)
 {
-    /// <summary>
-    /// Paragraph (d)(1): true while the aircraft is no less than <c>cloud-clearance</c>'s printed
-    /// distance below the cloud. "No less than" is met at the figure and broken below it.
-    /// </summary>
-    public bool BelowCloudMinimumMet => FeetBelowCloud >= Clearance.BelowCloudFeet;
-
-    /// <summary>
-    /// Paragraph (d)(2): true while the aircraft is no less than <c>cloud-clearance</c>'s printed
-    /// distance horizontally from the cloud. "No less than" is met at the figure and broken below it.
-    /// </summary>
-    public bool HorizontallyFromCloudMinimumMet => FeetHorizontallyFromCloud >= Clearance.HorizontallyFromCloudFeet;
-
     /// <summary>
     /// Whether § 107.51(c) and § 107.51(d) are both met: false, in every finding this engine can
     /// resolve. A finding is constructed only where neither cloud minimum is met, which makes the
@@ -62,9 +64,9 @@ public sealed record WeatherMinimumsFinding(
     public override string ToString() =>
         string.Create(
             CultureInfo.InvariantCulture,
-            $"the minimums are not met: {FeetBelowCloud} feet below the cloud is less than {Clearance.BelowCloudFeet} and "
-            + $"{FeetHorizontallyFromCloud} feet horizontally from it is less than {Clearance.HorizontallyFromCloudFeet} "
-            + $"[{Authority}]; {Waiver}");
+            $"the minimums are not met: {Cloud.FeetBelowCloud} feet below the cloud is less than {Clearance.BelowCloudFeet} and "
+            + $"{Cloud.FeetHorizontallyFromCloud} feet horizontally from it is less than {Clearance.HorizontallyFromCloudFeet} "
+            + $"[{Authority}]; {Cloud}; {Waiver}");
 }
 
 /// <summary>
@@ -99,6 +101,17 @@ public sealed record WeatherMinimumsFinding(
 /// Everywhere else § 107.51(c) is reached and the answer is undetermined, so the decline cites
 /// <c>prominent-objects</c>' § 107.51(c) and names the term the corpus leaves undefined.
 /// </para>
+/// <para>
+/// <b>The cloud is a <see cref="CloudStatement"/>, and no cloud is a case the caller states.</b>
+/// § 107.51(d)'s two minimums are distances from a cloud, so an operation with no cloud has no
+/// distance to state — and two bare numbers gave such a caller only zero, which is a measurement:
+/// the aircraft at the cloud, breaking both minimums. That is how this engine came to answer "the
+/// weather minimums are not met" to an ordinary clear-air flight. The second case is now stated
+/// rather than encoded, on the model of <see cref="EncounteredObject.NoneOfThem"/> and
+/// <see cref="StructureStatement.NoneWithinRadius"/>, and it is a decline: what § 107.51(d)
+/// requires of an operation with no cloud is a question the map does not settle, and this engine
+/// does not answer it in either direction.
+/// </para>
 /// </remarks>
 public static class Weather
 {
@@ -113,33 +126,44 @@ public static class Weather
     /// horizontally from the cloud."
     /// </summary>
     /// <remarks>
-    /// Resolves only where neither cloud minimum is met: § 107.51(d) is then broken on either
-    /// reading of how its two figures combine, so the conjunction is false whatever the flight
-    /// visibility is, and § 107.51(c) is never reached. Every other situation reaches § 107.51(c)
-    /// and declines, including one whose stated visibility is far above or far below the figure:
-    /// the stated distance is not § 107.51(c)'s flight visibility until "prominent" is fixed, and
-    /// this engine does not fix it. Where the cloud half is itself undetermined — one minimum met
-    /// and not the other — the decline names <c>cloud-clearance</c>'s question as well.
+    /// <para>
+    /// Resolves only where the caller's statement names a cloud and neither cloud minimum is met:
+    /// § 107.51(d) is then broken on either reading of how its two figures combine, so the
+    /// conjunction is false whatever the flight visibility is, and § 107.51(c) is never reached.
+    /// Every other situation reaches § 107.51(c) and declines, including one whose stated
+    /// visibility is far above or far below the figure: the stated distance is not § 107.51(c)'s
+    /// flight visibility until "prominent" is fixed, and this engine does not fix it. Where the
+    /// cloud half is itself undetermined — one minimum met and not the other — the decline names
+    /// <c>cloud-clearance</c>'s question as well.
+    /// </para>
+    /// <para>
+    /// A statement that the aircraft is not operated near a cloud declines too, and for a reason of
+    /// its own: § 107.51(d)'s minimums are distances from a cloud, and there is then no distance to
+    /// compare either of them with. The engine does not read that as both minimums broken — which
+    /// is what a stated zero is, and what an operation in clear air had no other way to say — and it
+    /// does not read it as § 107.51(d) met either, because what that paragraph requires of an
+    /// operation with no cloud is not something the map settles and not this engine's to decide
+    /// (<c>AGENTS.md</c> §6). Declining is the whole of the answer, and the outcome still turns on
+    /// § 107.51(c), whose quantity <c>prominent-objects</c> holds open.
+    /// </para>
     /// </remarks>
     /// <param name="flightVisibilityStatuteMiles">The flight visibility the caller states, observed from the location of the control station, in statute miles, not negative.</param>
-    /// <param name="feetBelowCloud">How far below the cloud the caller states the small unmanned aircraft is, in feet, not negative.</param>
-    /// <param name="feetHorizontallyFromCloud">How far horizontally from the cloud the caller states the small unmanned aircraft is, in feet, not negative.</param>
+    /// <param name="cloud">What the caller states about the cloud § 107.51(d)'s minimums are distances from: the two distances, or that the aircraft is not operated near one.</param>
     /// <param name="waiver">Whether a waiver of § 107.51 is in force, as the caller states it.</param>
     /// <returns>
-    /// The finding, the minimums not met, where neither cloud minimum is met;
-    /// <see cref="UnresolvedReason.OutsideCurrentScope"/> citing § 107.205 while a waiver is in
-    /// force; otherwise <see cref="UnresolvedReason.RequiresInterpretation"/> citing
+    /// The finding, the minimums not met, where the statement names a cloud and neither cloud
+    /// minimum is met; <see cref="UnresolvedReason.OutsideCurrentScope"/> citing § 107.205 while a
+    /// waiver is in force; otherwise <see cref="UnresolvedReason.RequiresInterpretation"/> citing
     /// <c>prominent-objects</c>' § 107.51(c).
     /// </returns>
+    /// <exception cref="ArgumentNullException"><paramref name="cloud"/> is null.</exception>
     public static Resolution<WeatherMinimumsFinding> MinimumsMet(
         decimal flightVisibilityStatuteMiles,
-        decimal feetBelowCloud,
-        decimal feetHorizontallyFromCloud,
+        CloudStatement cloud,
         WaiverStatement waiver)
     {
+        ArgumentNullException.ThrowIfNull(cloud);
         ArgumentOutOfRangeException.ThrowIfNegative(flightVisibilityStatuteMiles);
-        ArgumentOutOfRangeException.ThrowIfNegative(feetBelowCloud);
-        ArgumentOutOfRangeException.ThrowIfNegative(feetHorizontallyFromCloud);
 
         if (Waivers.Suspension(MapEntries.WeatherMinimumsMet, Regulation, waiver) is { } suspended)
         {
@@ -150,10 +174,21 @@ public static class Weather
             minimum => Clouds.Clearance(waiver).Match(
                 clearance =>
                 {
+                    // The two minimums are compared with the distances the statement measured, and
+                    // a statement that names no cloud measured none. Nothing here supplies one:
+                    // there is no figure to compare, so there is no comparison, and the entry says
+                    // so rather than answering from the absence.
+                    if (cloud.FeetBelowCloud is not { } below || cloud.FeetHorizontallyFromCloud is not { } horizontal)
+                    {
+                        return Resolution<WeatherMinimumsFinding>.FromUnresolved(
+                            NoCloudToMeasureFrom(flightVisibilityStatuteMiles, cloud, minimum));
+                    }
+
                     var finding = new WeatherMinimumsFinding(
                         flightVisibilityStatuteMiles,
-                        feetBelowCloud,
-                        feetHorizontallyFromCloud,
+                        BelowCloudMinimumMet: below >= clearance.BelowCloudFeet,
+                        HorizontallyFromCloudMinimumMet: horizontal >= clearance.HorizontallyFromCloudFeet,
+                        cloud,
                         minimum,
                         clearance);
 
@@ -166,6 +201,35 @@ public static class Weather
     }
 
     /// <summary>
+    /// The decline for an operation the caller states is not near a cloud: § 107.51(d) has no
+    /// measured distance to reach, this engine does not decide what the paragraph then requires,
+    /// and § 107.51(c) is reached with its quantity still open.
+    /// </summary>
+    /// <remarks>
+    /// <c>cloud-clearance</c>'s question is not named here, and deliberately: what that entry holds
+    /// open is how § 107.51(d)'s two figures combine, and no measurement has been offered for
+    /// either of them to combine over. What blocks the answer is § 107.51(c)'s, which is what this
+    /// decline cites.
+    /// </remarks>
+    private static UnresolvedResult NoCloudToMeasureFrom(
+        decimal flightVisibilityStatuteMiles,
+        CloudStatement cloud,
+        VisibilityMinimum minimum) =>
+        new(
+            UnresolvedReason.RequiresInterpretation,
+            string.Create(
+                CultureInfo.InvariantCulture,
+                $"decide whether the map entry '{MapEntries.WeatherMinimumsMet.Id}' is met on a stated flight "
+                + $"visibility of {flightVisibilityStatuteMiles} statute miles: {cloud}, so § 107.51(d)'s \"minimum "
+                + $"distance of the small unmanned aircraft from clouds\" has no measured distance on this operation "
+                + $"and this engine does not decide what that paragraph requires of one; the outcome turns on "
+                + $"§ 107.51(c), which requires no less than {minimum.StatuteMiles} statute miles of the flight "
+                + $"visibility it defines, and the map entry '{MapEntries.ProminentObjects.Id}' holds open which "
+                + $"objects are \"prominent\" — the degree that fixes the distance the definition reports — so the "
+                + $"stated figure is not yet that quantity"),
+            MapEntries.ProminentObjects.Locator);
+
+    /// <summary>
     /// The decline for a situation that reaches § 107.51(c): the visibility half is undetermined
     /// however the stated figure compares with the minimum, and the cloud half is named too when it
     /// is itself undetermined.
@@ -176,7 +240,7 @@ public static class Weather
             ? string.Empty
             : string.Create(
                 CultureInfo.InvariantCulture,
-                $"; and {finding.FeetBelowCloud} feet below the cloud with {finding.FeetHorizontallyFromCloud} feet "
+                $"; and {finding.Cloud.FeetBelowCloud} feet below the cloud with {finding.Cloud.FeetHorizontallyFromCloud} feet "
                 + $"horizontally from it meets one of § 107.51(d)'s two minimums and not the other, which the map "
                 + $"entry '{MapEntries.CloudClearance.Id}' holds open");
 
