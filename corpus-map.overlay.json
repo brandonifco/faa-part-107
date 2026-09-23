@@ -492,5 +492,38 @@
         "mutation": "Handlers.Missing stopped naming the entry whose request was short (`$\"resolving a map entry needs its request's {name}, and it was not set\"` for `$\"resolving the map entry '{entryId}' needs its request's {name}, and it was not set\"`), so the dictionary dispatch refused without saying which entry it was resolving; this test went red (Failed: 1, Passed: 0)."
       }
     ]
+  },
+  "well-clear": {
+    "status": "implemented",
+    "implementedIn": {
+      "ruleset": "faa-part-107",
+      "version": 1
+    },
+    "tests": [
+      {
+        "test": "WellClearEntryPointTests.Resolving_it_declines_RequiresInterpretation_citing_107_37_a",
+        "mutation": "Yielding.WellClear cited collision-hazard-proximity's `§ 107.37(b)` (`MapEntries.CollisionHazardProximity.Locator` for `MapEntries.WellClear.Locator`), so the decline named the other constituent of § 107.37; this test went red. It went red too with the reason wrong (`UnresolvedReason.UnsupportedRule` for `UnresolvedReason.RequiresInterpretation`). Citing right-of-way's locator (`MapEntries.RightOfWay.Locator`) did NOT turn it red: both entries cite `§ 107.37(a)`, so the locator cannot tell them apart and only Attempted names well-clear."
+      },
+      {
+        "test": "WellClearEntryPointTests.The_decline_is_the_rules_own_and_names_the_term_the_corpus_leaves_undefined",
+        "mutation": "Yielding.WellClear declined with the correspondence row's bare wording, naming no reason (`$\"resolve the map entry '{MapEntries.WellClear.Id}'\"` for the message naming \"well clear\" as undefined, the exception to the prohibition on passing over, under or ahead, and that § 107.37(a) states no measure for it), so the decline cited where without saying why; this test went red. It went red too with Handlers.WellClear answering the open question instead of delegating to the rule (`Resolution<object>.FromValue(true)` for `Yielding.WellClear(Demand(...))`), which broke the assertion that the entry point's resolution is exactly `Yielding.WellClear(NoWaiver)` — that mutation turned all six of these tests red."
+      },
+      {
+        "test": "WellClearEntryPointTests.It_declines_the_same_way_whatever_the_caller_asserts_for_it",
+        "mutation": "Handlers.WellClear took the caller's word for the entry, as though it were `kind: assertion` (`request.Assertions == RuleRequest.Empty ? Yielding.WellClear(Demand(...)) : Resolution<object>.FromValue(request.Assertions.Asserted(request.EntryId))` for `Yielding.WellClear(Demand(...))`), so a caller who asserted well-clear true resolved to true instead of the decline; this test went red, and only this one."
+      },
+      {
+        "test": "WellClearEntryPointTests.While_a_waiver_of_107_37_a_is_stated_in_force_it_declines_OutsideCurrentScope_citing_107_205_and_records_the_statement",
+        "mutation": "Yielding.WellClear handed the gate a statement that no waiver is in force (`waiver with { InForce = false }` for `waiver`), so a stated waiver was not honoured and the entry declined RequiresInterpretation citing § 107.37(a) instead of OutsideCurrentScope citing § 107.205; this test went red. It went red too with Yielding.WellClear naming right-of-way as the suspended entry (`MapEntries.RightOfWay` for `MapEntries.WellClear` in the call to Waivers.Suspension), so Attempted named right-of-way rather than well-clear — the two entries share the locator `§ 107.37(a)`, so what was attempted is the only thing that tells them apart."
+      },
+      {
+        "test": "WellClearEntryPointTests.Without_a_waiver_statement_it_refuses_rather_than_infer_one",
+        "mutation": "Handlers.WellClear defaulted a missing statement to none held (`request.Waiver ?? WaiverStatement.NoneHeld(Yielding.Regulation, \"the engine\")` for `Demand(request.Waiver, ...)`); this test went red."
+      },
+      {
+        "test": "WellClearEntryPointTests.A_waiver_statement_about_another_regulation_is_refused",
+        "mutation": "Yielding.WellClear compared the statement's regulation with itself (`waiver.Regulation` for `Regulation` in the call to Waivers.Suspension), so a waiver of § 107.51 suspended § 107.37(a); this test went red."
+      }
+    ]
   }
 }

@@ -326,8 +326,8 @@ internal static partial class Handlers
     /// <summary>Yielding right of way to other aircraft (<c>right-of-way</c>): optional.</summary>
     static partial void RightOfWay(global::FaaPart107.Requests.RightOfWayRequest request, ref Resolution<object>? resolution);
 
-    /// <summary>The small unmanned aircraft is well clear of the aircraft or vehicle (<c>well-clear</c>): optional.</summary>
-    static partial void WellClear(global::FaaPart107.Requests.WellClearRequest request, ref Resolution<object>? resolution);
+    /// <summary>The small unmanned aircraft is well clear of the aircraft or vehicle (<c>well-clear</c>): required, the entry is implemented.</summary>
+    internal static partial Resolution<object> WellClear(global::FaaPart107.Requests.WellClearRequest request);
 
     /// <summary>Operating so close to another aircraft as to create a collision hazard (<c>collision-hazard-proximity</c>): optional.</summary>
     static partial void CollisionHazardProximity(global::FaaPart107.Requests.CollisionHazardProximityRequest request, ref Resolution<object>? resolution);
@@ -478,7 +478,7 @@ internal static partial class Handlers
                 RightOfWay(request as global::FaaPart107.Requests.RightOfWayRequest ?? new(assertions), ref resolution);
                 break;
             case "well-clear":
-                WellClear(request as global::FaaPart107.Requests.WellClearRequest ?? new(assertions), ref resolution);
+                resolution = WellClear(request as global::FaaPart107.Requests.WellClearRequest ?? new(assertions));
                 break;
             case "collision-hazard-proximity":
                 CollisionHazardProximity(request as global::FaaPart107.Requests.CollisionHazardProximityRequest ?? new(assertions), ref resolution);
@@ -579,7 +579,7 @@ internal static partial class Handlers
         "civil-twilight-alaska" => Hooked("CivilTwilightAlaska", typeof(global::FaaPart107.Requests.CivilTwilightAlaskaRequest)),
         "hazardous-material" => Hooked("HazardousMaterial", typeof(global::FaaPart107.Requests.HazardousMaterialRequest)),
         "right-of-way" => Hooked("RightOfWay", typeof(global::FaaPart107.Requests.RightOfWayRequest)),
-        "well-clear" => Hooked("WellClear", typeof(global::FaaPart107.Requests.WellClearRequest)),
+        "well-clear" => true,
         "collision-hazard-proximity" => Hooked("CollisionHazardProximity", typeof(global::FaaPart107.Requests.CollisionHazardProximityRequest)),
         "reasonable-protection" => Hooked("ReasonableProtection", typeof(global::FaaPart107.Requests.ReasonableProtectionRequest)),
         "over-human-beings" => Hooked("OverHumanBeings", typeof(global::FaaPart107.Requests.OverHumanBeingsRequest)),
