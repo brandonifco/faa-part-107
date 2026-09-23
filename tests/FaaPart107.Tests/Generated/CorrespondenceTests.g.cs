@@ -162,8 +162,8 @@ public sealed class CorrespondenceTests
         Assert.True(Registry.HasImplementation("speed-within-limit"), "speed-within-limit is implemented in the overlay and has no [Implements] handler");
 
     [Fact]
-    public void altitude_within_limit__declines_UnsupportedRule_row_2() =>
-        AssertDeclines("altitude-within-limit", UnresolvedReason.UnsupportedRule, EntryPoints.AltitudeWithinLimit.Resolve(global::FaaPart107.Requests.AltitudeWithinLimitRequest.Empty), new SourceLocator("cfr-14-107", "§ 107.51(b)"));
+    public void altitude_within_limit__is_implemented_so_a_hand_written_handler_answers_it() =>
+        Assert.True(Registry.HasImplementation("altitude-within-limit"), "altitude-within-limit is implemented in the overlay and has no [Implements] handler");
 
     [Fact]
     public void weather_minimums_met__declines_UnsupportedRule_row_2() =>

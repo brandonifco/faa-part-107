@@ -143,7 +143,7 @@ public static class Registry
         new("cloud-clearance", EntryStatus.Implemented, CorrespondenceRow.UnresolvedAmbiguity, [MapEntries.CloudClearance.Locator]),
         new("civil-twilight-window", EntryStatus.Implemented, CorrespondenceRow.None, [MapEntries.CivilTwilightWindow.Locator]),
         new("speed-within-limit", EntryStatus.Implemented, CorrespondenceRow.None, [MapEntries.SpeedWithinLimit.Locator]),
-        new("altitude-within-limit", EntryStatus.Mapped, CorrespondenceRow.NotBuilt, [MapEntries.AltitudeWithinLimit.Locator]),
+        new("altitude-within-limit", EntryStatus.Implemented, CorrespondenceRow.None, [MapEntries.AltitudeWithinLimit.Locator]),
         new("weather-minimums-met", EntryStatus.Mapped, CorrespondenceRow.NotBuilt, [MapEntries.WeatherMinimumsMet.Locator]),
         new("operating-limitations", EntryStatus.Mapped, CorrespondenceRow.NotBuilt, [MapEntries.OperatingLimitations.Locator]),
         new("prominent-objects", EntryStatus.Mapped, CorrespondenceRow.NotBuilt, [MapEntries.ProminentObjects.Locator]),

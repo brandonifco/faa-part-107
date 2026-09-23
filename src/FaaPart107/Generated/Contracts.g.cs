@@ -272,8 +272,8 @@ internal static partial class Handlers
     /// <summary>Groundspeed is within the limit (<c>speed-within-limit</c>): required, the entry is implemented.</summary>
     internal static partial Resolution<object> SpeedWithinLimit(global::FaaPart107.Requests.SpeedWithinLimitRequest request);
 
-    /// <summary>Altitude is within the limit (<c>altitude-within-limit</c>): optional.</summary>
-    static partial void AltitudeWithinLimit(global::FaaPart107.Requests.AltitudeWithinLimitRequest request, ref Resolution<object>? resolution);
+    /// <summary>Altitude is within the limit (<c>altitude-within-limit</c>): required, the entry is implemented.</summary>
+    internal static partial Resolution<object> AltitudeWithinLimit(global::FaaPart107.Requests.AltitudeWithinLimitRequest request);
 
     /// <summary>Visibility and cloud clearance are met (<c>weather-minimums-met</c>): optional.</summary>
     static partial void WeatherMinimumsMet(global::FaaPart107.Requests.WeatherMinimumsMetRequest request, ref Resolution<object>? resolution);
@@ -424,7 +424,7 @@ internal static partial class Handlers
                 resolution = SpeedWithinLimit(request as global::FaaPart107.Requests.SpeedWithinLimitRequest ?? new(assertions));
                 break;
             case "altitude-within-limit":
-                AltitudeWithinLimit(request as global::FaaPart107.Requests.AltitudeWithinLimitRequest ?? new(assertions), ref resolution);
+                resolution = AltitudeWithinLimit(request as global::FaaPart107.Requests.AltitudeWithinLimitRequest ?? new(assertions));
                 break;
             case "weather-minimums-met":
                 WeatherMinimumsMet(request as global::FaaPart107.Requests.WeatherMinimumsMetRequest ?? new(assertions), ref resolution);
@@ -561,7 +561,7 @@ internal static partial class Handlers
         "cloud-clearance" => true,
         "civil-twilight-window" => true,
         "speed-within-limit" => true,
-        "altitude-within-limit" => Hooked("AltitudeWithinLimit", typeof(global::FaaPart107.Requests.AltitudeWithinLimitRequest)),
+        "altitude-within-limit" => true,
         "weather-minimums-met" => Hooked("WeatherMinimumsMet", typeof(global::FaaPart107.Requests.WeatherMinimumsMetRequest)),
         "operating-limitations" => Hooked("OperatingLimitations", typeof(global::FaaPart107.Requests.OperatingLimitationsRequest)),
         "prominent-objects" => Hooked("ProminentObjects", typeof(global::FaaPart107.Requests.ProminentObjectsRequest)),

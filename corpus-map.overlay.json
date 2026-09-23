@@ -185,5 +185,54 @@
         "mutation": "Handlers.CivilTwilightWindow gated the entry on a demanded waiver statement of § 107.29, by analogy with altitude-limit (a `Waiver` init property on CivilTwilightWindowRequest, then `Demand(request.Waiver, ...)` and `Waivers.Suspension(MapEntries.CivilTwilightWindow, \"§ 107.29\", waiver)` for `Resolution<object>.FromValue(CivilTwilight.Windows())`), so the dictionary dispatch's input-free request threw ArgumentException instead of resolving; this test went red, and so did the other three — the entry's map row has no suspendedBy, so no request of it may be refused for want of a waiver. Red on its own, with the other three still passing, with CivilTwilightWindows given reference equality (`public bool Equals(CivilTwilightWindows? other) => ReferenceEquals(this, other);` plus `GetHashCode`), so the value resolved through the dictionary dispatch no longer equalled the one resolved through the entry point."
       }
     ]
+  },
+  "altitude-within-limit": {
+    "status": "implemented",
+    "implementedIn": {
+      "ruleset": "faa-part-107",
+      "version": 1
+    },
+    "tests": [
+      {
+        "test": "AltitudeWithinLimitEntryPointTests.An_altitude_at_or_below_400_feet_above_ground_level_is_within_the_limit_citing_107_51_b",
+        "mutation": "Altitude.Within made the ceiling exclusive (`altitudeAboveGroundLevelFeet < limit.AboveGroundLevelFeet` for `<=`), so 400 feet above ground level was beyond a limit it \"cannot be higher than\"; this test went red (Failed: 1, Passed: 3 of the 4 theory cases). It went red too, in all 4 cases, with AltitudeFinding.Authority citing operating-limitations' `§ 107.51 introductory text` (`MapEntries.OperatingLimitations.Locator` for `MapEntries.AltitudeWithinLimit.Locator`). Citing altitude-limit's locator instead did NOT turn any of this class's 26 tests red: both entries cite `§ 107.51(b)`, so the locator cannot tell them apart and only Attempted names the entry."
+      },
+      {
+        "test": "AltitudeWithinLimitEntryPointTests.An_altitude_higher_than_400_feet_above_ground_level_with_no_structure_is_beyond_the_limit_citing_107_51_b",
+        "mutation": "Altitude.Within raised the ceiling a foot (`altitudeAboveGroundLevelFeet <= limit.AboveGroundLevelFeet + 1m` for `<= limit.AboveGroundLevelFeet`), so 400.01 and 401 feet above ground level resolved within the limit with no structure stated; this test went red (Failed: 2, Passed: 1 -- 5000 feet is beyond either way)."
+      },
+      {
+        "test": "AltitudeWithinLimitEntryPointTests.Within_a_400_foot_radius_and_not_higher_than_400_feet_above_the_structure_is_within_the_limit_above_400_agl",
+        "mutation": "Altitude.Within made paragraph (b)(2) exclusive (`altitudeAboveGroundLevelFeet < uppermost + limit.AboveStructureUppermostLimitFeet` for `<=`), so an aircraft exactly 400 feet above the structure's immediate uppermost limit was beyond a limit it \"does not fly higher than\"; this test went red (Failed: 3, Passed: 1 -- only the 899.99-foot case is below the allowance). It went red too (Failed: 2, Passed: 2) with paragraph (b)(1) made exclusive (`distance < limit.StructureRadiusFeet` for `<=`), so an aircraft exactly 400 feet from the structure was not \"within a 400-foot radius\" of it."
+      },
+      {
+        "test": "AltitudeWithinLimitEntryPointTests.Within_the_radius_but_higher_than_400_feet_above_the_structures_immediate_uppermost_limit_is_beyond_the_limit",
+        "mutation": "Altitude.Within dropped the altitude comparison from paragraph (b)(2) (`WithinStructureAllowance: structure.NamesAStructure` for `structure.ImmediateUppermostLimitFeet is { } uppermost && altitudeAboveGroundLevelFeet <= uppermost + limit.AboveStructureUppermostLimitFeet`), so naming a structure at all lifted the ceiling however high the flight and 900.01 feet over a 500-foot structure resolved within the limit; this test went red in all 4 theory cases."
+      },
+      {
+        "test": "AltitudeWithinLimitEntryPointTests.Beyond_a_400_foot_radius_the_structures_allowance_does_not_apply_and_only_the_400_foot_agl_ceiling_governs",
+        "mutation": "AltitudeFinding.WithinLimit joined the two parts of the exception with \"or\" (`WithinGroundLevelCeiling || WithinStructureRadius || WithinStructureAllowance` for `WithinGroundLevelCeiling || (WithinStructureRadius && WithinStructureAllowance)`), so a flight 900 feet up and 400.01 feet from a 500-foot structure resolved within the limit on paragraph (b)(2) alone; this test went red (Failed: 3, Passed: 1 -- the case already within the ceiling). It went red too (Failed: 3, Passed: 1) with the radius widened a foot (`distance <= limit.StructureRadiusFeet + 1m` for `<= limit.StructureRadiusFeet`), which brought 400.01 and 401 feet inside paragraph (b)(1)."
+      },
+      {
+        "test": "AltitudeWithinLimitEntryPointTests.While_a_waiver_of_107_51_is_stated_in_force_it_declines_OutsideCurrentScope_citing_107_205_whatever_the_altitude",
+        "mutation": "Altitude.Within skipped its own gate check (`is { } suspended && suspended.Reason == UnresolvedReason.UnsupportedRule`), so the decline came from altitude-limit's gate, reached through dependsOn, and Attempted named `altitude-limit` rather than `altitude-within-limit`; this test went red in all 3 theory cases. The locator could not have caught it: both entries cite `§ 107.51(b)`."
+      },
+      {
+        "test": "AltitudeWithinLimitEntryPointTests.Stated_that_no_waiver_is_in_force_the_rule_is_evaluated_and_the_statement_recorded",
+        "mutation": "Altitude.Within handed the gate a statement that a waiver is in force (`waiver with { InForce = true }` for `waiver` in the call to Waivers.Suspension), so a statement that none is held still declined OutsideCurrentScope; this test went red."
+      },
+      {
+        "test": "AltitudeWithinLimitEntryPointTests.Without_a_structure_statement_it_refuses_rather_than_assume_there_is_no_structure",
+        "mutation": "Handlers.AltitudeWithinLimit defaulted a missing structure statement to none within the radius (`request.Structure ?? StructureStatement.NoneWithinRadius(\"the engine\")` for `Demand(request.Structure, ...)`), so the engine assumed there was no structure instead of demanding the fact; this test went red."
+      },
+      {
+        "test": "AltitudeWithinLimitEntryPointTests.Without_a_waiver_statement_it_refuses_rather_than_infer_one",
+        "mutation": "Handlers.AltitudeWithinLimit defaulted a missing statement to none held (`request.Waiver ?? WaiverStatement.NoneHeld(Altitude.Regulation, \"the engine\")` for `Demand(request.Waiver, ...)`); this test went red."
+      },
+      {
+        "test": "AltitudeWithinLimitEntryPointTests.Without_an_altitude_it_refuses",
+        "mutation": "Handlers.AltitudeWithinLimit defaulted a missing altitude to ground level (`request.AltitudeAboveGroundLevelFeet ?? 0m` for `Demand(request.AltitudeAboveGroundLevelFeet, ...)`), so a request that stated no altitude resolved within the limit; this test went red."
+      }
+    ]
   }
 }
