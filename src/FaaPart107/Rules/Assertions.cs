@@ -132,7 +132,7 @@ public static class Assertions
     /// assert, so the engine attributes the assertion to whoever the caller says made it." Three
     /// Part 107 entries carry it — <see cref="MapEntries.CollisionHazardProximity"/>,
     /// <see cref="MapEntries.ReasonableProtection"/> and
-    /// <see cref="MapEntries.FlashRateSufficient"/> — and 0025's consequences table names those
+    /// <see cref="MapEntries.FlashRateSufficient"/> — and 0025's "Applied" table names those
     /// three. So the marker turns the attribution check off for them and changes nothing for the
     /// other seven, whose lists are people.
     /// </para>
