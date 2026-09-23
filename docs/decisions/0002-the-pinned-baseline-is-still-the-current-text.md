@@ -6,7 +6,8 @@
 
 This engine pins 14 CFR Part 107 in `corpus/part107.xml` and cites it as of a date.
 Two files describe that pin, and they do not carry the same fields. `provenance.json`'s `corpus`
-block carries four, and the map package's `corpus-manifest.json` carries those four and three more:
+block carries four of them (and a fifth key, `recomputed`, which is about the record rather than the
+pin); the map package's `corpus-manifest.json` carries those four and three more:
 
 | | in `provenance.json` | in `corpus-manifest.json` |
 |---|---|---|
@@ -127,10 +128,15 @@ finds a single boundary, and it is nowhere near an amendment:
 
 ```
 $ for d in 2026-05-24 2026-05-25 2026-05-26 2026-05-27 2026-06-15; do
-    curl -sS --compressed ".../full/$d/title-14.xml?part=107" | sha256sum; done
-2026-05-24 -> 80f6bc4b002df9dc…      2026-05-26 -> 8d448ab10578dfaf…
-2026-05-25 -> 80f6bc4b002df9dc…      2026-05-27 -> 8d448ab10578dfaf…
-                                     2026-06-15 -> 8d448ab10578dfaf…
+    printf '%s  ' "$d"
+    curl -sS --compressed "https://www.ecfr.gov/api/versioner/v1/full/$d/title-14.xml?part=107" \
+      | sha256sum | cut -c1-16
+  done
+2026-05-24  80f6bc4b002df9dc
+2026-05-25  80f6bc4b002df9dc
+2026-05-26  8d448ab10578dfaf
+2026-05-27  8d448ab10578dfaf
+2026-06-15  8d448ab10578dfaf
 ```
 
 Every date to 2026-05-25 serves the old serialization; every date from 2026-05-26 serves the new
@@ -210,14 +216,38 @@ neither moved.
 So: re-open the question when a diff shows any of
 
 - an `amendment_date`, `date` or `issue_date` after the baseline in the versioner's history for
-  part 107 — the record checked all three, and on this corpus they agree on every row;
+  part 107. All three are checked, and they are **not** interchangeable — `date` and
+  `amendment_date` are identical on all 176 rows, but `issue_date` differs from them on 84, nearly
+  half, and takes six values that appear in neither of the others (2017-01-01, 2018-03-06,
+  2021-11-17, 2023-03-31, 2024-03-12, 2025-04-09). Checking all three is what makes "nothing after
+  the baseline" a claim about the history rather than about one column of it:
+
+  ```
+  $ python3 - <<'EOF'   # over .../versions/title-14.json?part=107
+  … print row count, pairwise disagreements, and max/after-baseline per column
+  EOF
+  176 rows
+    date vs amendment_date: 0 row(s) differ
+    amendment_date vs issue_date: 84 row(s) differ
+    max(date) = 2025-11-03, rows after 2026-01-01: 0
+    max(amendment_date) = 2025-11-03, rows after 2026-01-01: 0
+    max(issue_date) = 2025-11-03, rows after 2026-01-01: 0
+  ```
+
+  The three columns agree on the *answer* here — none of them has a row after the baseline — and
+  they agree on nothing else;
 - a change to text: anything inside a `<P>`, a `<HEAD>`, a section heading, or any other prose the
   map quotes as `evidence`;
 - a change to an element's **identity** — its `N`, its `TYPE`, or its presence: a section, subpart
   or paragraph added to, removed from, or renumbered within the part;
 - a change to an attribute that any entry's locator or the adapter actually reads. `VOLUME` is not
   one; a criterion that lists attributes by name would go stale, so the test is whether anything in
-  the map or the `ecfr-xml` adapter reads it.
+  the map or the `ecfr-xml` adapter reads it. Note what a reader standing in *this* tree can and
+  cannot check: the locator half is checkable here — all 47 locators carry only `sourceId` and
+  `citation` — but the adapter half is not, because the `ecfr-xml` adapter lives in rules-factory
+  and nothing in this engine parses the corpus XML at all. Here it is only ever hashed. So for this
+  engine the attribute question has a short answer, and for the map it is a question to take
+  upstream.
 
 and treat as **not** a corpus change a difference that is confined to markup nothing reads,
 **provided** it is shown to be so rather than assumed.
@@ -243,8 +273,10 @@ versioning.
 - This engine continues to cite `cfr-14-107` as of `2026-01-01`, and that citation is accurate.
 - `corpus/part107.xml`, `provenance.json`, `corpus-map.overlay.json` and the map package version are
   untouched by this record. It adds a document and changes no behaviour.
-- The re-check is reproducible: the four commands above are the whole of it, and a reader who runs
-  them gets the outputs above, or has found something this record did not.
+- The re-check is reproducible: the commands above are the whole of it, and a reader who runs them
+  gets the outputs above, or has found something this record did not. Three of them settle the
+  question — the version history, the re-fetch of `retrievedFrom`, and the diff against the current
+  text. The rest characterise the one difference the third turns up.
 - This is a point-in-time result. It is evidence that the baseline was current on the date of this
   record, not a guarantee that it stays current. The check is cheap and its inputs are public, so
   re-running it is the maintenance this pin needs — watching the versioner's history for part 107,
