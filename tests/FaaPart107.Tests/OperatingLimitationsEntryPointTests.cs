@@ -101,11 +101,19 @@ public class OperatingLimitationsEntryPointTests
         finding.Limitations.Single(limitation => limitation.Entry.Id == entryId);
 
     /// <summary>
-    /// The whole of a finding but the person it is about: every limitation as the entry that states
-    /// it answered it — that entry, its citation, its verdict and its account — and the conjunction
-    /// read off them. § 107.51's introductory text joins its two people by "and", so this is the one
-    /// obligation both of them are under, and no part of it may turn on which of them asked.
+    /// Every limitation as the entry that states it answered it — that entry's id, its citation, its
+    /// verdict and its account — and the conjunction read off them. § 107.51's introductory text
+    /// joins its two people by "and", so this is the one obligation both of them are under, and no
+    /// part of it may turn on which of them asked.
     /// </summary>
+    /// <remarks>
+    /// It is not the whole finding, and the omissions are deliberate rather than an oversight:
+    /// <see cref="OperatingLimitationsFinding.Person"/> is the thing being varied and so cannot be
+    /// compared, and <c>Waiver</c> and <c>Authority</c> are the same on both sides by construction —
+    /// one statement about one regulation, and this entry's own locator. What is compared is
+    /// everything that could differ between the two people, which is what makes the comparison a
+    /// test rather than a restatement.
+    /// </remarks>
     private static IEnumerable<string> Answer(OperatingLimitationsFinding finding) =>
         finding.Limitations
             .Select(limitation =>
