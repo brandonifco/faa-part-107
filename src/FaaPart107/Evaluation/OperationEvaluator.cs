@@ -95,6 +95,7 @@ public static class OperationEvaluator
                 decline => new EvaluatedRequirement(entry, RequirementStates.For(decline.Reason), decline.Attempted)
                 {
                     Reason = decline.Reason,
+                    DeclineCites = decline.Locator,
                 });
         }
         catch (AssertionRequiredException required)
@@ -262,6 +263,14 @@ public static class OperationEvaluator
                 Waiver = facts.WaiverOf(Observers.Regulation),
                 VisualLineOfSightWaiver = facts.WaiverOf(LineOfSight.Regulation),
             }),
+        "civil-twilight-operation" => facts => EntryPoints.CivilTwilightOperation.Resolve(
+            new Requests.CivilTwilightOperationRequest(facts.Assertions)
+            {
+                Place = facts.OperationPlace,
+                Period = facts.OperationPeriod,
+                Lighting = facts.Lighting,
+                Waiver = facts.WaiverOf(Twilight.Regulation),
+            }),
         "anti-collision-lighting" => facts => EntryPoints.AntiCollisionLighting.Resolve(
             new Requests.AntiCollisionLightingRequest(facts.Assertions)
             {
@@ -329,6 +338,18 @@ public static class OperationEvaluator
         // § 107.29(a)(2) and (b): true when the lighting the clause requires is there. The rule
         // makes that conjunction from the caller's statement and two assertions; this reads it.
         AntiCollisionLightingFinding finding => Met(finding.Met),
+
+        // § 107.29(b)-(c). Three answers, not two, and for the same reason § 107.33 has three: the
+        // rule's own property is bool?, and null is the paragraph stating no prohibition about this
+        // operation at all — which its own documentation is explicit is neither "the lighting
+        // requirement is met" nor "the operation is prohibited", and is never "undetermined".
+        // DuringCivilTwilight, on the finding, says which case a null is.
+        CivilTwilightOperationFinding finding => finding.Permitted switch
+        {
+            true => RequirementState.Satisfied,
+            false => RequirementState.Violated,
+            null => RequirementState.Informational,
+        },
 
         // § 107.33 as a whole. Three answers, not two: the rule's own property is bool?, and null
         // is the section not reaching this operation at all — which that property's own

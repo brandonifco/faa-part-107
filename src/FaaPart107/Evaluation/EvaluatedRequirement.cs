@@ -88,6 +88,22 @@ public sealed record EvaluatedRequirement
     public UnresolvedReason? Reason { get; init; }
 
     /// <summary>
+    /// The locator the decline itself carries, where the entry declined; null otherwise.
+    /// </summary>
+    /// <remarks>
+    /// <b>This is not always <see cref="Locator"/>, and the difference is the point.</b>
+    /// <see cref="Citations"/> is what the <em>entry</em> cites; a decline cites where the real
+    /// rule lives, which is often somewhere else: a waiver stated in force makes an entry decline
+    /// citing § 107.205 (<c>waivable-regulations</c>) rather than its own paragraph;
+    /// <c>civil-twilight-operation</c> in Alaska cites <c>civil-twilight-alaska</c>;
+    /// <c>speed-within-limit</c> between the two printed figures cites <c>speed-limit</c>'s
+    /// § 107.51(a), which is whose question it is (<c>docs/decisions/0001</c>). Dropping it would
+    /// leave a caller holding a decline whose citation is the entry it asked about rather than the
+    /// one that could not answer.
+    /// </remarks>
+    public SourceLocator? DeclineCites { get; init; }
+
+    /// <summary>
     /// What the entry resolved to, exactly as the rule built it — a finding, a printed figure, or
     /// an <see cref="Assertion"/> — and null where the entry did not resolve.
     /// </summary>
@@ -145,6 +161,7 @@ public sealed record EvaluatedRequirement
         && Row == other.Row
         && State == other.State
         && Reason == other.Reason
+        && DeclineCites == other.DeclineCites
         && string.Equals(Explanation, other.Explanation, StringComparison.Ordinal)
         && string.Equals(MissingInput, other.MissingInput, StringComparison.Ordinal)
         && citations.SequenceEqual(other.citations)

@@ -127,6 +127,22 @@ public sealed record OperationFacts
     /// </summary>
     public VisualObserverUse? VisualObserverUse { get; init; }
 
+    /// <summary>
+    /// Where the operation is, as the caller states it — what § 107.29(c) selects the definition of
+    /// civil twilight by (<c>civil-twilight-operation</c>). Stating Alaska makes the entry decline
+    /// <see cref="RequirementState.MissingRulesData"/> citing <c>civil-twilight-alaska</c>, which is
+    /// the engine naming a hole in itself rather than a finding about the operation.
+    /// </summary>
+    public OperationPlace? OperationPlace { get; init; }
+
+    /// <summary>
+    /// Which of the periods § 107.29(c)(1)-(2) state the operation is during, as the caller states
+    /// it, or neither of them (<c>civil-twilight-operation</c>). Never inferred: when official
+    /// sunrise and sunset occur at a place on a date is not in this corpus, and the engine has no
+    /// clock.
+    /// </summary>
+    public OperationPeriod? OperationPeriod { get; init; }
+
     /// <summary>The airspace the operation is in (<c>airspace-authorized</c>, § 107.41).</summary>
     public AirspaceClass? Airspace { get; init; }
 

@@ -110,9 +110,12 @@ public enum RequirementState
     /// <see cref="VisibilityMinimum"/>, <see cref="CloudClearance"/>,
     /// <see cref="CivilTwilightWindows"/>), or a finding whose own documentation disclaims a
     /// compliance verdict (<see cref="NightWaiverTerminationFinding"/>), or a finding that says the
-    /// section does not reach this operation at all and so states no requirement to meet
-    /// (<see cref="VisualObserverConditionsFinding.AllRequirementsMet"/> is null where no visual
-    /// observer is used). It must not be read as <see cref="Satisfied"/>.
+    /// paragraph does not reach this operation at all and so states no requirement to meet — the
+    /// third answer a <c>bool?</c> verdict carries, where the rule's own documentation is explicit
+    /// that the null is neither of the other two and is never "undetermined":
+    /// <see cref="VisualObserverConditionsFinding.AllRequirementsMet"/> where no visual observer is
+    /// used, and <see cref="CivilTwilightOperationFinding.Permitted"/> where the operation is during
+    /// neither period of civil twilight. It must not be read as <see cref="Satisfied"/>.
     /// </summary>
     Informational = 7,
 

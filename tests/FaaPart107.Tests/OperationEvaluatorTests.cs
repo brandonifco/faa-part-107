@@ -46,6 +46,8 @@ public class OperationEvaluatorTests
         BoundPerson = BoundPerson.RemotePilotInCommand,
         Lighting = LightingStatement.LightedAndVisibleFor(5m, Caller),
         VisualObserverUse = VisualObserverUse.NotUsed,
+        OperationPlace = OperationPlace.OutsideAlaska,
+        OperationPeriod = OperationPeriod.BeforeOfficialSunrise,
         Shelter = Shelter.CoveredStructure,
         HumanBeingLocation = HumanBeingLocation.UnderACoveredStructure,
         Airspace = AirspaceClass.ClassG,
@@ -350,16 +352,24 @@ public class OperationEvaluatorTests
             Lighting = LightingStatement.IntensityReducedAndVisibleFor(5m, Caller),
             VisualObserverUse = VisualObserverUse.Used,
         };
-        var baseline = OperationEvaluator.Evaluate(facts);
         var consumed = new List<string>();
         foreach (var entry in Registry.Entries
             .Where(entry => entry.Row == CorrespondenceRow.Assertion && entry.Status == EntryStatus.Implemented))
         {
-            var flipped = OperationEvaluator.Evaluate(
+            // Both directions, against each other — never against a baseline. Comparing a flip
+            // with Complete() is vacuous for an entry Complete() already asserts that way, which
+            // it is for collision-hazard-proximity: § 107.37(b)'s proposition holding is the
+            // prohibited state, so Complete() asserts it false, and "flipping" it to false probed
+            // nothing. Asserting each value explicitly makes Holds the only difference for every
+            // entry alike.
+            var holds = OperationEvaluator.Evaluate(
+                facts.Asserting(new Assertion(MapEntry(entry.Id), true, entry.AssertedBy[0])));
+            var doesNot = OperationEvaluator.Evaluate(
                 facts.Asserting(new Assertion(MapEntry(entry.Id), false, entry.AssertedBy[0])));
-            var movedElsewhere = baseline.Requirements
-                .Zip(flipped.Requirements, (before, after) => (before, after))
-                .Any(pair => pair.before != pair.after && !string.Equals(pair.before.EntryId, entry.Id, StringComparison.Ordinal));
+            var movedElsewhere = holds.Requirements
+                .Zip(doesNot.Requirements, (whenItHolds, whenItDoesNot) => (whenItHolds, whenItDoesNot))
+                .Any(pair => pair.whenItHolds != pair.whenItDoesNot
+                    && !string.Equals(pair.whenItHolds.EntryId, entry.Id, StringComparison.Ordinal));
             if (movedElsewhere)
             {
                 consumed.Add(entry.Id);
@@ -399,6 +409,24 @@ public class OperationEvaluatorTests
 
         Assert.Equal(10, rowEight.Length);
         Assert.Equal(5, rowEight.Length - measured.Length);
+
+        // The probe is only worth anything where the flip actually takes effect, so check that it
+        // does for every entry — including collision-hazard-proximity, which Complete() asserts
+        // false and for which a flip against that baseline would have been a no-op.
+        var facts = Complete() with
+        {
+            Lighting = LightingStatement.IntensityReducedAndVisibleFor(5m, Caller),
+            VisualObserverUse = VisualObserverUse.Used,
+        };
+        foreach (var entry in rowEight)
+        {
+            var holds = OperationEvaluator.Evaluate(
+                facts.Asserting(new Assertion(MapEntry(entry.Id), true, entry.AssertedBy[0])));
+            var doesNot = OperationEvaluator.Evaluate(
+                facts.Asserting(new Assertion(MapEntry(entry.Id), false, entry.AssertedBy[0])));
+
+            Assert.NotEqual(holds.Requirement(entry.Id), doesNot.Requirement(entry.Id));
+        }
     }
 
     [Fact]
@@ -587,6 +615,65 @@ public class OperationEvaluatorTests
     }
 
     [Fact]
+    public void A_decline_carries_the_citation_of_the_rule_that_could_not_answer()
+    {
+        // Three declines whose own citation is not the entry's, which is why it is carried
+        // separately: the entry says what was asked, the decline says where the real rule lives.
+        var suspended = Outcome(
+            "speed-within-limit",
+            Complete().Stating(WaiverStatement.Held(Speed.Regulation, Caller)));
+        Assert.Equal(MapEntries.SpeedWithinLimit.Locator, suspended.Locator);
+        Assert.Equal(MapEntries.WaivableRegulations.Locator, suspended.DeclineCites);
+        Assert.NotEqual(suspended.Locator, suspended.DeclineCites);
+
+        // § 107.51(a)'s two printed figures: the question is speed-limit's, and so is the citation
+        // (docs/decisions/0001).
+        var betweenFigures = Outcome("speed-within-limit", Complete() with { Groundspeed = Groundspeed.InKnots(87m) });
+        Assert.Equal(RequirementState.RequiresInterpretation, betweenFigures.State);
+        Assert.Equal(MapEntries.SpeedLimit.Locator, betweenFigures.DeclineCites);
+
+        // An entry that answers carries no decline citation at all.
+        Assert.Null(Outcome("speed-within-limit", Complete()).DeclineCites);
+
+        // And every decline carries one.
+        foreach (var outcome in OperationEvaluator.Evaluate(Complete()).Requirements)
+        {
+            Assert.Equal(outcome.Reason is not null, outcome.DeclineCites is not null);
+        }
+    }
+
+    [Fact]
+    public void A_stated_place_can_move_an_entry_into_what_the_engine_cannot_determine()
+    {
+        var facts = Complete();
+
+        // Outside Alaska § 107.29(c)(1)-(2) define civil twilight and the entry answers.
+        var outside = Outcome("civil-twilight-operation", facts with { OperationPlace = OperationPlace.OutsideAlaska });
+        Assert.Equal(RequirementState.Satisfied, outside.State);
+
+        // In Alaska the definition is civil-twilight-alaska's, which this engine has not got, so a
+        // fact the caller stated moves the entry into missing rules data — the engine naming a hole
+        // in itself. That is not "violated", and it is not "we did not say".
+        var inAlaska = Outcome("civil-twilight-operation", facts with { OperationPlace = OperationPlace.InAlaska });
+        Assert.Equal(RequirementState.MissingRulesData, inAlaska.State);
+        Assert.Equal(UnresolvedReason.MissingRulesData, inAlaska.Reason);
+        Assert.Equal(MapEntries.CivilTwilightOperation.Locator, inAlaska.Locator);
+        Assert.Equal(MapEntries.CivilTwilightAlaska.Locator, inAlaska.DeclineCites);
+        Assert.Null(inAlaska.Finding);
+        Assert.NotEqual(outside.State, inAlaska.State);
+
+        // And the paragraph's third answer, which is neither verdict: during neither period it says
+        // nothing about the operation, and DuringCivilTwilight on the finding says so.
+        var neither = Outcome("civil-twilight-operation", facts with { OperationPeriod = OperationPeriod.NeitherPeriod });
+        var finding = Assert.IsType<CivilTwilightOperationFinding>(neither.Finding);
+        Assert.Equal(RequirementState.Informational, neither.State);
+        Assert.Null(finding.Permitted);
+        Assert.False(finding.DuringCivilTwilight);
+        Assert.NotEqual(RequirementState.Satisfied, neither.State);
+        Assert.NotEqual(RequirementState.Violated, neither.State);
+    }
+
+    [Fact]
     public void No_rule_this_engine_has_built_reports_that_an_action_is_required()
     {
         // docs/decisions/0005: every rule here that names an obtainable thing also demands the
@@ -708,6 +795,27 @@ public class OperationEvaluatorTests
                 // Lighted, and not visible for the printed distance: likewise.
                 "anti-collision-lighting", RequirementState.Violated,
                 f => f with { Lighting = LightingStatement.LightedAndVisibleFor(1m, Caller) }
+            },
+
+            // § 107.29(b)-(c): during a period of civil twilight with the lighting the paragraph's
+            // unless-clause requires, and without it. The third answer is below, not here.
+            {
+                "civil-twilight-operation", RequirementState.Satisfied,
+                f => f with { OperationPeriod = OperationPeriod.BeforeOfficialSunrise }
+            },
+            {
+                "civil-twilight-operation", RequirementState.Violated,
+                f => f with
+                {
+                    OperationPeriod = OperationPeriod.AfterOfficialSunset,
+                    Lighting = LightingStatement.FittedButExtinguished(Caller),
+                }
+            },
+            {
+                // Neither period: § 107.29(b) states no prohibition about this operation, which is
+                // not a permission and not a breach.
+                "civil-twilight-operation", RequirementState.Informational,
+                f => f with { OperationPeriod = OperationPeriod.NeitherPeriod }
             },
 
             // § 107.33 as a whole, with no visual observer used: the section states no requirement
