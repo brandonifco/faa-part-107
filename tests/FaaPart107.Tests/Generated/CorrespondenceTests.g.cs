@@ -186,8 +186,8 @@ public sealed class CorrespondenceTests
         AssertDeclines("airspace-authorized", UnresolvedReason.UnsupportedRule, EntryPoints.AirspaceAuthorized.Resolve(global::FaaPart107.Requests.AirspaceAuthorizedRequest.Empty), new SourceLocator("cfr-14-107", "§ 107.41"));
 
     [Fact]
-    public void restricted_area_permitted__declines_UnsupportedRule_row_2() =>
-        AssertDeclines("restricted-area-permitted", UnresolvedReason.UnsupportedRule, EntryPoints.RestrictedAreaPermitted.Resolve(global::FaaPart107.Requests.RestrictedAreaPermittedRequest.Empty), new SourceLocator("cfr-14-107", "§ 107.45"));
+    public void restricted_area_permitted__is_implemented_so_a_hand_written_handler_answers_it() =>
+        Assert.True(Registry.HasImplementation("restricted-area-permitted"), "restricted-area-permitted is implemented in the overlay and has no [Implements] handler");
 
     [Fact]
     public void moving_vehicle_operation__declines_UnsupportedRule_row_2() =>

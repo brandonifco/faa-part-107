@@ -149,7 +149,7 @@ public static class Registry
         new("prominent-objects", EntryStatus.Mapped, CorrespondenceRow.NotBuilt, [MapEntries.ProminentObjects.Locator]),
         new("single-aircraft", EntryStatus.Implemented, CorrespondenceRow.None, [MapEntries.SingleAircraft.Locator]),
         new("airspace-authorized", EntryStatus.Mapped, CorrespondenceRow.NotBuilt, [MapEntries.AirspaceAuthorized.Locator]),
-        new("restricted-area-permitted", EntryStatus.Mapped, CorrespondenceRow.NotBuilt, [MapEntries.RestrictedAreaPermitted.Locator]),
+        new("restricted-area-permitted", EntryStatus.Implemented, CorrespondenceRow.None, [MapEntries.RestrictedAreaPermitted.Locator]),
         new("moving-vehicle-operation", EntryStatus.Mapped, CorrespondenceRow.NotBuilt, [MapEntries.MovingVehicleOperation.Locator]),
         new("moving-aircraft-operation", EntryStatus.Mapped, CorrespondenceRow.NotBuilt, [MapEntries.MovingAircraftOperation.Locator]),
         new("night-operation", EntryStatus.Declined, CorrespondenceRow.DefinedElsewhere, [MapEntries.NightOperation.Locator]),

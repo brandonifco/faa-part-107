@@ -279,5 +279,46 @@
         "mutation": "Handlers.SingleAircraft defaulted a missing person (`request.Person ?? \"a person\"` for `Demand(request.Person, ...)`); this test went red."
       }
     ]
+  },
+  "restricted-area-permitted": {
+    "status": "implemented",
+    "implementedIn": {
+      "ruleset": "faa-part-107",
+      "version": 1
+    },
+    "tests": [
+      {
+        "test": "RestrictedAreaPermittedEntryPointTests.In_a_prohibited_or_restricted_area_with_permission_the_operation_is_permitted_citing_107_45",
+        "mutation": "ProhibitedAndRestrictedAreas.Permitted ignored the permission (`new AreaPermissionFinding(designation, !required, permission)` for `!required || permission.Held`), so an operation in a prohibited or a restricted area was not permitted even with permission stated; this test went red for both designations (Failed: 2, Passed: 0). It went red too with AreaPermissionFinding.Authority citing airspace-authorized's § 107.41 (`MapEntries.AirspaceAuthorized.Locator` for `MapEntries.RestrictedAreaPermitted.Locator`)."
+      },
+      {
+        "test": "RestrictedAreaPermittedEntryPointTests.In_a_prohibited_or_restricted_area_without_permission_the_operation_is_not_permitted_citing_107_45",
+        "mutation": "ProhibitedAndRestrictedAreas.Permitted permitted every operation (`new AreaPermissionFinding(designation, true, permission)` for `!required || permission.Held`), so a prohibited or restricted area with no permission stated still resolved permitted; this test went red for both designations (Failed: 2, Passed: 0)."
+      },
+      {
+        "test": "RestrictedAreaPermittedEntryPointTests.Outside_a_prohibited_or_restricted_area_the_section_requires_no_permission_and_does_not_bar_the_operation",
+        "mutation": "ProhibitedAndRestrictedAreas.Permitted required permission everywhere (`var required = true;` for `designation is AreaDesignation.Prohibited or AreaDesignation.Restricted`), so an area that is neither was barred when no permission was stated; this test went red on that case (Failed: 1, Passed: 1). It went red on both cases with AreaPermissionFinding.PermissionRequired always true (`=> true` for `=> Designation != AreaDesignation.NeitherProhibitedNorRestricted`) (Failed: 2, Passed: 0)."
+      },
+      {
+        "test": "RestrictedAreaPermittedEntryPointTests.The_permission_recorded_is_the_callers_own_statement_and_the_agency_it_names_is_not_judged",
+        "mutation": "ProhibitedAndRestrictedAreas.Permitted recorded a permission the engine made up (`PermissionStatement.Granted(\"the engine\")` for `permission` in the AreaPermissionFinding), so the agency and the person answerable for the statement were the engine's rather than the caller's; this test went red (Failed: 1, Passed: 0)."
+      },
+      {
+        "test": "RestrictedAreaPermittedEntryPointTests.Without_a_permission_statement_it_refuses_rather_than_infer_one",
+        "mutation": "Handlers.RestrictedAreaPermitted defaulted a missing permission statement to none held (`request.Permission ?? PermissionStatement.NotGranted(\"the engine\")` for `Demand(request.Permission, ...)`), so the engine inferred a permission the caller never stated; this test went red (Failed: 1, Passed: 0)."
+      },
+      {
+        "test": "RestrictedAreaPermittedEntryPointTests.Without_an_area_designation_it_refuses_rather_than_infer_one",
+        "mutation": "Handlers.RestrictedAreaPermitted defaulted a missing designation to neither prohibited nor restricted (`request.Area ?? AreaDesignation.NeitherProhibitedNorRestricted` for `Demand(request.Area, ...)`), so the engine decided the area was not one § 107.45 reaches; this test went red (Failed: 1, Passed: 0)."
+      },
+      {
+        "test": "RestrictedAreaPermittedEntryPointTests.An_area_designation_that_is_none_the_section_states_is_refused",
+        "mutation": "ProhibitedAndRestrictedAreas.Permitted skipped its designation check (`if (false)` for `if (!Enum.IsDefined(designation))`), so a default-constructed designation (0) and an undefined 4 were both read as an area § 107.45 does not reach and resolved permitted; this test went red for both values (Failed: 2, Passed: 0)."
+      },
+      {
+        "test": "RestrictedAreaPermittedEntryPointTests.The_entry_has_no_waiver_gate_so_it_asks_for_no_waiver_statement",
+        "mutation": "RestrictedAreaPermittedRequest gained a waiver input it has no gate for (`public WaiverStatement? Waiver { get; init; }` added to the partial request), giving § 107.45 a gate by analogy with § 107.41 and § 107.51 that the entry's empty suspendedBy does not give it; this test went red (Failed: 1, Passed: 0)."
+      }
+    ]
   }
 }
