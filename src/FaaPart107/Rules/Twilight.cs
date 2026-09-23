@@ -152,11 +152,26 @@ public sealed record CivilTwilightOperationFinding(
 /// depending on when it was: outside civil twilight the definition entry would resolve a finding,
 /// because nothing suspends it; inside it, <c>anti-collision-lighting</c>'s own gate would decline
 /// under <em>that</em> entry's name. Reading the gate here first gives one answer, in this entry's
-/// name, for every operation, and demands no fact about an operation the caller has said is out of
-/// reach. And the gate precedes the definition rather than following it: (c) defines civil twilight
-/// "for purposes of paragraph (b)", so once (b) is suspended there is nothing left for (c) to
-/// define — which is why a waived Alaskan operation is answered by the gate and not by the Air
-/// Almanac's absence.
+/// name, for every operation. And the gate precedes the definition rather than following it: (c)
+/// defines civil twilight "for purposes of paragraph (b)", so once (b) is suspended there is
+/// nothing left for (c) to define — which is why a waived Alaskan operation is answered by the
+/// gate and not by the Air Almanac's absence.
+/// </para>
+/// <para>
+/// <b>What the gate precedes is the assertion, not the caller's typed inputs.</b> The four inputs
+/// this rule reads are demanded by <see cref="Handlers"/> as the arguments of the call, so all four
+/// are demanded before this method is entered and before the gate is read: a caller who states a
+/// waiver in force but leaves the place unset is refused with <see cref="ArgumentException"/>
+/// naming the place, not answered <see cref="UnresolvedReason.OutsideCurrentScope"/>. What a waived
+/// operation is spared is the assertion: no constituent is asked, so nothing is demanded through
+/// <see cref="RuleRequest"/>. That is <c>operating-limitations</c>' ordering, and
+/// <c>visual-observer-conditions</c>' and <c>anti-collision-lighting</c>', which is why this
+/// composite takes it. <b>The engine also does it the other way</b>: <c>reasonable-protection</c>
+/// passes its <see cref="Shelter"/> in unresolved so that <see cref="Protection.Reasonable"/> can
+/// demand it <em>after</em> the gate, on the argument that a waiver in force makes the place as
+/// irrelevant as the assertion. The two orderings coexist and nothing in this repository records
+/// which is right; settling that is not this entry's to do (<c>AGENTS.md</c> §6), and what is
+/// recorded here is which one this entry takes and what it therefore does.
 /// </para>
 /// <para>
 /// <b>Its other consequence is worth stating plainly</b>, as <see cref="Lights"/> states it: this
@@ -210,7 +225,10 @@ public static class Twilight
     /// then, and only for an operation during one of that entry's periods, § 107.29(b)'s
     /// requirement, as <c>anti-collision-lighting</c> answers it on this aircraft. An operation
     /// during neither period resolves a finding that says the paragraph states no prohibition about
-    /// it, and no fact about the lighting is demanded for it.
+    /// it: that entry is not asked, so nothing about the flash rate or the remote pilot in command's
+    /// determination is demanded through <paramref name="assertions"/>. The caller's own
+    /// <paramref name="lighting"/> statement is demanded whatever the period, by the handler, before
+    /// this method is entered.
     /// </remarks>
     /// <param name="place">Where the operation is, as the caller states it. Never inferred.</param>
     /// <param name="period">Which of § 107.29(c)(1)-(2)'s periods the operation is during, as the caller states it. Never inferred.</param>
@@ -242,9 +260,10 @@ public static class Twilight
         ArgumentNullException.ThrowIfNull(lighting);
         ArgumentNullException.ThrowIfNull(assertions);
 
-        // This entry's own gate, before anything else — before the definition as well as before the
-        // requirement. § 107.205(b) reaches paragraph (b), and (c) defines civil twilight only "for
-        // purposes of paragraph (b)".
+        // This entry's own gate, before the definition as well as before the requirement:
+        // § 107.205(b) reaches paragraph (b), and (c) defines civil twilight only "for purposes of
+        // paragraph (b)". It is not before everything — the four inputs above were demanded by the
+        // handler to make this call at all.
         if (Waivers.Suspension(MapEntries.CivilTwilightOperation, Regulation, waiver) is { } suspended)
         {
             return Resolution<CivilTwilightOperationFinding>.FromUnresolved(suspended);

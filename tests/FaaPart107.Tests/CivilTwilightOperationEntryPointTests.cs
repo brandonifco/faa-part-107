@@ -314,7 +314,8 @@ public class CivilTwilightOperationEntryPointTests
     {
         var waiver = WaiverStatement.Held(Regulation, Caller);
 
-        // Nothing is asserted: the gate is read before anything is demanded of the caller.
+        // Nothing is asserted: the gate is read before any constituent is asked, so no assertion is
+        // demanded for an operation the caller has said is out of reach.
         var unresolved = Declined(Resolve(waiver: waiver, rate: null));
 
         Assert.Equal(UnresolvedReason.OutsideCurrentScope, unresolved.Reason);
@@ -345,6 +346,22 @@ public class CivilTwilightOperationEntryPointTests
 
         Assert.Equal(UnresolvedReason.OutsideCurrentScope, outside.Reason);
         Assert.Contains("civil-twilight-operation", outside.Attempted, StringComparison.Ordinal);
+
+        // What the gate does not precede is the caller's typed inputs. They are demanded by the
+        // handler as the arguments of the call, so a waived operation the caller has not fully
+        // described is refused for the missing input rather than declined for the waiver — the
+        // ordering operating-limitations, visual-observer-conditions and anti-collision-lighting
+        // take, and not the one reasonable-protection takes, where the rule demands its input after
+        // the gate. Nothing in this repository records which is right; this pins which one is here.
+        Assert.Equal(
+            nameof(CivilTwilightOperationRequest.Place),
+            Assert.Throws<ArgumentException>(() =>
+                EntryPoints.CivilTwilightOperation.Resolve(new CivilTwilightOperationRequest(Asserting(null))
+                {
+                    Period = OperationPeriod.NeitherPeriod,
+                    Lighting = Lit,
+                    Waiver = waiver,
+                })).ParamName);
     }
 
     [Fact]

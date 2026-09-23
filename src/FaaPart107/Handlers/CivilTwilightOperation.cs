@@ -65,10 +65,24 @@ namespace FaaPart107
         /// selects, then § 107.29(b)'s requirement as <c>anti-collision-lighting</c> answers it.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// The handler decides nothing. It demands the four inputs the rule needs, never defaulting
         /// any of them, and hands the caller's assertions through unchanged so that the entries
         /// this one reaches answer on their own terms and cite their own locators. The map gives
         /// this entry no <c>assertedBy</c>, so nothing asserted under its own id is an input here.
+        /// </para>
+        /// <para>
+        /// <b>All four are demanded here, before the rule's waiver gate is read</b>, because they
+        /// are the arguments of the call: a request that states a waiver in force and leaves one of
+        /// them unset is refused naming that input rather than declined
+        /// <see cref="UnresolvedReason.OutsideCurrentScope"/>. What the gate precedes is the
+        /// assertion — no constituent is asked for a waived operation, so nothing is demanded
+        /// through <see cref="RuleRequest"/>. This is <c>operating-limitations</c>',
+        /// <c>visual-observer-conditions</c>' and <c>anti-collision-lighting</c>' ordering;
+        /// <c>reasonable-protection</c> takes the other one, passing its input in unresolved so its
+        /// rule can demand it after the gate. Which is right is not recorded anywhere in this
+        /// repository and is not this entry's to settle (<c>AGENTS.md</c> §6).
+        /// </para>
         /// </remarks>
         internal static partial Resolution<object> CivilTwilightOperation(Requests.CivilTwilightOperationRequest request) =>
             Answer(Twilight.Operation(
