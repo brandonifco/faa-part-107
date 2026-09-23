@@ -168,7 +168,7 @@ public static class Registry
         new("direct-participation", EntryStatus.Implemented, CorrespondenceRow.UnresolvedAmbiguity, [MapEntries.DirectParticipation.Locator]),
         new("subpart-d-categories", EntryStatus.Declined, CorrespondenceRow.ScopeOut, [MapEntries.SubpartDCategories.Locator]),
         new("flash-rate-sufficient", EntryStatus.Mapped, CorrespondenceRow.NotBuilt, [MapEntries.FlashRateSufficient.Locator]) { AssertedBy = ["caller"] },
-        new("intensity-reduction-in-interest-of-safety", EntryStatus.Mapped, CorrespondenceRow.NotBuilt, [MapEntries.IntensityReductionInInterestOfSafety.Locator]) { AssertedBy = ["remote pilot in command"] },
+        new("intensity-reduction-in-interest-of-safety", EntryStatus.Implemented, CorrespondenceRow.Assertion, [MapEntries.IntensityReductionInInterestOfSafety.Locator]) { AssertedBy = ["remote pilot in command"] },
         new("anti-collision-lighting", EntryStatus.Mapped, CorrespondenceRow.NotBuilt, [MapEntries.AntiCollisionLighting.Locator]),
         new("visual-line-of-sight", EntryStatus.Mapped, CorrespondenceRow.NotBuilt, [MapEntries.VisualLineOfSight.Locator]),
         new("unaided-visual-contact", EntryStatus.Implemented, CorrespondenceRow.Assertion, [MapEntries.UnaidedVisualContact.Locator]) { AssertedBy = ["remote pilot in command", "visual observer", "person manipulating the flight control"] },
