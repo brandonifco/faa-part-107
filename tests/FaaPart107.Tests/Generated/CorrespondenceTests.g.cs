@@ -306,8 +306,20 @@ public sealed class CorrespondenceTests
         Assert.True(Registry.HasImplementation("control-links-working"), "control-links-working is implemented in the overlay and has no [Implements] handler");
 
     [Fact]
-    public void sufficient_available_power__declines_UnsupportedRule_row_2() =>
-        AssertDeclines("sufficient-available-power", UnresolvedReason.UnsupportedRule, EntryPoints.SufficientAvailablePower.Resolve(global::FaaPart107.Requests.SufficientAvailablePowerRequest.Empty), new SourceLocator("cfr-14-107", "§ 107.49(d)"));
+    public void sufficient_available_power__is_implemented_and_answers_or_demands_the_assertion()
+    {
+        if (Registry.HasImplementation("sufficient-available-power"))
+        {
+            return;
+        }
+
+        var value = new object();
+        var resolved = Registry.Resolve("sufficient-available-power", RuleRequest.Empty.Assert("sufficient-available-power", value)).Match<object?>(v => v, _ => null);
+        Assert.Same(value, resolved);
+        var typed = EntryPoints.SufficientAvailablePower.Resolve(global::FaaPart107.Requests.SufficientAvailablePowerRequest.Asserting(value)).Match<object?>(v => v, _ => null);
+        Assert.Same(value, typed);
+        Assert.Throws<AssertionRequiredException>(() => Registry.Resolve("sufficient-available-power", RuleRequest.Empty));
+    }
 
     [Fact]
     public void attached_object_secure__declines_UnsupportedRule_row_2() =>
