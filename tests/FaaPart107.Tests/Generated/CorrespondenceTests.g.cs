@@ -274,8 +274,20 @@ public sealed class CorrespondenceTests
         AssertDeclines("visual-line-of-sight", UnresolvedReason.UnsupportedRule, EntryPoints.VisualLineOfSight.Resolve(global::FaaPart107.Requests.VisualLineOfSightRequest.Empty), new SourceLocator("cfr-14-107", "§ 107.31"));
 
     [Fact]
-    public void unaided_visual_contact__declines_UnsupportedRule_row_2() =>
-        AssertDeclines("unaided-visual-contact", UnresolvedReason.UnsupportedRule, EntryPoints.UnaidedVisualContact.Resolve(global::FaaPart107.Requests.UnaidedVisualContactRequest.Empty), new SourceLocator("cfr-14-107", "§ 107.31(a)"));
+    public void unaided_visual_contact__is_implemented_and_answers_or_demands_the_assertion()
+    {
+        if (Registry.HasImplementation("unaided-visual-contact"))
+        {
+            return;
+        }
+
+        var value = new object();
+        var resolved = Registry.Resolve("unaided-visual-contact", RuleRequest.Empty.Assert("unaided-visual-contact", value)).Match<object?>(v => v, _ => null);
+        Assert.Same(value, resolved);
+        var typed = EntryPoints.UnaidedVisualContact.Resolve(global::FaaPart107.Requests.UnaidedVisualContactRequest.Asserting(value)).Match<object?>(v => v, _ => null);
+        Assert.Same(value, typed);
+        Assert.Throws<AssertionRequiredException>(() => Registry.Resolve("unaided-visual-contact", RuleRequest.Empty));
+    }
 
     [Fact]
     public void visual_observer_conditions__declines_UnsupportedRule_row_2() =>
