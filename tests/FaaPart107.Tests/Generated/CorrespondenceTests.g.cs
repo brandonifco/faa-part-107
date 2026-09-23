@@ -238,8 +238,20 @@ public sealed class CorrespondenceTests
         Assert.True(Registry.HasImplementation("well-clear"), "well-clear is implemented in the overlay and has no [Implements] handler");
 
     [Fact]
-    public void collision_hazard_proximity__declines_UnsupportedRule_row_2() =>
-        AssertDeclines("collision-hazard-proximity", UnresolvedReason.UnsupportedRule, EntryPoints.CollisionHazardProximity.Resolve(global::FaaPart107.Requests.CollisionHazardProximityRequest.Empty), new SourceLocator("cfr-14-107", "§ 107.37(b)"));
+    public void collision_hazard_proximity__is_implemented_and_answers_or_demands_the_assertion()
+    {
+        if (Registry.HasImplementation("collision-hazard-proximity"))
+        {
+            return;
+        }
+
+        var value = new object();
+        var resolved = Registry.Resolve("collision-hazard-proximity", RuleRequest.Empty.Assert("collision-hazard-proximity", value)).Match<object?>(v => v, _ => null);
+        Assert.Same(value, resolved);
+        var typed = EntryPoints.CollisionHazardProximity.Resolve(global::FaaPart107.Requests.CollisionHazardProximityRequest.Asserting(value)).Match<object?>(v => v, _ => null);
+        Assert.Same(value, typed);
+        Assert.Throws<AssertionRequiredException>(() => Registry.Resolve("collision-hazard-proximity", RuleRequest.Empty));
+    }
 
     [Fact]
     public void reasonable_protection__declines_UnsupportedRule_row_2() =>

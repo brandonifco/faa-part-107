@@ -30,9 +30,24 @@ namespace FaaPart107;
 /// entry, and an assertion attributed to somebody the corpus does not let assert it. Asserting
 /// nothing at all is <see cref="AssertionRequiredException"/>, which the kernel's request raises.
 /// </para>
+/// <para>
+/// The third of those refusals is the one the map decides the reach of. An entry whose
+/// <see cref="MapEntry.AssertedBy"/> is exactly <c>["caller"]</c> is one the corpus does not
+/// narrow, so there is nobody for the engine to hold the attribution against and the check does
+/// not constrain it; every other entry's list is the people the corpus names, compared exactly.
+/// <c>docs/decisions/0003-caller-is-not-a-name-to-match.md</c> records the reading, and
+/// rules-factory decision 0025 is its authority.
+/// </para>
 /// </remarks>
 public static class Assertions
 {
+    /// <summary>
+    /// The map's word for "the corpus names nobody" — rules-factory decision 0025's
+    /// <c>assertedBy</c> marker, not a person and not a name to match a caller's attribution
+    /// against.
+    /// </summary>
+    private const string Caller = "caller";
+
     /// <summary>
     /// What the caller asserted for <paramref name="entry"/>: the fact unchanged, on the map's
     /// entry.
@@ -52,7 +67,9 @@ public static class Assertions
     /// <exception cref="AssertionRequiredException">The caller asserted nothing for the entry.</exception>
     /// <exception cref="ArgumentException">
     /// The asserted value is not an <see cref="Assertion"/>, is about another entry, or is
-    /// attributed to somebody the map's <see cref="MapEntry.AssertedBy"/> does not name.
+    /// attributed to somebody the map's <see cref="MapEntry.AssertedBy"/> does not name — the
+    /// last only where that list names people; an entry whose list is exactly <c>["caller"]</c>
+    /// takes whatever attribution the caller gives.
     /// </exception>
     public static Resolution<Assertion> Stated(MapEntry entry, RuleRequest assertions)
     {
@@ -76,7 +93,14 @@ public static class Assertions
                 nameof(assertions));
         }
 
-        if (!entry.AssertedBy.Any(who => string.Equals(who, assertion.AssertedBy, StringComparison.Ordinal)))
+        // Who may assert is the map's to narrow, and on three entries it narrows nobody. Where
+        // assertedBy names people, their exact strings are the check and are not normalized: the
+        // corpus really does say "the person manipulating the flight control" in § 107.31(a) and
+        // "flight controls" in § 107.33(c), and an engine that smoothed that over would be papering
+        // a distinction the corpus makes. Where assertedBy is the marker, there is no name to
+        // compare against — the attribution is recorded, not checked.
+        if (!NamesNobody(entry)
+            && !entry.AssertedBy.Any(who => string.Equals(who, assertion.AssertedBy, StringComparison.Ordinal)))
         {
             throw new ArgumentException(
                 $"the map entry '{entry.Id}' [{entry.Locator.Citation}] is asserted by "
@@ -95,4 +119,35 @@ public static class Assertions
         // in this engine may see (AGENTS.md section 8).
         return Resolution<Assertion>.FromValue(new Assertion(entry, assertion.Holds, assertion.AssertedBy));
     }
+
+    /// <summary>
+    /// Whether the map records that the corpus names nobody who may assert
+    /// <paramref name="entry"/>: its <see cref="MapEntry.AssertedBy"/> is exactly the one marker
+    /// <c>caller</c>.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Rules-factory decision 0025 created <c>assertedBy</c> and states what the marker means:
+    /// <c>caller</c> "does not mean 'anyone'. It means that the corpus does not narrow who may
+    /// assert, so the engine attributes the assertion to whoever the caller says made it." Three
+    /// Part 107 entries carry it — <see cref="MapEntries.CollisionHazardProximity"/>,
+    /// <see cref="MapEntries.ReasonableProtection"/> and
+    /// <see cref="MapEntries.FlashRateSufficient"/> — and 0025's consequences table names those
+    /// three. So the marker turns the attribution check off for them and changes nothing for the
+    /// other seven, whose lists are people.
+    /// </para>
+    /// <para>
+    /// "Exactly" is the whole test, and it is the map's own rule rather than this engine's
+    /// convenience: 0025 requires that <c>["caller"]</c> stand alone, so a list that named the
+    /// marker alongside a person would be a map defect, and this engine would rather refuse the
+    /// attribution than read a defect as permission. <c>caller</c> is itself an ordinary
+    /// attribution to hand in for such an entry — <see cref="Assertion.AssertedBy"/> records
+    /// whatever the caller says, that word included. Refusing it would be a constraint 0025 does
+    /// not state, and the engine does not add constraints to the map.
+    /// </para>
+    /// </remarks>
+    /// <param name="entry">The assertion entry, as the map has it.</param>
+    /// <returns><see langword="true"/> where the corpus narrows nobody.</returns>
+    private static bool NamesNobody(MapEntry entry) =>
+        entry.AssertedBy.Length == 1 && string.Equals(entry.AssertedBy[0], Caller, StringComparison.Ordinal);
 }
