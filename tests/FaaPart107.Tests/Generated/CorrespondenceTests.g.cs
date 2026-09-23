@@ -146,8 +146,8 @@ public sealed class CorrespondenceTests
         Assert.True(Registry.HasImplementation("altitude-limit"), "altitude-limit is implemented in the overlay and has no [Implements] handler");
 
     [Fact]
-    public void visibility_minimum__declines_UnsupportedRule_row_2() =>
-        AssertDeclines("visibility-minimum", UnresolvedReason.UnsupportedRule, EntryPoints.VisibilityMinimum.Resolve(global::FaaPart107.Requests.VisibilityMinimumRequest.Empty), new SourceLocator("cfr-14-107", "§ 107.51(c)"));
+    public void visibility_minimum__is_implemented_so_a_hand_written_handler_answers_it() =>
+        Assert.True(Registry.HasImplementation("visibility-minimum"), "visibility-minimum is implemented in the overlay and has no [Implements] handler");
 
     [Fact]
     public void cloud_clearance__declines_UnsupportedRule_row_2() =>

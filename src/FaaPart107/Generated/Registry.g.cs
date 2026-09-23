@@ -139,7 +139,7 @@ public static class Registry
     [
         new("speed-limit", EntryStatus.Implemented, CorrespondenceRow.UnresolvedAmbiguity, [MapEntries.SpeedLimit.Locator]),
         new("altitude-limit", EntryStatus.Implemented, CorrespondenceRow.None, [MapEntries.AltitudeLimit.Locator]),
-        new("visibility-minimum", EntryStatus.Mapped, CorrespondenceRow.NotBuilt, [MapEntries.VisibilityMinimum.Locator]),
+        new("visibility-minimum", EntryStatus.Implemented, CorrespondenceRow.None, [MapEntries.VisibilityMinimum.Locator]),
         new("cloud-clearance", EntryStatus.Mapped, CorrespondenceRow.NotBuilt, [MapEntries.CloudClearance.Locator]),
         new("civil-twilight-window", EntryStatus.Mapped, CorrespondenceRow.NotBuilt, [MapEntries.CivilTwilightWindow.Locator]),
         new("speed-within-limit", EntryStatus.Implemented, CorrespondenceRow.None, [MapEntries.SpeedWithinLimit.Locator]),

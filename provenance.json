@@ -214,148 +214,144 @@
       "sha256": "6da95d24394881865c0153cef534c33a53702d28ca609c8b3712bd9a1191f1ef"
     },
     {
-      "path": "backlog/001-visibility-minimum.md",
-      "sha256": "4979123eff656f4e2d198541098fbf08f4d1c3916fe610d91bef34d503bcd6f1"
+      "path": "backlog/001-cloud-clearance.md",
+      "sha256": "633201752c2678a4befb8be45c385edf3baea7a7667a492ae8617f50e5a32904"
     },
     {
-      "path": "backlog/002-cloud-clearance.md",
-      "sha256": "919ea2a2c516d7f3a838db9d2a7638c08b4fd4e9a8d1e9c74a1947f4d0b1aaac"
+      "path": "backlog/002-civil-twilight-window.md",
+      "sha256": "c2549dafcceb5d1f5d3c1ed9211810b3c9a1d73629c1eb45411e7bac392d5151"
     },
     {
-      "path": "backlog/003-civil-twilight-window.md",
-      "sha256": "18b26c1cea5332605f17a460bf360d62e702a2a241347a1972bf3b4071b3e68c"
+      "path": "backlog/003-altitude-within-limit.md",
+      "sha256": "72ffbe2d8d8e2d5b5d2348089ed3af56b28d88ded2b3433449b060b03bc49086"
     },
     {
-      "path": "backlog/004-altitude-within-limit.md",
-      "sha256": "dacbf5facc6381e80d70795e2843df007acfd84c0d785820699e05ff53dd3e7f"
+      "path": "backlog/004-prominent-objects.md",
+      "sha256": "45af6c11dce3d3ab85954febf51c9b1c470f7c12d9f1d97c3927a17d17dc5d19"
     },
     {
-      "path": "backlog/005-prominent-objects.md",
-      "sha256": "926dda0c63214a7b10ec644b6a12457d73d032df64acb85ee35a10f49de761b7"
+      "path": "backlog/005-weather-minimums-met.md",
+      "sha256": "b3904082fa960655b8e9e84eb2f05a376a6953651a9a08b4046b8e28275704cb"
     },
     {
-      "path": "backlog/006-weather-minimums-met.md",
-      "sha256": "81536d77469f0c72ab446287d5c243d11b2f3c29c72900cd9034aefefe072222"
+      "path": "backlog/006-operating-limitations.md",
+      "sha256": "c10348dc7e4993e53b3b6c3043cfdb3f0ef37fb7c6e12df39e60e261f8606e25"
     },
     {
-      "path": "backlog/007-operating-limitations.md",
-      "sha256": "a38ef043448b397759012ff1cab837069a1791cc321b620e73400c9ede5d3cc7"
+      "path": "backlog/007-single-aircraft.md",
+      "sha256": "75bf64c796a011ea0278b6a54fc315275cafdcac858ab1884bb525d52c0c0b5f"
     },
     {
-      "path": "backlog/008-single-aircraft.md",
-      "sha256": "be58f4272d52c3390e67c5a5665392b995419b28ae7d3544ed49e76cf2ec0a1b"
+      "path": "backlog/008-airspace-authorized.md",
+      "sha256": "047860d43ffe8ae1c88338f8a6e39a8baa8caa36ce13b9e5353f21ef05a2cf5c"
     },
     {
-      "path": "backlog/009-airspace-authorized.md",
-      "sha256": "a266b65fdafb4ce45487511514b07ef1f3a300b615bc08fd70b97992a9d90c5f"
+      "path": "backlog/009-restricted-area-permitted.md",
+      "sha256": "f267064f4008ccbb530e80de88aa34bc11233da62d32eeaa3e776680c8c1aaa1"
     },
     {
-      "path": "backlog/010-restricted-area-permitted.md",
-      "sha256": "c8da254bd0cf09ed53f56d2d5270065ad27de12d81705b929db3c7e487f0c027"
+      "path": "backlog/010-moving-vehicle-operation.md",
+      "sha256": "ae6bc9bcf5733eee261be897a90c232e79611dc751b06e5747e907094ffcaab8"
     },
     {
-      "path": "backlog/011-moving-vehicle-operation.md",
-      "sha256": "64dad1dedb575d0407f458a65ae9a46c07e9ea8e0d70dd2fe3319c8abea89592"
+      "path": "backlog/011-moving-aircraft-operation.md",
+      "sha256": "07edb4aaa99be780492f1e44a085ddcdde5d6be0e89a2a13d9a925f726d35614"
     },
     {
-      "path": "backlog/012-moving-aircraft-operation.md",
-      "sha256": "c831be015c952c3f511a83e855ef055ef7a6a83c5c51f80b1d0e262a5ad30b15"
+      "path": "backlog/012-night-training-completed.md",
+      "sha256": "ee5bd9e5bbf528036ce99af9997cff752f836fd02fc1527d188c9340b8356121"
     },
     {
-      "path": "backlog/013-night-training-completed.md",
-      "sha256": "2d2f2259a597ac4225121b30ff16f298827b59a4a3769892dcf1266a44183c23"
+      "path": "backlog/013-night-waiver-termination.md",
+      "sha256": "3d064a5eb5e1762f923f694737df3de293720febf1fc3b86cc03e17bb1937238"
     },
     {
-      "path": "backlog/014-night-waiver-termination.md",
-      "sha256": "b0c83a551ad694e9ed926ea9e0d9b5d9dd6f672a01aaf21e3fcb41d6be9bca27"
+      "path": "backlog/014-well-clear.md",
+      "sha256": "ff85cb0c54853a7e35ad6ee1769d5c95ef829bec4503fc49ed2522cf969ea89c"
     },
     {
-      "path": "backlog/015-well-clear.md",
-      "sha256": "d840ac04fd99b106bf6812d020ea198d5de3813ded7edc73f72716047e0e4c71"
+      "path": "backlog/015-right-of-way.md",
+      "sha256": "39c7860fd16af42054c1a3acb4b76c35574f778f016dad0162786b86503f771a"
     },
     {
-      "path": "backlog/016-right-of-way.md",
-      "sha256": "e315f3b12a1ae2c9c4b0509e3cc4792f2b6d95b058daaacb8f6ba3a101c44f5b"
+      "path": "backlog/016-collision-hazard-proximity.md",
+      "sha256": "0daff708c2738d3b1895527bb669a2fa2427ad49fdb585440875826087aa4292"
     },
     {
-      "path": "backlog/017-collision-hazard-proximity.md",
-      "sha256": "4ad55eeab5ba5af54e3471448e78b9e8330bedd277396e76b641fcbd7219cca9"
+      "path": "backlog/017-reasonable-protection.md",
+      "sha256": "1d6b508099826b9ee05b2b398e74bc787a0bf99b84adab3b7c4a1d2cfecfbcb0"
     },
     {
-      "path": "backlog/018-reasonable-protection.md",
-      "sha256": "5a080013d2394dad4313472ff1576efa97d114d6730a32256b59dd64f655f6d5"
+      "path": "backlog/018-direct-participation.md",
+      "sha256": "01ecd1d6e8792c57d3121c537748d960586fb35985a5ffb765650d1a7eca93ad"
     },
     {
-      "path": "backlog/019-direct-participation.md",
-      "sha256": "55f25d408f4a444f4b9cf5feb51fb06e0049651bfef3bea91b5e7c6830752b44"
+      "path": "backlog/019-over-human-beings.md",
+      "sha256": "fea54afe53317c3b59ed1c82c12232303c26ef61389a336e02e916c2625b07ad"
     },
     {
-      "path": "backlog/020-over-human-beings.md",
-      "sha256": "9493140557d072341badde89bba7eced12128b248c6eaed6070519e06c2d9ee6"
+      "path": "backlog/020-flash-rate-sufficient.md",
+      "sha256": "e99f2cb843fac9c9366b038cd5af53cdd86de6bea738d0edb2f553889c4a4b35"
     },
     {
-      "path": "backlog/021-flash-rate-sufficient.md",
-      "sha256": "28f821d6e3d277a3ac2b453dff58b7104f5bc0dee63e1fcbd0bdf00f76e0d20f"
+      "path": "backlog/021-intensity-reduction-in-interest-of-safety.md",
+      "sha256": "3b10d4c45d2b38ce2a22ef862ee8d76103b6e83daf1030fcf7f60edf4cb19c7a"
     },
     {
-      "path": "backlog/022-intensity-reduction-in-interest-of-safety.md",
-      "sha256": "0873e004a660100d7ea1ca9e9028c5d6c5990bc3aa62bad89bd7882aeb317e33"
+      "path": "backlog/022-anti-collision-lighting.md",
+      "sha256": "1234f4e486228eb82551bc7a1b61126d60d291991f3b42926b738b2384d19393"
     },
     {
-      "path": "backlog/023-anti-collision-lighting.md",
-      "sha256": "e82ed400cc212940c204ecbbbae42661f90b91854202bce78ba869b39086c8f5"
+      "path": "backlog/023-civil-twilight-operation.md",
+      "sha256": "9d3fffc43a99febd2e7d1b43bec2908d553dd931d7bba3dcfdd0e3ab8f8b0eb9"
     },
     {
-      "path": "backlog/024-civil-twilight-operation.md",
-      "sha256": "0bb7b3824cc6b4c4a30b02911abdf2ad87112b333a579e1ce8a9049aa318491b"
+      "path": "backlog/024-unaided-visual-contact.md",
+      "sha256": "9d45aa80490b1507cd77982672f8136b3ba4cd0acc190a865277ac254329327c"
     },
     {
-      "path": "backlog/025-unaided-visual-contact.md",
-      "sha256": "1ce84cb9c66c28170960dd5bcf0f69352f9facfa9765c4e4c5c74b44f79ebd1b"
+      "path": "backlog/025-visual-line-of-sight.md",
+      "sha256": "fb5263b22dae8ff8adcb85cf4dc561c423f5800db41adfc7caa934de3af256c0"
     },
     {
-      "path": "backlog/026-visual-line-of-sight.md",
-      "sha256": "f311ecd9b2db3e7976af81754dd4241f4bb7c92ad7468c65fe77dc5a00aa0e5f"
+      "path": "backlog/026-effective-communication.md",
+      "sha256": "4b8103669143dc84bc3d43da855c6a0bfd795509b12be59c03198599bc651715"
     },
     {
-      "path": "backlog/027-effective-communication.md",
-      "sha256": "a329bba4e21d374903b9c9a3b246e25cdc14c162b5739171c6569b80e76c7046"
+      "path": "backlog/027-observer-coordination.md",
+      "sha256": "241db79f5be8ac69e8ec3368252eb01e0a9b2931b52fc18e8d9fb6cdc8d07cdd"
     },
     {
-      "path": "backlog/028-observer-coordination.md",
-      "sha256": "c81408c6a3d5df3fb6ab9f23e1ecee4931830253dac99ba6a3ac4d9261ab38b1"
+      "path": "backlog/028-visual-observer-conditions.md",
+      "sha256": "0e3e95ccfedd301cfa671de19f953783f7a63ce70f0a0a8215b5d44ff622a7e7"
     },
     {
-      "path": "backlog/029-visual-observer-conditions.md",
-      "sha256": "47318c0310183c30ca739d3b8255dae49ee1ebf1e12162036bd4645490074abc"
+      "path": "backlog/029-preflight-risk-assessment.md",
+      "sha256": "1132ea9eb32d7e6f8362cd66ee91b96426732640b57e925f89541470673dd4e5"
     },
     {
-      "path": "backlog/030-preflight-risk-assessment.md",
-      "sha256": "e8efc8746d4b12aa5fe781de2c1e75d75d69dcb5e20c68caf7c19ced9113800f"
+      "path": "backlog/030-participant-briefing.md",
+      "sha256": "d91d60102e32e6d0316f5f6652fc6d0e3f61e3d2947bf6e6a17c7aeb4e7a14ce"
     },
     {
-      "path": "backlog/031-participant-briefing.md",
-      "sha256": "fe7b142ec4fc143b59678242233ab22ec266ef3fccb1ed24f99eae189c033d6e"
+      "path": "backlog/031-sufficient-available-power.md",
+      "sha256": "3e6dae856bf52d812b27da3544ea8c8533d76354ca1e18a6549d96401f45e01a"
     },
     {
-      "path": "backlog/032-sufficient-available-power.md",
-      "sha256": "7c613779bf86a0bfb03d8cba67df10a71984f8bbd00088fe9560f5f3765353ee"
+      "path": "backlog/032-attached-object-secure.md",
+      "sha256": "bca8a71e8c34a4078ae8bc154acc9e9c1ebd4d5cfc872ba148f9223e12ac6310"
     },
     {
-      "path": "backlog/033-attached-object-secure.md",
-      "sha256": "854e380bd0d96c920394180f75f895e14c2236ba5aa871021eaa9cce1e38804b"
+      "path": "backlog/033-attached-object-no-adverse-effect.md",
+      "sha256": "2c84bdc693d2c8b1ee19ea71604dc917de2eff544e4bf7d10ac4e451d198e236"
     },
     {
-      "path": "backlog/034-attached-object-no-adverse-effect.md",
-      "sha256": "9cd4206adef5e226c709f2c03c4384a7fe9b3786d6f872af230129554c6b65f4"
-    },
-    {
-      "path": "backlog/035-preflight-actions.md",
-      "sha256": "d90939216fdbd1aae47ac76e40d8b3db3c8697b264fb12e4c97cd1b716f9336f"
+      "path": "backlog/034-preflight-actions.md",
+      "sha256": "2b37ab859e161a7c77c426564df2f94af67a155d5e959752a38752de78dc6ca2"
     },
     {
       "path": "backlog/README.md",
-      "sha256": "0a0542b0ca2a36f6654951e61492ba0882394cda2c45e02be17659ceafc1ae02"
+      "sha256": "0ac93885e5220e3ba251178e30d3295e7c197f338cad85e98cac018166cbfd49"
     },
     {
       "path": "corpus/part107.xml",
@@ -395,7 +391,7 @@
     },
     {
       "path": "src/FaaPart107/Generated/Contracts.g.cs",
-      "sha256": "913380a1c97a29b289eef7deed35ba32718075a40efb9b244d14d03fdf56ba5e"
+      "sha256": "b5a2c3cd320bbee09ee3249df2d25aeaccd8d76d7a295014b41db653575b050f"
     },
     {
       "path": "src/FaaPart107/Generated/MapEntries.g.cs",
@@ -407,7 +403,7 @@
     },
     {
       "path": "src/FaaPart107/Generated/Registry.g.cs",
-      "sha256": "fc63d435a2c96986ae73d7bcc624158812f2efdb54902bab60b7b8807dc26db1"
+      "sha256": "f04ea519901ff7f29e75c01d21dc3e82e6af70d9709abcac2d57431e6a6740cb"
     },
     {
       "path": "src/FaaPart107/Generated/Requests.g.cs",
@@ -415,7 +411,7 @@
     },
     {
       "path": "tests/FaaPart107.Tests/Generated/CorrespondenceTests.g.cs",
-      "sha256": "824221f8c87035b1952fbdfc95cf6ba57c285c40d94a3cd446dea95e6bd4f5a5"
+      "sha256": "3a587b74bf7d5af86e9714a41547b6b9139bd2e444717897ccf32813ca1f3a8c"
     },
     {
       "path": "tests/FaaPart107.Tests/Generated/ProvenanceTests.g.cs",
@@ -603,7 +599,7 @@
     },
     {
       "path": "corpus-map.overlay.json",
-      "sha256": "0d80cd5a864c191f472a79297c57a91a4f05acf895202641d1478c8f14889b57"
+      "sha256": "58d8d04ed647ee2ff8bd67c808568413749ffbee4fd20f03177bfff9e8fcaede"
     },
     {
       "path": "src/FaaPart107/FaaPart107.csproj",
