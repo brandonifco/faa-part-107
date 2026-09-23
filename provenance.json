@@ -214,20 +214,16 @@
       "sha256": "6da95d24394881865c0153cef534c33a53702d28ca609c8b3712bd9a1191f1ef"
     },
     {
-      "path": "backlog/001-over-human-beings.md",
-      "sha256": "4af806b038f4cffea1c7dd700503fc84b711f5fc91de15f387d68b51ab03bb55"
+      "path": "backlog/001-civil-twilight-operation.md",
+      "sha256": "5adc2cf79bcb98c1aa3a8a3a056eddfbc4e64e36719df5a11016b540cb21e692"
     },
     {
-      "path": "backlog/002-civil-twilight-operation.md",
-      "sha256": "d836c744d5cab323b849cdc4c6e1051287a4696b15e003433316b6f9a24f57d1"
-    },
-    {
-      "path": "backlog/003-preflight-actions.md",
-      "sha256": "b0b27369040cc7244446e50a20a36b529a3fcccd932c8b0e1fd6aab974242468"
+      "path": "backlog/002-preflight-actions.md",
+      "sha256": "52b318d78450cfaf626a653c0a879db83c5cc16f1a96d56ae97dbc51d77eda40"
     },
     {
       "path": "backlog/README.md",
-      "sha256": "c9f893dfbc4585c095bdc9190c8d1388d877d7066cd50f7b57ca9c0961e9d083"
+      "sha256": "8557fd4457824e6a351e5bef6e1a6e22590c3ab4d9a62bd208b9c4824690aef9"
     },
     {
       "path": "corpus/part107.xml",
@@ -267,7 +263,7 @@
     },
     {
       "path": "src/FaaPart107/Generated/Contracts.g.cs",
-      "sha256": "37c0d43e2b95dd1ba433b301226bbd0b7d8ef80992adf18417c7e6fdddd6c45f"
+      "sha256": "963c3f6620f09b026eb8581d0d9c11979e6f212449ed245277e360d6345ea715"
     },
     {
       "path": "src/FaaPart107/Generated/MapEntries.g.cs",
@@ -279,7 +275,7 @@
     },
     {
       "path": "src/FaaPart107/Generated/Registry.g.cs",
-      "sha256": "c1db85510db4523318f06aff3ec8adf349cdfe4aab3e890ea31adbae84bddb85"
+      "sha256": "d215a9e93d900826b85d1c592e944e89b6458482d159b2c8fed2947f590c25c8"
     },
     {
       "path": "src/FaaPart107/Generated/Requests.g.cs",
@@ -287,7 +283,7 @@
     },
     {
       "path": "tests/FaaPart107.Tests/Generated/CorrespondenceTests.g.cs",
-      "sha256": "c7cb8b00bea128f73a5b10a06046c389991a90f474d8d54206a03d85ae58b43d"
+      "sha256": "0f76df390e1f19aff6b195edb7886aa6beb29e5a4d57acc03eb084ecc9c63a77"
     },
     {
       "path": "tests/FaaPart107.Tests/Generated/ProvenanceTests.g.cs",
@@ -475,7 +471,7 @@
     },
     {
       "path": "corpus-map.overlay.json",
-      "sha256": "e2ae5300519fbe05e4b75b9c8569a2496751b24a3460d8a4fc183b74ce83bbb5"
+      "sha256": "a1dc783643d6e522a65797efbe860d5e398e86ba1aba80b63d79f539f76544d2"
     },
     {
       "path": "src/FaaPart107/FaaPart107.csproj",

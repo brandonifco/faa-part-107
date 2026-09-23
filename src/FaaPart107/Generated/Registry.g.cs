@@ -164,7 +164,7 @@ public static class Registry
         new("well-clear", EntryStatus.Implemented, CorrespondenceRow.UnresolvedAmbiguity, [MapEntries.WellClear.Locator]),
         new("collision-hazard-proximity", EntryStatus.Implemented, CorrespondenceRow.Assertion, [MapEntries.CollisionHazardProximity.Locator]) { AssertedBy = ["caller"] },
         new("reasonable-protection", EntryStatus.Implemented, CorrespondenceRow.Assertion, [MapEntries.ReasonableProtection.Locator]) { AssertedBy = ["caller"] },
-        new("over-human-beings", EntryStatus.Mapped, CorrespondenceRow.NotBuilt, [MapEntries.OverHumanBeings.Locator]),
+        new("over-human-beings", EntryStatus.Implemented, CorrespondenceRow.None, [MapEntries.OverHumanBeings.Locator]),
         new("direct-participation", EntryStatus.Implemented, CorrespondenceRow.UnresolvedAmbiguity, [MapEntries.DirectParticipation.Locator]),
         new("subpart-d-categories", EntryStatus.Declined, CorrespondenceRow.ScopeOut, [MapEntries.SubpartDCategories.Locator]),
         new("flash-rate-sufficient", EntryStatus.Implemented, CorrespondenceRow.Assertion, [MapEntries.FlashRateSufficient.Locator]) { AssertedBy = ["caller"] },
