@@ -210,8 +210,8 @@ public sealed class CorrespondenceTests
         AssertDeclines("knowledge-recency", UnresolvedReason.OutsideCurrentScope, EntryPoints.KnowledgeRecency.Resolve(global::FaaPart107.Requests.KnowledgeRecencyRequest.Empty), new SourceLocator("cfr-14-107", "§ 107.65"));
 
     [Fact]
-    public void night_waiver_termination__declines_UnsupportedRule_row_2() =>
-        AssertDeclines("night-waiver-termination", UnresolvedReason.UnsupportedRule, EntryPoints.NightWaiverTermination.Resolve(global::FaaPart107.Requests.NightWaiverTerminationRequest.Empty), new SourceLocator("cfr-14-107", "§ 107.29(d)"));
+    public void night_waiver_termination__is_implemented_so_a_hand_written_handler_answers_it() =>
+        Assert.True(Registry.HasImplementation("night-waiver-termination"), "night-waiver-termination is implemented in the overlay and has no [Implements] handler");
 
     [Fact]
     public void night_waiver_bar__declines_UnsupportedRule_row_2() =>

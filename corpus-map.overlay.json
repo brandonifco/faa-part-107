@@ -678,5 +678,46 @@
         "mutation": "Participation.Direct compared the statement's regulation with itself (`waiver.Regulation` for `Regulation` in the call to Waivers.Suspension), so a waiver of § 107.49 suspended § 107.39(a); this test went red — `Failed!  - Failed:     1, Passed:     5, Skipped:     0, Total:     6` on net10.0 and net8.0. It went red too with the gate lifted out of Participation.Direct's body altogether, so no statement was ever checked against the entry's regulation — `Failed!  - Failed:     2, Passed:     4, Skipped:     0, Total:     6`."
       }
     ]
+  },
+  "night-waiver-termination": {
+    "status": "implemented",
+    "implementedIn": {
+      "ruleset": "faa-part-107",
+      "version": 1
+    },
+    "tests": [
+      {
+        "test": "NightWaiverTerminationEntryPointTests.A_certificate_issued_before_March_16_2021_that_authorizes_deviation_from_107_29_is_terminated_on_May_17_2021_citing_107_29_d",
+        "mutation": "NightWaivers.TerminationDate printed May 18, 2021 (`new(2021, 5, 18)` for `new(2021, 5, 17)`), so the finding's TerminatesOn was a day late; this test went red -- `Failed!  - Failed:     4, Passed:     0, Skipped:     0, Total:     4`. It went red too with NightWaivers.IssuanceCutOff printed March 15, 2021 (`new(2021, 3, 15)` for `new(2021, 3, 16)`), which released only the case issued on 2021-03-15 -- `Failed:     1, Passed:     3` -- so the just-below-the-cut-off boundary is asserted distinctly, and with NightWaiverTerminationFinding.Authority citing night-operation's `§ 107.29(a)` (`MapEntries.NightOperation.Locator` for `MapEntries.NightWaiverTermination.Locator`) -- `Failed:     4, Passed:     0`. Citing night-waiver-bar's locator did NOT turn it red: the map gives both entries `§ 107.29(d)`, the paragraph's two sentences, so the locator cannot tell them apart and nothing in this engine's output can."
+      },
+      {
+        "test": "NightWaiverTerminationEntryPointTests.A_certificate_issued_on_or_after_March_16_2021_is_not_terminated_by_this_sentence",
+        "mutation": "NightWaivers.Termination read the issuance cut-off as inclusive (`certificate.IssuedOn <= IssuanceCutOff` for `<`), so a certificate issued ON March 16, 2021 -- not \"prior to\" it -- was reported terminated; this test went red -- `Failed!  - Failed:     1, Passed:     6, Skipped:     0, Total:     7`. Only the at-the-boundary case moved, which is what the boundary case is for; the 2021-04-21 and 2021-05-17 issuance dates in this theory stayed green throughout, so this sentence is never made to reach night-waiver-bar's April 21, 2021 cut-off."
+      },
+      {
+        "test": "NightWaiverTerminationEntryPointTests.A_certificate_that_does_not_authorize_deviation_from_107_29_is_not_terminated_by_this_sentence",
+        "mutation": "NightWaivers.Termination dropped the conjunct for what the certificate authorizes (`certificate.IssuedOn < IssuanceCutOff` for `certificate.AuthorizesDeviationFromSection10729 && certificate.IssuedOn < IssuanceCutOff`), so a certificate that does not authorize deviation from § 107.29 was terminated on its issuance date alone; this test went red -- `Failed!  - Failed:     2, Passed:     2, Skipped:     0, Total:     4` (the two early issuance dates; the two on or after the cut-off are not reached either way)."
+      },
+      {
+        "test": "NightWaiverTerminationEntryPointTests.It_has_terminated_on_and_after_May_17_2021_and_not_before",
+        "mutation": "NightWaiverTerminationFinding.HasTerminated excluded the termination date itself (`AsOf > NightWaivers.TerminationDate` for `>=`), so asked as of May 17, 2021 -- the date the sentence says the certificates terminate on -- the engine answered that it had not terminated; this test went red -- `Failed!  - Failed:     1, Passed:     4, Skipped:     0, Total:     5`. Exactly the at-the-date case moved: 2021-05-16 and 2021-05-18 stayed green, so the boundary is pinned at the date and not near it."
+      },
+      {
+        "test": "NightWaiverTerminationEntryPointTests.The_finding_records_the_certificate_and_the_date_it_was_asked_as_of",
+        "mutation": "NightWaivers.Termination rebuilt the certificate instead of recording the caller's (`new WaiverCertificate(certificate.IssuedOn, certificate.AuthorizesDeviationFromSection10729, certificate.StatedBy)` for `certificate`), so the finding carried an equal certificate that was not the one stated; this test went red -- `Failed!  - Failed:     1, Passed:     0, Skipped:     0, Total:     1` -- on Assert.Same. Attribution that is reconstructed is not attribution (rules-factory decision 0021)."
+      },
+      {
+        "test": "NightWaiverTerminationEntryPointTests.Without_a_certificate_it_refuses_rather_than_infer_one",
+        "mutation": "Handlers.NightWaiverTermination defaulted a missing certificate (`request.Certificate ?? new WaiverCertificate(new DateOnly(2021, 3, 15), true, \"the engine\")` for `Demand(request.Certificate, ...)`), so the engine invented an instrument the Administrator had not issued and answered about it; this test went red -- `Failed!  - Failed:     1, Passed:     0, Skipped:     0, Total:     1`."
+      },
+      {
+        "test": "NightWaiverTerminationEntryPointTests.Without_a_date_it_refuses_rather_than_read_the_clock",
+        "mutation": "Handlers.NightWaiverTermination defaulted a missing date (`request.AsOf ?? new DateOnly(2026, 1, 1)` for `Demand(request.AsOf, ...)`), so the engine answered as of a date the caller never supplied; this test went red -- `Failed!  - Failed:     1, Passed:     0, Skipped:     0, Total:     1`. The wall-clock form of the same default, `request.AsOf ?? DateOnly.FromDateTime(DateTime.Today)`, never reaches a test run: it fails the build on both target frameworks with `error RK0002: 'DateTime.Today' reads an ambient clock; pass the instant in as an argument instead`. Both are recorded because this is the entry whose dates most invite a clock, and the map is explicit that they are ordinary operations over a date the caller supplies."
+      },
+      {
+        "test": "NightWaiverTerminationEntryPointTests.The_dictionary_dispatch_refuses_rather_than_answering_from_defaults",
+        "mutation": "Handlers.NightWaiverTermination defaulted a missing certificate (`request.Certificate ?? new WaiverCertificate(new DateOnly(2021, 3, 15), true, \"the engine\")` for `Demand(request.Certificate, ...)`), so Registry.Resolve(\"night-waiver-termination\", RuleRequest.Empty) -- which builds a request with every input at its default -- resolved to a finding instead of refusing; this test went red -- `Failed!  - Failed:     1, Passed:     0, Skipped:     0, Total:     1`. It is the same substitution the typed-path test above names, run on the path that test does not cover: the dictionary dispatch cannot carry typed inputs, so nothing but the handler's Demand stands between it and an invented answer."
+      }
+    ]
   }
 }

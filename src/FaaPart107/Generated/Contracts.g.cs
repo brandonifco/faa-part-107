@@ -308,8 +308,8 @@ internal static partial class Handlers
     /// <summary>Aeronautical knowledge recency (<c>knowledge-recency</c>): optional.</summary>
     static partial void KnowledgeRecency(global::FaaPart107.Requests.KnowledgeRecencyRequest request, ref Resolution<object>? resolution);
 
-    /// <summary>Termination of night waivers issued before March 16, 2021 (<c>night-waiver-termination</c>): optional.</summary>
-    static partial void NightWaiverTermination(global::FaaPart107.Requests.NightWaiverTerminationRequest request, ref Resolution<object>? resolution);
+    /// <summary>Termination of night waivers issued before March 16, 2021 (<c>night-waiver-termination</c>): required, the entry is implemented.</summary>
+    internal static partial Resolution<object> NightWaiverTermination(global::FaaPart107.Requests.NightWaiverTerminationRequest request);
 
     /// <summary>No night operation after May 17, 2021 under a waiver issued before April 21, 2021 (<c>night-waiver-bar</c>): optional.</summary>
     static partial void NightWaiverBar(global::FaaPart107.Requests.NightWaiverBarRequest request, ref Resolution<object>? resolution);
@@ -460,7 +460,7 @@ internal static partial class Handlers
                 KnowledgeRecency(request as global::FaaPart107.Requests.KnowledgeRecencyRequest ?? new(assertions), ref resolution);
                 break;
             case "night-waiver-termination":
-                NightWaiverTermination(request as global::FaaPart107.Requests.NightWaiverTerminationRequest ?? new(assertions), ref resolution);
+                resolution = NightWaiverTermination(request as global::FaaPart107.Requests.NightWaiverTerminationRequest ?? new(assertions));
                 break;
             case "night-waiver-bar":
                 NightWaiverBar(request as global::FaaPart107.Requests.NightWaiverBarRequest ?? new(assertions), ref resolution);
@@ -573,7 +573,7 @@ internal static partial class Handlers
         "night-operation" => Hooked("NightOperation", typeof(global::FaaPart107.Requests.NightOperationRequest)),
         "night-training-completed" => true,
         "knowledge-recency" => Hooked("KnowledgeRecency", typeof(global::FaaPart107.Requests.KnowledgeRecencyRequest)),
-        "night-waiver-termination" => Hooked("NightWaiverTermination", typeof(global::FaaPart107.Requests.NightWaiverTerminationRequest)),
+        "night-waiver-termination" => true,
         "night-waiver-bar" => Hooked("NightWaiverBar", typeof(global::FaaPart107.Requests.NightWaiverBarRequest)),
         "civil-twilight-operation" => Hooked("CivilTwilightOperation", typeof(global::FaaPart107.Requests.CivilTwilightOperationRequest)),
         "civil-twilight-alaska" => Hooked("CivilTwilightAlaska", typeof(global::FaaPart107.Requests.CivilTwilightAlaskaRequest)),
