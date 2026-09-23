@@ -294,8 +294,20 @@ public sealed class CorrespondenceTests
         AssertDeclines("preflight-actions", UnresolvedReason.UnsupportedRule, EntryPoints.PreflightActions.Resolve(global::FaaPart107.Requests.PreflightActionsRequest.Empty), new SourceLocator("cfr-14-107", "§ 107.49"));
 
     [Fact]
-    public void preflight_risk_assessment__declines_UnsupportedRule_row_2() =>
-        AssertDeclines("preflight-risk-assessment", UnresolvedReason.UnsupportedRule, EntryPoints.PreflightRiskAssessment.Resolve(global::FaaPart107.Requests.PreflightRiskAssessmentRequest.Empty), new SourceLocator("cfr-14-107", "§ 107.49(a)"));
+    public void preflight_risk_assessment__is_implemented_and_answers_or_demands_the_assertion()
+    {
+        if (Registry.HasImplementation("preflight-risk-assessment"))
+        {
+            return;
+        }
+
+        var value = new object();
+        var resolved = Registry.Resolve("preflight-risk-assessment", RuleRequest.Empty.Assert("preflight-risk-assessment", value)).Match<object?>(v => v, _ => null);
+        Assert.Same(value, resolved);
+        var typed = EntryPoints.PreflightRiskAssessment.Resolve(global::FaaPart107.Requests.PreflightRiskAssessmentRequest.Asserting(value)).Match<object?>(v => v, _ => null);
+        Assert.Same(value, typed);
+        Assert.Throws<AssertionRequiredException>(() => Registry.Resolve("preflight-risk-assessment", RuleRequest.Empty));
+    }
 
     [Fact]
     public void participant_briefing__declines_UnsupportedRule_row_2() =>
