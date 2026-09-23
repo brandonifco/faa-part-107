@@ -314,8 +314,8 @@ internal static partial class Handlers
     /// <summary>No night operation after May 17, 2021 under a waiver issued before April 21, 2021 (<c>night-waiver-bar</c>): optional.</summary>
     static partial void NightWaiverBar(global::FaaPart107.Requests.NightWaiverBarRequest request, ref Resolution<object>? resolution);
 
-    /// <summary>Operation during civil twilight (<c>civil-twilight-operation</c>): optional.</summary>
-    static partial void CivilTwilightOperation(global::FaaPart107.Requests.CivilTwilightOperationRequest request, ref Resolution<object>? resolution);
+    /// <summary>Operation during civil twilight (<c>civil-twilight-operation</c>): required, the entry is implemented.</summary>
+    internal static partial Resolution<object> CivilTwilightOperation(global::FaaPart107.Requests.CivilTwilightOperationRequest request);
 
     /// <summary>Civil twilight in Alaska (<c>civil-twilight-alaska</c>): optional.</summary>
     static partial void CivilTwilightAlaska(global::FaaPart107.Requests.CivilTwilightAlaskaRequest request, ref Resolution<object>? resolution);
@@ -466,7 +466,7 @@ internal static partial class Handlers
                 NightWaiverBar(request as global::FaaPart107.Requests.NightWaiverBarRequest ?? new(assertions), ref resolution);
                 break;
             case "civil-twilight-operation":
-                CivilTwilightOperation(request as global::FaaPart107.Requests.CivilTwilightOperationRequest ?? new(assertions), ref resolution);
+                resolution = CivilTwilightOperation(request as global::FaaPart107.Requests.CivilTwilightOperationRequest ?? new(assertions));
                 break;
             case "civil-twilight-alaska":
                 CivilTwilightAlaska(request as global::FaaPart107.Requests.CivilTwilightAlaskaRequest ?? new(assertions), ref resolution);
@@ -575,7 +575,7 @@ internal static partial class Handlers
         "knowledge-recency" => Hooked("KnowledgeRecency", typeof(global::FaaPart107.Requests.KnowledgeRecencyRequest)),
         "night-waiver-termination" => true,
         "night-waiver-bar" => Hooked("NightWaiverBar", typeof(global::FaaPart107.Requests.NightWaiverBarRequest)),
-        "civil-twilight-operation" => Hooked("CivilTwilightOperation", typeof(global::FaaPart107.Requests.CivilTwilightOperationRequest)),
+        "civil-twilight-operation" => true,
         "civil-twilight-alaska" => Hooked("CivilTwilightAlaska", typeof(global::FaaPart107.Requests.CivilTwilightAlaskaRequest)),
         "hazardous-material" => Hooked("HazardousMaterial", typeof(global::FaaPart107.Requests.HazardousMaterialRequest)),
         "right-of-way" => true,
