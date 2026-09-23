@@ -173,7 +173,7 @@ public static class Registry
         new("visual-line-of-sight", EntryStatus.Mapped, CorrespondenceRow.NotBuilt, [MapEntries.VisualLineOfSight.Locator]),
         new("unaided-visual-contact", EntryStatus.Mapped, CorrespondenceRow.NotBuilt, [MapEntries.UnaidedVisualContact.Locator]) { AssertedBy = ["remote pilot in command", "visual observer", "person manipulating the flight control"] },
         new("visual-observer-conditions", EntryStatus.Mapped, CorrespondenceRow.NotBuilt, [MapEntries.VisualObserverConditions.Locator]),
-        new("effective-communication", EntryStatus.Mapped, CorrespondenceRow.NotBuilt, [MapEntries.EffectiveCommunication.Locator]),
+        new("effective-communication", EntryStatus.Implemented, CorrespondenceRow.UnresolvedAmbiguity, [MapEntries.EffectiveCommunication.Locator]),
         new("observer-coordination", EntryStatus.Mapped, CorrespondenceRow.NotBuilt, [MapEntries.ObserverCoordination.Locator]) { AssertedBy = ["remote pilot in command", "person manipulating the flight controls", "visual observer"] },
         new("preflight-actions", EntryStatus.Mapped, CorrespondenceRow.NotBuilt, [MapEntries.PreflightActions.Locator]),
         new("preflight-risk-assessment", EntryStatus.Mapped, CorrespondenceRow.NotBuilt, [MapEntries.PreflightRiskAssessment.Locator]) { AssertedBy = ["remote pilot in command"] },

@@ -362,8 +362,8 @@ internal static partial class Handlers
     /// <summary>Visual observer requirements, when one is used (<c>visual-observer-conditions</c>): optional.</summary>
     static partial void VisualObserverConditions(global::FaaPart107.Requests.VisualObserverConditionsRequest request, ref Resolution<object>? resolution);
 
-    /// <summary>Effective communication is maintained among the three named persons (<c>effective-communication</c>): optional.</summary>
-    static partial void EffectiveCommunication(global::FaaPart107.Requests.EffectiveCommunicationRequest request, ref Resolution<object>? resolution);
+    /// <summary>Effective communication is maintained among the three named persons (<c>effective-communication</c>): required, the entry is implemented.</summary>
+    internal static partial Resolution<object> EffectiveCommunication(global::FaaPart107.Requests.EffectiveCommunicationRequest request);
 
     /// <summary>The three named persons coordinate to scan the airspace and maintain awareness (<c>observer-coordination</c>): optional.</summary>
     static partial void ObserverCoordination(global::FaaPart107.Requests.ObserverCoordinationRequest request, ref Resolution<object>? resolution);
@@ -514,7 +514,7 @@ internal static partial class Handlers
                 VisualObserverConditions(request as global::FaaPart107.Requests.VisualObserverConditionsRequest ?? new(assertions), ref resolution);
                 break;
             case "effective-communication":
-                EffectiveCommunication(request as global::FaaPart107.Requests.EffectiveCommunicationRequest ?? new(assertions), ref resolution);
+                resolution = EffectiveCommunication(request as global::FaaPart107.Requests.EffectiveCommunicationRequest ?? new(assertions));
                 break;
             case "observer-coordination":
                 ObserverCoordination(request as global::FaaPart107.Requests.ObserverCoordinationRequest ?? new(assertions), ref resolution);
@@ -591,7 +591,7 @@ internal static partial class Handlers
         "visual-line-of-sight" => Hooked("VisualLineOfSight", typeof(global::FaaPart107.Requests.VisualLineOfSightRequest)),
         "unaided-visual-contact" => Hooked("UnaidedVisualContact", typeof(global::FaaPart107.Requests.UnaidedVisualContactRequest)),
         "visual-observer-conditions" => Hooked("VisualObserverConditions", typeof(global::FaaPart107.Requests.VisualObserverConditionsRequest)),
-        "effective-communication" => Hooked("EffectiveCommunication", typeof(global::FaaPart107.Requests.EffectiveCommunicationRequest)),
+        "effective-communication" => true,
         "observer-coordination" => Hooked("ObserverCoordination", typeof(global::FaaPart107.Requests.ObserverCoordinationRequest)),
         "preflight-actions" => Hooked("PreflightActions", typeof(global::FaaPart107.Requests.PreflightActionsRequest)),
         "preflight-risk-assessment" => Hooked("PreflightRiskAssessment", typeof(global::FaaPart107.Requests.PreflightRiskAssessmentRequest)),
