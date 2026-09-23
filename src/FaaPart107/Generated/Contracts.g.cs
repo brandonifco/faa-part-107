@@ -338,8 +338,8 @@ internal static partial class Handlers
     /// <summary>Operation over a human being (<c>over-human-beings</c>): optional.</summary>
     static partial void OverHumanBeings(global::FaaPart107.Requests.OverHumanBeingsRequest request, ref Resolution<object>? resolution);
 
-    /// <summary>A human being is directly participating in the operation (<c>direct-participation</c>): optional.</summary>
-    static partial void DirectParticipation(global::FaaPart107.Requests.DirectParticipationRequest request, ref Resolution<object>? resolution);
+    /// <summary>A human being is directly participating in the operation (<c>direct-participation</c>): required, the entry is implemented.</summary>
+    internal static partial Resolution<object> DirectParticipation(global::FaaPart107.Requests.DirectParticipationRequest request);
 
     /// <summary>Operational categories for flight over human beings (<c>subpart-d-categories</c>): optional.</summary>
     static partial void SubpartDCategories(global::FaaPart107.Requests.SubpartDCategoriesRequest request, ref Resolution<object>? resolution);
@@ -490,7 +490,7 @@ internal static partial class Handlers
                 OverHumanBeings(request as global::FaaPart107.Requests.OverHumanBeingsRequest ?? new(assertions), ref resolution);
                 break;
             case "direct-participation":
-                DirectParticipation(request as global::FaaPart107.Requests.DirectParticipationRequest ?? new(assertions), ref resolution);
+                resolution = DirectParticipation(request as global::FaaPart107.Requests.DirectParticipationRequest ?? new(assertions));
                 break;
             case "subpart-d-categories":
                 SubpartDCategories(request as global::FaaPart107.Requests.SubpartDCategoriesRequest ?? new(assertions), ref resolution);
@@ -583,7 +583,7 @@ internal static partial class Handlers
         "collision-hazard-proximity" => Hooked("CollisionHazardProximity", typeof(global::FaaPart107.Requests.CollisionHazardProximityRequest)),
         "reasonable-protection" => Hooked("ReasonableProtection", typeof(global::FaaPart107.Requests.ReasonableProtectionRequest)),
         "over-human-beings" => Hooked("OverHumanBeings", typeof(global::FaaPart107.Requests.OverHumanBeingsRequest)),
-        "direct-participation" => Hooked("DirectParticipation", typeof(global::FaaPart107.Requests.DirectParticipationRequest)),
+        "direct-participation" => true,
         "subpart-d-categories" => Hooked("SubpartDCategories", typeof(global::FaaPart107.Requests.SubpartDCategoriesRequest)),
         "flash-rate-sufficient" => Hooked("FlashRateSufficient", typeof(global::FaaPart107.Requests.FlashRateSufficientRequest)),
         "intensity-reduction-in-interest-of-safety" => Hooked("IntensityReductionInInterestOfSafety", typeof(global::FaaPart107.Requests.IntensityReductionInInterestOfSafetyRequest)),
