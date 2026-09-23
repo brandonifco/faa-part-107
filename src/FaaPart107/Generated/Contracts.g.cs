@@ -350,8 +350,8 @@ internal static partial class Handlers
     /// <summary>Reducing the anti-collision lighting intensity is in the interest of safety (<c>intensity-reduction-in-interest-of-safety</c>): optional.</summary>
     static partial void IntensityReductionInInterestOfSafety(global::FaaPart107.Requests.IntensityReductionInInterestOfSafetyRequest request, ref Resolution<object>? resolution);
 
-    /// <summary>Anti-collision lighting is fitted and visible for 3 statute miles (<c>anti-collision-lighting</c>): optional.</summary>
-    static partial void AntiCollisionLighting(global::FaaPart107.Requests.AntiCollisionLightingRequest request, ref Resolution<object>? resolution);
+    /// <summary>Anti-collision lighting is fitted and visible for 3 statute miles (<c>anti-collision-lighting</c>): required, the entry is implemented.</summary>
+    internal static partial Resolution<object> AntiCollisionLighting(global::FaaPart107.Requests.AntiCollisionLightingRequest request);
 
     /// <summary>Visual line of sight is maintained (<c>visual-line-of-sight</c>): required, the entry is implemented.</summary>
     internal static partial Resolution<object> VisualLineOfSight(global::FaaPart107.Requests.VisualLineOfSightRequest request);
@@ -502,7 +502,7 @@ internal static partial class Handlers
                 IntensityReductionInInterestOfSafety(request as global::FaaPart107.Requests.IntensityReductionInInterestOfSafetyRequest ?? new(assertions), ref resolution);
                 break;
             case "anti-collision-lighting":
-                AntiCollisionLighting(request as global::FaaPart107.Requests.AntiCollisionLightingRequest ?? new(assertions), ref resolution);
+                resolution = AntiCollisionLighting(request as global::FaaPart107.Requests.AntiCollisionLightingRequest ?? new(assertions));
                 break;
             case "visual-line-of-sight":
                 resolution = VisualLineOfSight(request as global::FaaPart107.Requests.VisualLineOfSightRequest ?? new(assertions));
@@ -587,7 +587,7 @@ internal static partial class Handlers
         "subpart-d-categories" => Hooked("SubpartDCategories", typeof(global::FaaPart107.Requests.SubpartDCategoriesRequest)),
         "flash-rate-sufficient" => Hooked("FlashRateSufficient", typeof(global::FaaPart107.Requests.FlashRateSufficientRequest)),
         "intensity-reduction-in-interest-of-safety" => Hooked("IntensityReductionInInterestOfSafety", typeof(global::FaaPart107.Requests.IntensityReductionInInterestOfSafetyRequest)),
-        "anti-collision-lighting" => Hooked("AntiCollisionLighting", typeof(global::FaaPart107.Requests.AntiCollisionLightingRequest)),
+        "anti-collision-lighting" => true,
         "visual-line-of-sight" => true,
         "unaided-visual-contact" => Hooked("UnaidedVisualContact", typeof(global::FaaPart107.Requests.UnaidedVisualContactRequest)),
         "visual-observer-conditions" => Hooked("VisualObserverConditions", typeof(global::FaaPart107.Requests.VisualObserverConditionsRequest)),

@@ -314,8 +314,8 @@ public sealed class CorrespondenceTests
     }
 
     [Fact]
-    public void anti_collision_lighting__declines_UnsupportedRule_row_2() =>
-        AssertDeclines("anti-collision-lighting", UnresolvedReason.UnsupportedRule, EntryPoints.AntiCollisionLighting.Resolve(global::FaaPart107.Requests.AntiCollisionLightingRequest.Empty), new SourceLocator("cfr-14-107", "§ 107.29(a)(2), (b)"));
+    public void anti_collision_lighting__is_implemented_so_a_hand_written_handler_answers_it() =>
+        Assert.True(Registry.HasImplementation("anti-collision-lighting"), "anti-collision-lighting is implemented in the overlay and has no [Implements] handler");
 
     [Fact]
     public void visual_line_of_sight__is_implemented_so_a_hand_written_handler_answers_it() =>
