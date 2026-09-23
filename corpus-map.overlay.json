@@ -1668,5 +1668,62 @@
         "mutation": "Handlers.CivilTwilightOperation invented the lighting when it was not given (`request.Lighting ?? LightingStatement.NoneFitted(\"the engine\")` for `Demand(request.Lighting, ...)`), so a request that described no aircraft was answered as an aircraft with no anti-collision lighting -- a conviction from silence, and through `Registry.Resolve(id, RuleRequest)`, which can carry no typed input at all. This test went red alone with `Assert.All() Failure: 1 out of 4 items in the collection did not pass. [2]: Item: Tuple (\"Lighting\", ...) / Error: Assert.Throws() Failure: No exception was thrown` -- `Failed!  - Failed:     1, Passed:   524, Skipped:     0, Total:   525` on both net8.0 and net10.0. It went red too with the place defaulted, item [0]: every one of the four inputs is checked in this one test."
       }
     ]
+  },
+  "preflight-actions": {
+    "status": "implemented",
+    "implementedIn": {
+      "ruleset": "faa-part-107",
+      "version": 1
+    },
+    "tests": [
+      {
+        "test": "PreflightActionsEntryPointTests.The_chapeau_adds_the_conjunction_and_no_input_of_its_own_and_107_49_fs_condition_is_the_entrys_one_input",
+        "mutation": "The engine started taking § 107.49's lead-in as input: `public bool? PriorToFlight { get; init; }` added to the `PreflightActionsRequest` partial beside `Operation`, which is the first step of \"Prior to flight\" becoming a second verdict about obligations the constituents already report done or not done — a caller could then say an obligation was done and was not done in time, which the map gives no entry. This test went red alone, with `Assert.Equal() Failure: Collections differ / Expected: [\"Assertions\", \"EntryId\", \"Operation\"] / Actual: [\"Assertions\", \"EntryId\", \"Operation\", \"PriorToFlight\"]` (`Failed!  - Failed:     1, Passed:   570, Skipped:     0, Total:   571` on both net8.0 and net10.0)."
+      },
+      {
+        "test": "PreflightActionsEntryPointTests.Every_obligation_this_engine_can_answer_stated_done_it_declines_RequiresInterpretation_citing_control_links_workings_107_49_c",
+        "mutation": "Preflight.Undetermined cited this entry's own locator instead of the blocking constituent's (`MapEntries.PreflightActions.Locator` for `blocking.Entry.Locator`), so a decline pointed at § 107.49 whole rather than at § 107.49(c), where the question that blocked it actually lives — the shape #78 and docs/decisions/0001 settle. This test went red, with the paragraph-order test and the decline-is-this-entry's-own test (`Failed!  - Failed:     3, Passed:   568, Skipped:     0, Total:   571` on both net8.0 and net10.0). It went red too with the last unanswered obligation blocking instead of the first (5 red), with (e)'s first conjunct placed before (c) (3 red), with the constituent's account handed back (3 red), and with an open constituent answered done by the engine (12 red)."
+      },
+      {
+        "test": "PreflightActionsEntryPointTests.An_obligation_stated_not_done_settles_the_conjunction_whatever_the_undetermined_ones_would_have_said",
+        "mutation": "Preflight.Actions let an unanswered obligation block even where one was answered not done (`return blocking is null` for `return obligations.Exists(obligation => obligation.Done == false) || blocking is null`), so § 107.49's conjunction stopped being settled by a conjunct the remote pilot in command reported not done and every request declined instead — the reading Compliance and Observers both refuse for \"all of the following\". All four rows of this theory went red, with 34 others (`Failed!  - Failed:    38, Passed:   533, Skipped:     0, Total:   571` on both net8.0 and net10.0)."
+      },
+      {
+        "test": "PreflightActionsEntryPointTests.Across_every_combination_of_the_four_stated_obligations_the_engine_never_resolves_107_49_complete",
+        "mutation": "Preflight.Untyped answered the questions the map holds open (`ObligationOutcome.Answered(entry, paragraph, true, \"the engine decided the open question\")` for `Outcome(entry, paragraph, resolution, value => value as bool?)`), so § 107.49(c), the first conjunct of § 107.49(e) and § 107.49(f) were all recorded done and § 107.49 resolved complete on an operation with every assertion in the affirmative — the single worst outcome available here. The two all-affirmative rows of this theory went red, with 10 others (`Failed!  - Failed:    12, Passed:   559, Skipped:     0, Total:   571` on both net8.0 and net10.0)."
+      },
+      {
+        "test": "PreflightActionsEntryPointTests.An_operation_stated_not_to_be_under_subpart_D_does_not_reach_107_49_f_and_that_entry_is_not_asked",
+        "mutation": "Preflight.Actions asked subpart-d-categories unconditionally (`if (operation == SubpartDOperation.OverHumanBeings || operation == SubpartDOperation.NotOverHumanBeings)` for `if (operation == SubpartDOperation.OverHumanBeings)`) — the over-human-beings reading, which is right for § 107.39(c) because that paragraph states no antecedent and wrong here because § 107.49(f) states one. § 107.49(f) then stated an obligation about an operation the caller said it does not reach, and a purely subpart B operation carried a seventh, permanently undetermined conjunct. This test went red alone, with `Assert.Equal() Failure / Expected: 6 / Actual: 7` (`Failed!  - Failed:     1, Passed:   570, Skipped:     0, Total:   571` on both net8.0 and net10.0)."
+      },
+      {
+        "test": "PreflightActionsEntryPointTests.Where_107_49_f_is_reached_its_OutsideCurrentScope_stays_that_entrys_own_and_never_becomes_this_entrys_reason",
+        "mutation": "Preflight.Actions blocked on the last unanswered obligation instead of the first (`obligations.FindLast(obligation => obligation.Done is null)` for `obligations.Find(...)`), so on an operation under subpart D the decline carried subpart-d-categories' OutsideCurrentScope citing `subpart D` — a caller asking about a section this engine maps was told the section is outside its scope, which the entry's note forbids in terms: (f) is \"a dependency on subpart-d-categories rather than a second reason on this entry\". This test went red, with four others (`Failed!  - Failed:     5, Passed:   566, Skipped:     0, Total:   571` on both net8.0 and net10.0)."
+      },
+      {
+        "test": "PreflightActionsEntryPointTests.The_obligations_are_in_107_49s_own_paragraph_order_which_fixes_which_constituent_a_decline_cites",
+        "mutation": "Preflight.Actions placed § 107.49(e)'s first conjunct before § 107.49(c) (the `attached-object-secure` and `control-links-working` rows of the obligations list swapped), so the paragraphs came out (a) (b) (e) (d) (c) (e) and a decline cited § 107.49(e) instead of § 107.49(c) — both are open on every request, so only the order decides which one a caller is pointed at. This test went red, with two others (`Failed!  - Failed:     3, Passed:   568, Skipped:     0, Total:   571` on both net8.0 and net10.0). It went red too with the last unanswered obligation blocking instead of the first (5 red), and with the decline citing this entry's own locator (3 red)."
+      },
+      {
+        "test": "PreflightActionsEntryPointTests.The_verdicts_and_the_accounts_are_the_constituent_entries_own_and_are_not_restated_here",
+        "mutation": "Preflight.Outcome restated the answer in this entry's own words instead of carrying the constituent's (`$\"§ 107.49{paragraph} {(verdict ? \"done\" : \"not done\")}\"` for `value.ToString() ?? string.Empty` on the resolved branch), so § 107.49(d)'s outcome no longer carried what sufficient-available-power printed — who asserted it, and under which citation — and this entry began speaking for its constituents. This test went red alone, with `Assert.Equal() Failure: Strings differ` (`Failed!  - Failed:     1, Passed:   570, Skipped:     0, Total:   571` on both net8.0 and net10.0)."
+      },
+      {
+        "test": "PreflightActionsEntryPointTests.The_decline_is_this_entrys_own_and_not_control_links_workings_handed_back",
+        "mutation": "Preflight.Undetermined handed back the blocking constituent's account as this entry's (`string.Join(string.Empty, unanswered.Take(0)) + blocking.Account` for the message naming preflight-actions and every unanswered obligation), so a decline of § 107.49 became byte-identical to a decline of control-links-working — the propagation #78 rejects, and the one the reason and the citation cannot detect because both are deliberately the constituent's. This test went red, with two others (`Failed!  - Failed:     3, Passed:   568, Skipped:     0, Total:   571` on both net8.0 and net10.0). It went red too with the decline citing this entry's own locator (3 red) and with (e)'s first conjunct placed before (c) (3 red)."
+      },
+      {
+        "test": "PreflightActionsEntryPointTests.An_obligation_the_caller_did_not_assert_is_demanded_rather_than_inferred",
+        "mutation": "Preflight.Stated assumed an obligation nobody asserted was done (the call to `Assertions.Stated` wrapped in `try`/`catch (AssertionRequiredException)` returning `ObligationOutcome.Answered(entry, paragraph, true, \"the engine assumed it\")`), which is correspondence row 8's whole point inverted — an obligation § 107.49 gives the remote pilot in command to report became one the engine reported for them. This test went red alone, with `Assert.Throws() Failure: No exception was thrown / Expected: typeof(FaaPart107.AssertionRequiredException)` (`Failed!  - Failed:     1, Passed:   570, Skipped:     0, Total:   571` on both net8.0 and net10.0)."
+      },
+      {
+        "test": "PreflightActionsEntryPointTests.Without_a_statement_about_107_49_fs_condition_it_refuses_rather_than_infer_one",
+        "mutation": "Handlers.PreflightActions defaulted the unstated condition (`request.Operation ?? SubpartDOperation.NotOverHumanBeings` for `Demand(request.Operation, request.EntryId, nameof(request.Operation))`), so an operation the caller had not described was read as an operation outside subpart D and whether a paragraph of the corpus reaches it was decided from an absence (rules-factory decision 0021). This test went red alone, with `Assert.Throws() Failure: No exception was thrown` (`Failed!  - Failed:     1, Passed:   570, Skipped:     0, Total:   571` on both net8.0 and net10.0)."
+      },
+      {
+        "test": "PreflightActionsEntryPointTests.Each_obligation_is_read_under_its_own_entry_and_an_assertion_about_another_or_by_another_asserter_is_refused",
+        "mutation": "Preflight.Stated built the assertion itself instead of going through the entry's own mechanism (`Resolution<Assertion>.FromValue(new Assertion(entry, ((Assertion)assertions.Asserted(entry.Id)).Holds, entry.AssertedBy[0]))` for `Assertions.Stated(entry, assertions)`), so an assertion attributed to a visual observer answered an entry § 107.49's lead-in gives to the remote pilot in command, and an assertion about sufficient-available-power answered preflight-risk-assessment. This test went red alone, with `Assert.Throws() Failure: No exception was thrown` (`Failed!  - Failed:     1, Passed:   570, Skipped:     0, Total:   571` on both net8.0 and net10.0)."
+      }
+    ]
   }
 }

@@ -214,12 +214,8 @@
       "sha256": "6da95d24394881865c0153cef534c33a53702d28ca609c8b3712bd9a1191f1ef"
     },
     {
-      "path": "backlog/001-preflight-actions.md",
-      "sha256": "1bb7e54821c5e5f619595190e736e65b78665ba25aaca4771640396ab8529622"
-    },
-    {
       "path": "backlog/README.md",
-      "sha256": "767d7c8974166f23d50e58bc5ce26a13222056ce36fc48c887ff03de0f20352a"
+      "sha256": "e353be623ea641fa67fad86af3b5aaefb0ac922b251574a1880f6b54d407c1f5"
     },
     {
       "path": "corpus/part107.xml",
@@ -259,7 +255,7 @@
     },
     {
       "path": "src/FaaPart107/Generated/Contracts.g.cs",
-      "sha256": "f7c4144f8732ab5f848ea8e5ef38a17f6e48e60fe4ae5a26c24d474f44c3a3ca"
+      "sha256": "793647c6700caa2a272a293b35038fa2366f47c72d251294c4bb4b7a08df38e1"
     },
     {
       "path": "src/FaaPart107/Generated/MapEntries.g.cs",
@@ -271,7 +267,7 @@
     },
     {
       "path": "src/FaaPart107/Generated/Registry.g.cs",
-      "sha256": "3002cac4d600b089a3f5cc08fef05bbf84fd45ed6c510f5baab5f1a39a5a58e2"
+      "sha256": "81672e40002cee880463f1b13baf9716879b04c61c39fbc421a8701a266d1bd7"
     },
     {
       "path": "src/FaaPart107/Generated/Requests.g.cs",
@@ -279,7 +275,7 @@
     },
     {
       "path": "tests/FaaPart107.Tests/Generated/CorrespondenceTests.g.cs",
-      "sha256": "8617bde0371dbbebb0a111600c5f3c2c3c71858b77f8906cf6d26d27394b94c8"
+      "sha256": "3eb9ab52d3a33bbd87ed62ff0daf7fe5f6956e9611373b131cf3e819c1a40fc6"
     },
     {
       "path": "tests/FaaPart107.Tests/Generated/ProvenanceTests.g.cs",
@@ -467,7 +463,7 @@
     },
     {
       "path": "corpus-map.overlay.json",
-      "sha256": "8b36681e350fd19d6150cb8e2cd9b6e95cb59178db4d1c9709dca835e86c0f59"
+      "sha256": "24ae77ff51846a5d87ec8f7592e5f2eb02269f330cd07a60032f259014c1f2e9"
     },
     {
       "path": "src/FaaPart107/FaaPart107.csproj",

@@ -362,8 +362,8 @@ public sealed class CorrespondenceTests
     }
 
     [Fact]
-    public void preflight_actions__declines_UnsupportedRule_row_2() =>
-        AssertDeclines("preflight-actions", UnresolvedReason.UnsupportedRule, EntryPoints.PreflightActions.Resolve(global::FaaPart107.Requests.PreflightActionsRequest.Empty), new SourceLocator("cfr-14-107", "§ 107.49"));
+    public void preflight_actions__is_implemented_so_a_hand_written_handler_answers_it() =>
+        Assert.True(Registry.HasImplementation("preflight-actions"), "preflight-actions is implemented in the overlay and has no [Implements] handler");
 
     [Fact]
     public void preflight_risk_assessment__is_implemented_and_answers_or_demands_the_assertion()
