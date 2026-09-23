@@ -234,8 +234,9 @@ So: re-open the question when a diff shows any of
     max(issue_date) = 2025-11-03, rows after 2026-01-01: 0
   ```
 
-  The three columns agree on the *answer* here — none of them has a row after the baseline — and
-  they agree on nothing else;
+  The three columns agree on the *answer* here — none of them has a row after the baseline.
+  `date` and `amendment_date` agree on everything; `issue_date` does not, which is why all three
+  are checked;
 - a change to text: anything inside a `<P>`, a `<HEAD>`, a section heading, or any other prose the
   map quotes as `evidence`;
 - a change to an element's **identity** — its `N`, its `TYPE`, or its presence: a section, subpart
