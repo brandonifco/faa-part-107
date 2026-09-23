@@ -275,8 +275,8 @@ internal static partial class Handlers
     /// <summary>Altitude is within the limit (<c>altitude-within-limit</c>): required, the entry is implemented.</summary>
     internal static partial Resolution<object> AltitudeWithinLimit(global::FaaPart107.Requests.AltitudeWithinLimitRequest request);
 
-    /// <summary>Visibility and cloud clearance are met (<c>weather-minimums-met</c>): optional.</summary>
-    static partial void WeatherMinimumsMet(global::FaaPart107.Requests.WeatherMinimumsMetRequest request, ref Resolution<object>? resolution);
+    /// <summary>Visibility and cloud clearance are met (<c>weather-minimums-met</c>): required, the entry is implemented.</summary>
+    internal static partial Resolution<object> WeatherMinimumsMet(global::FaaPart107.Requests.WeatherMinimumsMetRequest request);
 
     /// <summary>The operating limitations are complied with (<c>operating-limitations</c>): optional.</summary>
     static partial void OperatingLimitations(global::FaaPart107.Requests.OperatingLimitationsRequest request, ref Resolution<object>? resolution);
@@ -427,7 +427,7 @@ internal static partial class Handlers
                 resolution = AltitudeWithinLimit(request as global::FaaPart107.Requests.AltitudeWithinLimitRequest ?? new(assertions));
                 break;
             case "weather-minimums-met":
-                WeatherMinimumsMet(request as global::FaaPart107.Requests.WeatherMinimumsMetRequest ?? new(assertions), ref resolution);
+                resolution = WeatherMinimumsMet(request as global::FaaPart107.Requests.WeatherMinimumsMetRequest ?? new(assertions));
                 break;
             case "operating-limitations":
                 OperatingLimitations(request as global::FaaPart107.Requests.OperatingLimitationsRequest ?? new(assertions), ref resolution);
@@ -562,7 +562,7 @@ internal static partial class Handlers
         "civil-twilight-window" => true,
         "speed-within-limit" => true,
         "altitude-within-limit" => true,
-        "weather-minimums-met" => Hooked("WeatherMinimumsMet", typeof(global::FaaPart107.Requests.WeatherMinimumsMetRequest)),
+        "weather-minimums-met" => true,
         "operating-limitations" => Hooked("OperatingLimitations", typeof(global::FaaPart107.Requests.OperatingLimitationsRequest)),
         "prominent-objects" => true,
         "single-aircraft" => true,
