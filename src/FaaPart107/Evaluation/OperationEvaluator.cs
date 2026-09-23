@@ -189,6 +189,8 @@ public static class OperationEvaluator
                 Cloud = facts.Cloud,
                 Waiver = facts.WaiverOf(Compliance.Regulation),
             }),
+        "sufficient-available-power" => facts => EntryPoints.SufficientAvailablePower.Resolve(
+            new Requests.SufficientAvailablePowerRequest(facts.Assertions) { Power = facts.AircraftPower }),
         "preflight-actions" => facts => EntryPoints.PreflightActions.Resolve(
             new Requests.PreflightActionsRequest(facts.Assertions) { Operation = facts.SubpartDOperation }),
         "over-human-beings" => facts => EntryPoints.OverHumanBeings.Resolve(
@@ -310,7 +312,34 @@ public static class OperationEvaluator
     /// wraps the <see cref="Assertion"/> in.
     /// </remarks>
     private static RequirementState StateOf(RegisteredEntry entry, object value) =>
-        entry.Row == CorrespondenceRow.Assertion ? RequirementState.HumanAssertionRecorded : Verdict(value);
+        entry.Row == CorrespondenceRow.Assertion ? Recorded(value) : Verdict(value);
+
+    /// <summary>
+    /// The state a <c>kind: assertion</c> entry's resolved value is reported as: the fact recorded,
+    /// or — where the paragraph that states the entry states an antecedent the caller says is not
+    /// satisfied — <see cref="RequirementState.Informational"/>, because there was no fact to record.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// § 107.49(d) is the one entry in this map whose own evidence states such an antecedent ("If
+    /// the small unmanned aircraft is powered"), and where it fails the paragraph states no
+    /// obligation about the operation: nothing is demanded, nobody has asserted anything, and
+    /// reporting <see cref="RequirementState.HumanAssertionRecorded"/> would name a fact nobody
+    /// stated. It is not <see cref="RequirementState.Satisfied"/> either — that is the case
+    /// <c>#95</c> exists to prevent.
+    /// </para>
+    /// <para>
+    /// The test stays the map's and the rule's, and never a list of types: the row says the entry is
+    /// an assertion, and <see cref="IConditionalAssertion"/> is the rule's own declaration that its
+    /// paragraph did not reach this operation. So decision 0004's property survives — an assertion
+    /// entry a later map version adds, under an antecedent or without one, is covered the day it is
+    /// built.
+    /// </para>
+    /// </remarks>
+    private static RequirementState Recorded(object value) =>
+        value is IConditionalAssertion { ParagraphApplies: false }
+            ? RequirementState.Informational
+            : RequirementState.HumanAssertionRecorded;
 
     /// <summary>
     /// The state a resolved value is reported as where the entry states a rule of its own: one

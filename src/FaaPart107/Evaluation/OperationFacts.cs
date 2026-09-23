@@ -152,6 +152,16 @@ public sealed record OperationFacts
     /// </summary>
     public SubpartDOperation? SubpartDOperation { get; init; }
 
+    /// <summary>
+    /// Whether the small unmanned aircraft is powered — § 107.49(d)'s condition
+    /// (<c>sufficient-available-power</c>). Never inferred in either direction, and never read off
+    /// the assertion made under that entry: whether the aircraft is powered is the condition the
+    /// paragraph states its obligation under, and whether there is enough available power for the
+    /// small unmanned aircraft system to operate for the intended operational time is the fact the
+    /// remote pilot in command reports under it.
+    /// </summary>
+    public AircraftPower? AircraftPower { get; init; }
+
     /// <summary>The airspace the operation is in (<c>airspace-authorized</c>, § 107.41).</summary>
     public AirspaceClass? Airspace { get; init; }
 

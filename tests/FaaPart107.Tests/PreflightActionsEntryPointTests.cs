@@ -358,9 +358,17 @@ public class PreflightActionsEntryPointTests
     {
         var finding = Finding(Resolve(SubpartDOperation.OverHumanBeings, powered: false));
 
-        var power = Assert.IsType<Assertion>(Assert.IsType<Resolution<object>.Resolved>(
-            EntryPoints.SufficientAvailablePower.Resolve(
-                new SufficientAvailablePowerRequest(Asserted(powered: false)))).Value);
+        // § 107.49(d) states its obligation under a condition of its own, "If the small unmanned
+        // aircraft is powered" (#95), so that entry is asked about a powered aircraft — the case in
+        // which the paragraph states the obligation this section conjoins — and what it recorded is
+        // the assertion this entry read.
+        var power = Assert.IsType<Assertion>(Assert.IsType<SufficientAvailablePowerFinding>(
+            Assert.IsType<Resolution<object>.Resolved>(
+                EntryPoints.SufficientAvailablePower.Resolve(
+                    new SufficientAvailablePowerRequest(Asserted(powered: false))
+                    {
+                        Power = AircraftPower.Powered,
+                    })).Value).Availability);
 
         // The verdict is what that entry answered, and the account is what it printed.
         Assert.Equal(power.Holds, Obligation(finding, "sufficient-available-power").Done);

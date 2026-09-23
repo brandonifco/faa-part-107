@@ -69,6 +69,7 @@ public class OperationEvaluatorTests
         Lighting = LightingStatement.LightedAndVisibleFor(5m, Caller),
         VisualObserverUse = VisualObserverUse.NotUsed,
         SubpartDOperation = SubpartDOperation.NotOverHumanBeings,
+        AircraftPower = AircraftPower.Powered,
         OperationPlace = OperationPlace.OutsideAlaska,
         OperationPeriod = OperationPeriod.BeforeOfficialSunrise,
         Shelter = Shelter.CoveredStructure,
@@ -290,7 +291,10 @@ public class OperationEvaluatorTests
     [Fact]
     public void An_assertion_not_supplied_is_a_demand_on_the_caller_and_never_a_decline()
     {
-        var outcome = Outcome("sufficient-available-power", OperationFacts.Nothing);
+        // Stated() and not Nothing: § 107.49(d) states its obligation under a condition of its own
+        // (#95), and an entry asked with no condition stated demands that first. The case this pins
+        // is the one where the paragraph reaches the operation and nobody has spoken to the fact.
+        var outcome = Outcome("sufficient-available-power", Stated());
 
         Assert.Equal(RequirementState.HumanAssertionRequired, outcome.State);
         Assert.Null(outcome.Reason);
@@ -310,8 +314,40 @@ public class OperationEvaluatorTests
         // prohibited one, and neither the map nor any rule here records which. So the fact is
         // reported with its asserter, and it is not turned into a verdict in either direction.
         Assert.Equal(RequirementState.HumanAssertionRecorded, outcome.State);
-        Assert.Equal(new Assertion(MapEntries.SufficientAvailablePower, holds, RemotePilotInCommand), outcome.Finding);
+        Assert.Equal(
+            new Assertion(MapEntries.SufficientAvailablePower, holds, RemotePilotInCommand),
+            Assert.IsType<SufficientAvailablePowerFinding>(outcome.Finding).Availability);
         Assert.Equal(MapEntries.SufficientAvailablePower.Locator, outcome.Locator);
+    }
+
+    [Fact]
+    public void A_paragraph_that_does_not_reach_the_operation_is_informational_and_not_an_assertion_recorded()
+    {
+        // § 107.49(d) states its obligation under a condition in its own evidence — "If the small
+        // unmanned aircraft is powered" — and where the caller states it is not satisfied, nobody
+        // has asserted anything and the paragraph says nothing about the operation. Reporting that
+        // as HumanAssertionRecorded would name a fact nobody stated; reporting it as Satisfied would
+        // be the verdict #95 exists to prevent.
+        var asserted = Complete().Asserting(
+            new Assertion(MapEntries.SufficientAvailablePower, true, RemotePilotInCommand));
+        var unpowered = asserted with { AircraftPower = AircraftPower.NotPowered };
+
+        var outcome = Outcome("sufficient-available-power", unpowered);
+        var finding = Assert.IsType<SufficientAvailablePowerFinding>(outcome.Finding);
+
+        Assert.Equal(RequirementState.Informational, outcome.State);
+        Assert.False(finding.ParagraphApplies);
+        Assert.Null(finding.Holds);
+        Assert.Null(outcome.Reason);
+
+        // And it is a third answer, distinct from both of the other two the same entry gives.
+        Assert.Equal(RequirementState.HumanAssertionRecorded, State("sufficient-available-power", asserted));
+        Assert.NotEqual(RequirementState.Satisfied, outcome.State);
+        Assert.NotEqual(RequirementState.Violated, outcome.State);
+
+        // The state is read from the map's row and the rule's own declaration, never from a list of
+        // finding types: every other row-8 entry is untouched by this and still records its fact.
+        Assert.Equal(RequirementState.HumanAssertionRecorded, State("participant-briefing", unpowered));
     }
 
     /// <summary>
@@ -890,7 +926,7 @@ public class OperationEvaluatorTests
         Assert.Equal(RequirementState.OutsideCurrentScope, State("knowledge-recency", facts));
 
         // And the two that are demands on the caller, which are neither of those.
-        Assert.Equal(RequirementState.HumanAssertionRequired, State("sufficient-available-power", OperationFacts.Nothing));
+        Assert.Equal(RequirementState.HumanAssertionRequired, State("sufficient-available-power", Stated()));
         Assert.Equal(RequirementState.FactRequired, State("speed-within-limit", OperationFacts.Nothing));
 
         var states = new[]
@@ -899,7 +935,7 @@ public class OperationEvaluatorTests
             State("night-operation", facts),
             State(notBuilt.Id, facts),
             State("knowledge-recency", facts),
-            State("sufficient-available-power", OperationFacts.Nothing),
+            State("sufficient-available-power", Stated()),
             State("speed-within-limit", OperationFacts.Nothing),
         };
 
