@@ -230,8 +230,8 @@ public sealed class CorrespondenceTests
         AssertDeclines("hazardous-material", UnresolvedReason.MissingRulesData, EntryPoints.HazardousMaterial.Resolve(global::FaaPart107.Requests.HazardousMaterialRequest.Empty), new SourceLocator("cfr-14-107", "§ 107.36"));
 
     [Fact]
-    public void right_of_way__declines_UnsupportedRule_row_2() =>
-        AssertDeclines("right-of-way", UnresolvedReason.UnsupportedRule, EntryPoints.RightOfWay.Resolve(global::FaaPart107.Requests.RightOfWayRequest.Empty), new SourceLocator("cfr-14-107", "§ 107.37(a)"));
+    public void right_of_way__is_implemented_so_a_hand_written_handler_answers_it() =>
+        Assert.True(Registry.HasImplementation("right-of-way"), "right-of-way is implemented in the overlay and has no [Implements] handler");
 
     [Fact]
     public void well_clear__is_implemented_so_a_hand_written_handler_answers_it() =>

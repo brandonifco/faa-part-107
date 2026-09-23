@@ -1,34 +1,99 @@
+using System.Diagnostics;
+using RulesKernel.Provenance;
 using RulesKernel.Resolution;
 
 namespace FaaPart107;
 
 /// <summary>
-/// § 107.37(a), "Yielding the right of way": <see cref="MapEntries.WellClear"/>, "Yielding the
-/// right of way means that the small unmanned aircraft must give way to the aircraft or vehicle
-/// and may not pass over, under, or ahead of it unless well clear."
+/// Whether § 107.37(a) prohibits the pass the caller states: <see cref="MapEntries.RightOfWay"/>,
+/// "(a) Each small unmanned aircraft must yield the right of way to all aircraft, airborne
+/// vehicles, and launch and reentry vehicles. Yielding the right of way means that the small
+/// unmanned aircraft must give way to the aircraft or vehicle and may not pass over, under, or
+/// ahead of it unless well clear."
+/// </summary>
+/// <remarks>
+/// The finding is this paragraph's and no wider: it says what § 107.37(a) does about this pass,
+/// and another rule may prohibit the operation anyway. § 107.37(b), operating so close to another
+/// aircraft as to create a collision hazard, is a separate entry
+/// (<see cref="MapEntries.CollisionHazardProximity"/>), and nothing here answers it.
+/// </remarks>
+/// <param name="Object">What was passed, as the caller stated it.</param>
+/// <param name="Position">Where the small unmanned aircraft passed it, as the caller stated it.</param>
+/// <param name="ObjectIsOneTheSectionNames">True when the object is one of the three kinds § 107.37(a) names.</param>
+/// <param name="PositionIsOneTheSectionProhibits">True when the pass is in one of the three relative positions § 107.37(a) prohibits.</param>
+/// <param name="Waiver">The caller's waiver statement the finding was resolved under, recorded with it.</param>
+public sealed record RightOfWayFinding(
+    EncounteredObject Object,
+    RelativePosition Position,
+    bool ObjectIsOneTheSectionNames,
+    bool PositionIsOneTheSectionProhibits,
+    WaiverStatement Waiver)
+{
+    /// <summary>
+    /// True when § 107.37(a) does not prohibit this pass, because one of its two enumerations does
+    /// not reach it.
+    /// </summary>
+    /// <remarks>
+    /// It is true in every finding this rule resolves, and that is the shape of the paragraph
+    /// rather than a rule that always permits: where both enumerations do reach the pass, whether
+    /// it is prohibited turns on the exception "unless well clear", and the rule answers with
+    /// <see cref="MapEntries.WellClear"/>'s decline instead of resolving to false.
+    /// </remarks>
+    public bool MayPass => !(ObjectIsOneTheSectionNames && PositionIsOneTheSectionProhibits);
+
+    /// <summary>Where the rule is stated: <c>§ 107.37(a)</c>.</summary>
+    public SourceLocator Authority => MapEntries.RightOfWay.Locator;
+
+    /// <inheritdoc/>
+    public override string ToString() =>
+        $"passing {Position.Designation}, and it is {Object}: § 107.37(a) "
+        + $"{(ObjectIsOneTheSectionNames ? "names it" : "does not name it")} and "
+        + $"{(PositionIsOneTheSectionProhibits ? "prohibits that pass" : "does not prohibit that pass")}, "
+        + $"so § 107.37(a) {(MayPass ? "does not prohibit" : "prohibits")} this pass [{Authority}]; {Waiver}";
+}
+
+/// <summary>
+/// § 107.37(a), "Yielding the right of way": <see cref="MapEntries.RightOfWay"/>, the two
+/// enumerations the paragraph prints, and <see cref="MapEntries.WellClear"/>, the exception it
+/// states no measure for.
 /// </summary>
 /// <remarks>
 /// <para>
-/// The map records this entry's question as unresolved, <c>RequiresInterpretation</c>: part 107
-/// does not define "well clear", and the term carries the whole exception to the prohibition on
-/// passing over, under or ahead. The term occurs exactly once in the corpus, § 107.3 does not
-/// define it and no other section does, and § 107.37(a) states no measure for it in its own
-/// constituent — "must give way" is a coordinate obligation in the definiens, not what the
-/// clearance is measured against.
+/// The class is named for what the paragraph is about rather than for the entry, because a type
+/// named <c>RightOfWay</c> collides with the <c>RightOfWay</c> the generated
+/// <see cref="Handlers"/> partial declares.
 /// </para>
 /// <para>
-/// So the engine declines, whatever the caller supplies. A separation distance, a time to closest
+/// <see cref="MapEntries.WellClear"/>'s question the map records as unresolved,
+/// <c>RequiresInterpretation</c>: part 107 does not define "well clear", and the term carries the
+/// whole exception to the prohibition on passing over, under or ahead. The term occurs exactly
+/// once in the corpus, § 107.3 does not define it and no other section does, and § 107.37(a)
+/// states no measure for it in its own constituent — "must give way" is a coordinate obligation in
+/// the definiens, not what the clearance is measured against.
+/// </para>
+/// <para>
+/// So that entry declines, whatever the caller supplies. A separation distance, a time to closest
 /// approach or any other quantitative well-clear threshold would be this engine answering a
 /// question the published map says is open, however standard the figure. The entry is not
 /// <c>kind: assertion</c> either, so the engine does not demand the answer from the caller and
 /// does not take it when offered: it records what the engine would have to do and cannot.
 /// </para>
 /// <para>
-/// § 107.37(a) is waivable — § 107.205(f) lists it — so the entry is suspended by
+/// <see cref="MapEntries.RightOfWay"/> is the same paragraph's two enumerations, which are
+/// computable, and it reaches the open term only where they both reach the pass. Its note:
+/// "Two enumerations, both computable: three protected kinds — aircraft, airborne vehicles, launch
+/// and reentry vehicles — and three prohibited relative positions — over, under, ahead. An engine
+/// told the object is none of the three, or that the manoeuvre is none of the three, decides the
+/// case without the open term at all … What is not computed is the exception 'unless well clear',
+/// which is well-clear."
+/// </para>
+/// <para>
+/// § 107.37(a) is waivable — § 107.205(f) lists it — so both entries are suspended by
 /// <see cref="MapEntries.WaivableRegulations"/>, and while the caller states a waiver of it is in
 /// force the answer is that gate's <see cref="UnresolvedReason.OutsideCurrentScope"/> rather than
-/// the open term's. The two declines say different things and cite different places, and the
-/// entry is not reached at all while the gate holds.
+/// anything the paragraph says. Each entry runs that gate as its own, naming itself: the two share
+/// the locator § 107.37(a), so where the decline cites cannot tell them apart and only what was
+/// attempted does.
 /// </para>
 /// <para>
 /// § 107.37(b), operating so close to another aircraft as to create a collision hazard, is a
@@ -38,8 +103,64 @@ namespace FaaPart107;
 /// </remarks>
 public static class Yielding
 {
-    /// <summary>The regulation § 107.205(f) lists that states the entry: <c>§ 107.37(a)</c>.</summary>
+    /// <summary>The regulation § 107.205(f) lists that states both entries: <c>§ 107.37(a)</c>.</summary>
     public const string Regulation = "§ 107.37(a)";
+
+    /// <summary>
+    /// <see cref="MapEntries.RightOfWay"/>: whether § 107.37(a) prohibits passing
+    /// <paramref name="position"/> an object the caller states is <paramref name="encountered"/>.
+    /// </summary>
+    /// <remarks>
+    /// Two enumerations, each closed and each the paragraph's own. An object that is none of the
+    /// three kinds § 107.37(a) names is one the paragraph does not reach, whatever the pass; an
+    /// object it does name, passed in none of the three relative positions it prohibits, is a pass
+    /// the prohibition does not reach. Either decides the case, and the exception is not consulted.
+    /// Where both reach the pass, whether it is prohibited turns on "unless well clear", which is
+    /// <see cref="MapEntries.WellClear"/> — reached through <c>dependsOn</c>, and its answer is
+    /// this entry's.
+    /// </remarks>
+    /// <param name="encountered">What was passed, as the caller states it. Never inferred.</param>
+    /// <param name="position">Where the small unmanned aircraft passed it, as the caller states it. Never inferred.</param>
+    /// <param name="waiver">Whether a waiver of § 107.37(a) is in force, as the caller states it.</param>
+    /// <returns>
+    /// The finding; <see cref="UnresolvedReason.OutsideCurrentScope"/> citing § 107.205 while a waiver
+    /// of § 107.37(a) is in force; otherwise, where both enumerations reach the pass,
+    /// <see cref="MapEntries.WellClear"/>'s own <see cref="UnresolvedReason.RequiresInterpretation"/>
+    /// decline, unchanged.
+    /// </returns>
+    /// <exception cref="ArgumentException">The waiver statement is about another regulation.</exception>
+    public static Resolution<RightOfWayFinding> RightOfWay(
+        EncounteredObject encountered,
+        RelativePosition position,
+        WaiverStatement waiver)
+    {
+        ArgumentNullException.ThrowIfNull(encountered);
+        ArgumentNullException.ThrowIfNull(position);
+
+        if (Waivers.Suspension(MapEntries.RightOfWay, Regulation, waiver) is { } suspended)
+        {
+            return Resolution<RightOfWayFinding>.FromUnresolved(suspended);
+        }
+
+        var named = Names(encountered);
+        var prohibited = Prohibits(position);
+        if (!named || !prohibited)
+        {
+            return Resolution<RightOfWayFinding>.FromValue(
+                new RightOfWayFinding(encountered, position, named, prohibited, waiver));
+        }
+
+        // Both enumerations reach the pass, so the case turns on the exception "unless well
+        // clear". That is the map entry this one dependsOn, and this rule asks it rather than
+        // answering it: the decline below is that entry's own, its wording and its locator
+        // unchanged, and this engine supplies no separation distance, no time to closest approach
+        // and no other well-clear measure to decide it with.
+        return WellClear(waiver) is Resolution<object>.Unresolved open
+            ? Resolution<RightOfWayFinding>.FromUnresolved(open.Result)
+            : throw new UnreachableException(
+                $"the map records the question of the entry '{MapEntries.WellClear.Id}' as unresolved, "
+                + "so it resolves to no value");
+    }
 
     /// <summary>
     /// <see cref="MapEntries.WellClear"/>: the entry's decline, always.
@@ -64,4 +185,23 @@ public static class Yielding
             + "or ahead, and § 107.37(a) states no measure for it",
             MapEntries.WellClear.Locator));
     }
+
+    /// <summary>
+    /// The three kinds § 107.37(a) names, and nothing else. <see cref="EncounteredObject.NoneOfThem"/>
+    /// falls through to false, and nothing outside <see cref="EncounteredObject.All"/> exists.
+    /// </summary>
+    private static bool Names(EncounteredObject encountered) =>
+        encountered == EncounteredObject.Aircraft
+        || encountered == EncounteredObject.AirborneVehicle
+        || encountered == EncounteredObject.LaunchOrReentryVehicle;
+
+    /// <summary>
+    /// The three relative positions § 107.37(a) prohibits passing in, and nothing else.
+    /// <see cref="RelativePosition.NoneOfThem"/> falls through to false, and nothing outside
+    /// <see cref="RelativePosition.All"/> exists.
+    /// </summary>
+    private static bool Prohibits(RelativePosition position) =>
+        position == RelativePosition.Over
+        || position == RelativePosition.Under
+        || position == RelativePosition.Ahead;
 }

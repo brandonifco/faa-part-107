@@ -323,8 +323,8 @@ internal static partial class Handlers
     /// <summary>Carriage of hazardous material (<c>hazardous-material</c>): optional.</summary>
     static partial void HazardousMaterial(global::FaaPart107.Requests.HazardousMaterialRequest request, ref Resolution<object>? resolution);
 
-    /// <summary>Yielding right of way to other aircraft (<c>right-of-way</c>): optional.</summary>
-    static partial void RightOfWay(global::FaaPart107.Requests.RightOfWayRequest request, ref Resolution<object>? resolution);
+    /// <summary>Yielding right of way to other aircraft (<c>right-of-way</c>): required, the entry is implemented.</summary>
+    internal static partial Resolution<object> RightOfWay(global::FaaPart107.Requests.RightOfWayRequest request);
 
     /// <summary>The small unmanned aircraft is well clear of the aircraft or vehicle (<c>well-clear</c>): required, the entry is implemented.</summary>
     internal static partial Resolution<object> WellClear(global::FaaPart107.Requests.WellClearRequest request);
@@ -475,7 +475,7 @@ internal static partial class Handlers
                 HazardousMaterial(request as global::FaaPart107.Requests.HazardousMaterialRequest ?? new(assertions), ref resolution);
                 break;
             case "right-of-way":
-                RightOfWay(request as global::FaaPart107.Requests.RightOfWayRequest ?? new(assertions), ref resolution);
+                resolution = RightOfWay(request as global::FaaPart107.Requests.RightOfWayRequest ?? new(assertions));
                 break;
             case "well-clear":
                 resolution = WellClear(request as global::FaaPart107.Requests.WellClearRequest ?? new(assertions));
@@ -578,7 +578,7 @@ internal static partial class Handlers
         "civil-twilight-operation" => Hooked("CivilTwilightOperation", typeof(global::FaaPart107.Requests.CivilTwilightOperationRequest)),
         "civil-twilight-alaska" => Hooked("CivilTwilightAlaska", typeof(global::FaaPart107.Requests.CivilTwilightAlaskaRequest)),
         "hazardous-material" => Hooked("HazardousMaterial", typeof(global::FaaPart107.Requests.HazardousMaterialRequest)),
-        "right-of-way" => Hooked("RightOfWay", typeof(global::FaaPart107.Requests.RightOfWayRequest)),
+        "right-of-way" => true,
         "well-clear" => true,
         "collision-hazard-proximity" => Hooked("CollisionHazardProximity", typeof(global::FaaPart107.Requests.CollisionHazardProximityRequest)),
         "reasonable-protection" => Hooked("ReasonableProtection", typeof(global::FaaPart107.Requests.ReasonableProtectionRequest)),

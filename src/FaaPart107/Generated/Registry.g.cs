@@ -160,7 +160,7 @@ public static class Registry
         new("civil-twilight-operation", EntryStatus.Mapped, CorrespondenceRow.NotBuilt, [MapEntries.CivilTwilightOperation.Locator]),
         new("civil-twilight-alaska", EntryStatus.Declined, CorrespondenceRow.DefinedElsewhere, [MapEntries.CivilTwilightAlaska.Locator]),
         new("hazardous-material", EntryStatus.Declined, CorrespondenceRow.DefinedElsewhere, [MapEntries.HazardousMaterial.Locator]),
-        new("right-of-way", EntryStatus.Mapped, CorrespondenceRow.NotBuilt, [MapEntries.RightOfWay.Locator]),
+        new("right-of-way", EntryStatus.Implemented, CorrespondenceRow.None, [MapEntries.RightOfWay.Locator]),
         new("well-clear", EntryStatus.Implemented, CorrespondenceRow.UnresolvedAmbiguity, [MapEntries.WellClear.Locator]),
         new("collision-hazard-proximity", EntryStatus.Implemented, CorrespondenceRow.Assertion, [MapEntries.CollisionHazardProximity.Locator]) { AssertedBy = ["caller"] },
         new("reasonable-protection", EntryStatus.Mapped, CorrespondenceRow.NotBuilt, [MapEntries.ReasonableProtection.Locator]) { AssertedBy = ["caller"] },
