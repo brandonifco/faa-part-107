@@ -234,8 +234,8 @@ public sealed class CorrespondenceTests
         AssertDeclines("right-of-way", UnresolvedReason.UnsupportedRule, EntryPoints.RightOfWay.Resolve(global::FaaPart107.Requests.RightOfWayRequest.Empty), new SourceLocator("cfr-14-107", "§ 107.37(a)"));
 
     [Fact]
-    public void well_clear__declines_UnsupportedRule_row_2() =>
-        AssertDeclines("well-clear", UnresolvedReason.UnsupportedRule, EntryPoints.WellClear.Resolve(global::FaaPart107.Requests.WellClearRequest.Empty), new SourceLocator("cfr-14-107", "§ 107.37(a)"));
+    public void well_clear__is_implemented_so_a_hand_written_handler_answers_it() =>
+        Assert.True(Registry.HasImplementation("well-clear"), "well-clear is implemented in the overlay and has no [Implements] handler");
 
     [Fact]
     public void collision_hazard_proximity__declines_UnsupportedRule_row_2() =>
