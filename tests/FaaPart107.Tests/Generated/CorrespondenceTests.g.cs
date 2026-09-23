@@ -174,8 +174,8 @@ public sealed class CorrespondenceTests
         AssertDeclines("operating-limitations", UnresolvedReason.UnsupportedRule, EntryPoints.OperatingLimitations.Resolve(global::FaaPart107.Requests.OperatingLimitationsRequest.Empty), new SourceLocator("cfr-14-107", "§ 107.51 introductory text"));
 
     [Fact]
-    public void prominent_objects__declines_UnsupportedRule_row_2() =>
-        AssertDeclines("prominent-objects", UnresolvedReason.UnsupportedRule, EntryPoints.ProminentObjects.Resolve(global::FaaPart107.Requests.ProminentObjectsRequest.Empty), new SourceLocator("cfr-14-107", "§ 107.51(c)"));
+    public void prominent_objects__is_implemented_so_a_hand_written_handler_answers_it() =>
+        Assert.True(Registry.HasImplementation("prominent-objects"), "prominent-objects is implemented in the overlay and has no [Implements] handler");
 
     [Fact]
     public void single_aircraft__is_implemented_so_a_hand_written_handler_answers_it() =>

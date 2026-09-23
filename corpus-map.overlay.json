@@ -361,5 +361,34 @@
         "mutation": "Assertions.Stated answered with the caller's own object (`Resolution<Assertion>.FromValue(assertion)` for `FromValue(new Assertion(entry, assertion.Holds, assertion.AssertedBy))`) — the defect the semantic review of PR #59 recorded a fail for. MapEntry and SourceLocator are publicly constructible, so an assertion carrying this entry's id under `§ 107.51(b)` and a name of the caller's choosing then passed all three checks and § 107.49(d) was answered citing § 107.51(b). This test went red alone with `Assert.Equal() Failure: Values differ` (`Failed!  - Failed:     1, Passed:   105, Skipped:     0, Total:   106`). It went red too with Assertion.Authority citing participant-briefing's locator, and with no hand-written handler at all, the row's bare default answering the caller's object unchecked (`Failed!  - Failed:     4, Passed:   102, Skipped:     0, Total:   106`)."
       }
     ]
+  },
+  "prominent-objects": {
+    "status": "implemented",
+    "implementedIn": {
+      "ruleset": "faa-part-107",
+      "version": 1
+    },
+    "tests": [
+      {
+        "test": "ProminentObjectsEntryPointTests.Resolving_it_declines_RequiresInterpretation_citing_107_51_c",
+        "mutation": "Prominence.Objects cited cloud-clearance's `§ 107.51(d)` (`MapEntries.CloudClearance.Locator` for `MapEntries.ProminentObjects.Locator`), so the decline named the wrong constituent of § 107.51; this test went red. It went red too with the reason wrong (`UnresolvedReason.UnsupportedRule` for `UnresolvedReason.RequiresInterpretation`), and with Prominence.Objects answering the open question instead of declining (`Resolution<object>.FromValue(\"an object is prominent when it can be seen and identified\")` for the `RequiresInterpretation` branch), which is the outcome this entry exists to prevent."
+      },
+      {
+        "test": "ProminentObjectsEntryPointTests.The_decline_is_the_rules_own_and_names_the_term_the_corpus_leaves_undefined",
+        "mutation": "Prominence.Objects declined with the correspondence row's bare wording, naming no reason (`$\"resolve the map entry '{MapEntries.ProminentObjects.Id}'\"` for the message naming \"prominent\" as undefined), so the decline cited where without saying why; this test went red. It went red too with Prominence.Objects answering the open question instead of declining (`Resolution<object>.FromValue(\"an object is prominent when it can be seen and identified\")` for the `RequiresInterpretation` branch), which broke the assertion that the entry point's resolution is exactly `Prominence.Objects(NoWaiver)`."
+      },
+      {
+        "test": "ProminentObjectsEntryPointTests.While_a_waiver_of_107_51_is_stated_in_force_it_declines_OutsideCurrentScope_citing_107_205_and_records_the_statement",
+        "mutation": "Prominence.Objects handed the gate a statement that no waiver is in force (`waiver with { InForce = false }` for `waiver` in the call to Waivers.Suspension), so a stated waiver of § 107.51 was not honoured and the entry declined `RequiresInterpretation` citing § 107.51(c) instead of `OutsideCurrentScope` citing § 107.205; this test went red."
+      },
+      {
+        "test": "ProminentObjectsEntryPointTests.Without_a_waiver_statement_it_refuses_rather_than_infer_one",
+        "mutation": "Handlers.ProminentObjects defaulted a missing statement to none held (`request.Waiver ?? WaiverStatement.NoneHeld(Prominence.Regulation, \"the engine\")` for `Demand(request.Waiver, request.EntryId, nameof(request.Waiver))`); this test went red."
+      },
+      {
+        "test": "ProminentObjectsEntryPointTests.A_waiver_statement_about_another_regulation_is_refused",
+        "mutation": "Prominence.Objects compared the statement's regulation with itself (`waiver.Regulation` for `Regulation` in the call to Waivers.Suspension), so a waiver of § 107.41 suspended § 107.51(c); this test went red."
+      }
+    ]
   }
 }
