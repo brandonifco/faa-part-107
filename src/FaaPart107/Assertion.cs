@@ -10,10 +10,19 @@ namespace FaaPart107;
 /// <para>
 /// An assertion entry is one the corpus states as a fact somebody outside this engine determines
 /// and reports. The engine's whole part in it is to demand the value, check who it is attributed
-/// to against the map's <c>assertedBy</c>, and answer with what was asserted, unchanged. It does
-/// not infer, compute, default or estimate the fact in either direction: an engine that decided
+/// to against the map's <c>assertedBy</c>, and answer with the fact unchanged. It does not infer,
+/// compute, default or estimate the fact in either direction: an engine that decided
 /// <see cref="MapEntries.SufficientAvailablePower"/> from a battery reading would be answering a
 /// question § 107.49 gives to the remote pilot in command.
+/// </para>
+/// <para>
+/// The fact is the caller's and the entry is the map's, and the two do not mix. A caller builds one
+/// of these to say which entry it asserts, whether the proposition holds, and who says so; an entry
+/// answers with one built on <see cref="MapEntries"/>' own <see cref="MapEntry"/>, carrying the
+/// caller's <see cref="Holds"/> and <see cref="AssertedBy"/> and the map's name and locator. So
+/// <see cref="Authority"/> on a resolved assertion is the map's citation always, and never one a
+/// caller chose — this type and <c>SourceLocator</c> are both publicly constructible, and a caller
+/// who could supply the citation could have § 107.49(d) answered under some other paragraph.
 /// </para>
 /// <para>
 /// This is the same debt <see cref="WaiverStatement"/> records for the waiver gate — demand it,
@@ -28,7 +37,8 @@ namespace FaaPart107;
 /// </para>
 /// </remarks>
 /// <param name="Entry">
-/// The map entry the assertion is about. An entry refuses an assertion about another entry.
+/// The map entry the assertion is about. An entry refuses an assertion about another entry, by id;
+/// on the way out it is always the map's own <see cref="MapEntry"/>, whatever the caller passed in.
 /// </param>
 /// <param name="Holds">True when the entry's proposition is so, as the asserter reports it.</param>
 /// <param name="AssertedBy">

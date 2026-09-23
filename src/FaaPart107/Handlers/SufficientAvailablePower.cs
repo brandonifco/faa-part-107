@@ -6,7 +6,7 @@ namespace FaaPart107
     {
         /// <summary>
         /// <c>sufficient-available-power</c>: <see cref="Assertions.Stated"/>, the remote pilot in
-        /// command's assertion, answered unchanged.
+        /// command's assertion, answered unchanged on the map's own entry.
         /// </summary>
         /// <remarks>
         /// § 107.49(d) tells the remote pilot in command to "ensure that there is enough available
@@ -18,7 +18,10 @@ namespace FaaPart107
         /// through <c>SufficientAvailablePowerRequest.Asserting</c> or
         /// <see cref="RuleRequest.Assert"/>, and asserting nothing throws
         /// <see cref="AssertionRequiredException"/> rather than declining: the corpus left the
-        /// engine nothing to interpret, so there is nothing here to be unresolved about.
+        /// engine nothing to interpret, so there is nothing here to be unresolved about. What the
+        /// caller does not get to supply is the citation: the answer is built on
+        /// <see cref="MapEntries.SufficientAvailablePower"/>, so it cites § 107.49(d) whatever
+        /// entry the caller's own <see cref="Assertion"/> was carrying.
         /// </remarks>
         static partial void SufficientAvailablePower(Requests.SufficientAvailablePowerRequest request, ref Resolution<object>? resolution) =>
             resolution = Answer(Assertions.Stated(MapEntries.SufficientAvailablePower, request.Assertions));

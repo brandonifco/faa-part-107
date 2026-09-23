@@ -1,4 +1,5 @@
 using FaaPart107.Requests;
+using RulesKernel.Provenance;
 using RulesKernel.Resolution;
 using Xunit;
 
@@ -10,6 +11,8 @@ namespace FaaPart107.Tests;
 /// <c>kind: assertion</c>, asserted by the remote pilot in command, so these pin the two halves of
 /// correspondence row 8: what the caller asserts is what the engine answers, unchanged and in
 /// either direction; and asserting nothing is a demand on the caller, not an unresolved result.
+/// They pin the division of ownership too — the fact is the caller's, the citation is the map's —
+/// by value, never by object identity, which is not something this engine's behaviour may turn on.
 /// </summary>
 public class SufficientAvailablePowerEntryPointTests
 {
@@ -28,9 +31,9 @@ public class SufficientAvailablePowerEntryPointTests
         var resolved = Assert.IsType<Resolution<object>.Resolved>(Resolve(asserted));
 
         var assertion = Assert.IsType<Assertion>(resolved.Value);
-        Assert.Same(asserted, assertion);
         Assert.True(assertion.Holds);
         Assert.Equal(RemotePilotInCommand, assertion.AssertedBy);
+        Assert.Equal(asserted, assertion);
         Assert.Equal("cfr-14-107", assertion.Authority.SourceId);
         Assert.Equal("§ 107.49(d)", assertion.Authority.Citation);
         Assert.Equal(EntryPoints.SufficientAvailablePower.Registered.Locator, assertion.Authority);
@@ -44,8 +47,9 @@ public class SufficientAvailablePowerEntryPointTests
         var resolved = Assert.IsType<Resolution<object>.Resolved>(Resolve(asserted));
 
         var assertion = Assert.IsType<Assertion>(resolved.Value);
-        Assert.Same(asserted, assertion);
         Assert.False(assertion.Holds);
+        Assert.Equal(RemotePilotInCommand, assertion.AssertedBy);
+        Assert.Equal(asserted, assertion);
         Assert.Contains(RemotePilotInCommand, assertion.ToString(), StringComparison.Ordinal);
     }
 
@@ -71,7 +75,11 @@ public class SufficientAvailablePowerEntryPointTests
         var resolved = Assert.IsType<Resolution<object>.Resolved>(
             Registry.Resolve(Entry.Id, RuleRequest.Empty.Assert(Entry.Id, asserted)));
 
-        Assert.Same(asserted, resolved.Value);
+        var assertion = Assert.IsType<Assertion>(resolved.Value);
+        Assert.True(assertion.Holds);
+        Assert.Equal(RemotePilotInCommand, assertion.AssertedBy);
+        Assert.Equal(Entry.Locator, assertion.Authority);
+        Assert.Equal(asserted, assertion);
         Assert.Throws<AssertionRequiredException>(() => Registry.Resolve(Entry.Id, RuleRequest.Empty));
     }
 
@@ -103,5 +111,31 @@ public class SufficientAvailablePowerEntryPointTests
 
         Assert.Contains(nameof(Assertion), error.Message, StringComparison.Ordinal);
         Assert.Contains(Entry.Id, error.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void The_citation_is_the_maps_and_a_caller_supplied_entry_does_not_become_it()
+    {
+        // MapEntry and SourceLocator are publicly constructible, so a caller can hand in an
+        // assertion carrying this entry's id under somebody else's paragraph and somebody else's
+        // name. The fact it reports is the caller's and is taken as given; the citation it is
+        // answered under is the map's, and is not on offer.
+        var forged = new MapEntry(
+            Entry.Id,
+            "There is plenty of battery, trust me",
+            new SourceLocator("cfr-14-107", "§ 107.51(b)"));
+
+        var resolved = Assert.IsType<Resolution<object>.Resolved>(
+            Resolve(new Assertion(forged, Holds: true, RemotePilotInCommand)));
+
+        var assertion = Assert.IsType<Assertion>(resolved.Value);
+        Assert.Equal(MapEntries.SufficientAvailablePower.Locator, assertion.Authority);
+        Assert.Equal("§ 107.49(d)", assertion.Authority.Citation);
+        Assert.Equal(MapEntries.SufficientAvailablePower.Name, assertion.Entry.Name);
+        Assert.DoesNotContain("trust me", assertion.ToString(), StringComparison.Ordinal);
+
+        // The fact itself still came from the caller, untouched.
+        Assert.True(assertion.Holds);
+        Assert.Equal(RemotePilotInCommand, assertion.AssertedBy);
     }
 }
