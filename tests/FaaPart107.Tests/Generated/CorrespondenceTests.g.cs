@@ -310,8 +310,20 @@ public sealed class CorrespondenceTests
         Assert.True(Registry.HasImplementation("effective-communication"), "effective-communication is implemented in the overlay and has no [Implements] handler");
 
     [Fact]
-    public void observer_coordination__declines_UnsupportedRule_row_2() =>
-        AssertDeclines("observer-coordination", UnresolvedReason.UnsupportedRule, EntryPoints.ObserverCoordination.Resolve(global::FaaPart107.Requests.ObserverCoordinationRequest.Empty), new SourceLocator("cfr-14-107", "§ 107.33(c)"));
+    public void observer_coordination__is_implemented_and_answers_or_demands_the_assertion()
+    {
+        if (Registry.HasImplementation("observer-coordination"))
+        {
+            return;
+        }
+
+        var value = new object();
+        var resolved = Registry.Resolve("observer-coordination", RuleRequest.Empty.Assert("observer-coordination", value)).Match<object?>(v => v, _ => null);
+        Assert.Same(value, resolved);
+        var typed = EntryPoints.ObserverCoordination.Resolve(global::FaaPart107.Requests.ObserverCoordinationRequest.Asserting(value)).Match<object?>(v => v, _ => null);
+        Assert.Same(value, typed);
+        Assert.Throws<AssertionRequiredException>(() => Registry.Resolve("observer-coordination", RuleRequest.Empty));
+    }
 
     [Fact]
     public void preflight_actions__declines_UnsupportedRule_row_2() =>
