@@ -224,6 +224,24 @@ public class OperatingLimitationsEntryPointTests
         Assert.Contains("weather-minimums-met", two.Attempted, StringComparison.Ordinal);
         Assert.Equal(EntryPoints.SpeedWithinLimit.Registered.Locator, two.Locator);
         Assert.Equal("§ 107.51(a)", two.Locator.Citation);
+
+        // And each of the two is quoted with the account it recorded itself, not the blocking one's
+        // twice over: a composite that attributed one constituent's words to another would be
+        // telling a caller something no entry said (#103).
+        var speed = Declined(EntryPoints.SpeedWithinLimit.Resolve(new SpeedWithinLimitRequest
+        {
+            Groundspeed = Groundspeed.InMilesPerHour(100.05m),
+            Waiver = NoWaiver,
+        }));
+        var weather = Declined(EntryPoints.WeatherMinimumsMet.Resolve(new WeatherMinimumsMetRequest
+        {
+            FlightVisibilityStatuteMiles = 10m,
+            Cloud = CloudStatement.Measured(1000m, 5000m, Caller),
+            Waiver = NoWaiver,
+        }));
+
+        Assert.Contains(speed.Attempted, two.Attempted, StringComparison.Ordinal);
+        Assert.Contains(weather.Attempted, two.Attempted, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -244,11 +262,19 @@ public class OperatingLimitationsEntryPointTests
         Assert.Contains("operating-limitations", mine.Attempted, StringComparison.Ordinal);
         Assert.DoesNotContain("operating-limitations", constituent.Attempted, StringComparison.Ordinal);
 
-        // Nor is it the question three levels down. weather-minimums-met declines on
-        // prominent-objects' § 107.51(c); this entry declines on weather-minimums-met's own
-        // § 107.51(c)-(d), which is the entry it asked.
+        // And what the constituent recorded is carried, whole and word for word, inside this
+        // entry's own account of what it attempted: the openness originates in prominent-objects,
+        // three levels down, and a caller who asked about § 107.51's introductory text can see that
+        // without holding the map (docs/decisions/0006, #103). Containing the constituent's account
+        // is not being the constituent's result — the two assertions above still hold.
         Assert.Contains("prominent-objects", constituent.Attempted, StringComparison.Ordinal);
-        Assert.DoesNotContain("prominent-objects", mine.Attempted, StringComparison.Ordinal);
+        Assert.Contains("prominent-objects", mine.Attempted, StringComparison.Ordinal);
+        Assert.Contains(constituent.Attempted, mine.Attempted, StringComparison.Ordinal);
+        Assert.Contains("what 'weather-minimums-met' recorded: ", mine.Attempted, StringComparison.Ordinal);
+
+        // The quotation is one hop and the citation does not follow it down. weather-minimums-met
+        // declines on prominent-objects' § 107.51(c); this entry declines on weather-minimums-met's
+        // own § 107.51(c)-(d), which is the entry its dependsOn names and the entry it asked.
         Assert.NotEqual(constituent.Locator, mine.Locator);
         Assert.Equal(EntryPoints.ProminentObjects.Registered.Locator, constituent.Locator);
         Assert.Equal(EntryPoints.WeatherMinimumsMet.Registered.Locator, mine.Locator);

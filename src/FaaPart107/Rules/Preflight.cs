@@ -623,9 +623,11 @@ public static class Preflight
     /// <summary>
     /// This entry's own decline for an operation no obligation settled: it names the entry the
     /// caller asked about and every obligation that went unanswered, with that obligation's own
-    /// reason, and it carries the first such obligation's reason and cites that entry's locator.
+    /// reason and the account the entry that could not answer it recorded, and it carries the first
+    /// such obligation's reason and cites that entry's locator.
     /// </summary>
     /// <remarks>
+    /// <para>
     /// It is not a constituent's decline handed back. The reason and the locator are the blocking
     /// obligation's, because the question that blocks the answer is that entry's question and a
     /// citation should lead to where that question is; what was attempted is this entry's, so that a
@@ -634,6 +636,17 @@ public static class Preflight
     /// <see cref="MapEntries.SubpartDCategories"/>' <see cref="UnresolvedReason.OutsideCurrentScope"/>
     /// stays visible as that entry's rather than being flattened into the one reason an
     /// <see cref="UnresolvedResult"/> can carry.
+    /// </para>
+    /// <para>
+    /// <b>Each unanswered obligation's own account is quoted here</b>, after this entry has named
+    /// itself and named that entry — <c>docs/decisions/0006</c>'s shape, and one hop of it exactly,
+    /// for the reasons <see cref="Compliance"/>'s own decline records at length: a composite quotes
+    /// the account of the entries its <c>dependsOn</c> names and never reads past them, and depth
+    /// arrives only because each of those entries did the same when it built its account. Without it
+    /// this decline named <c>control-links-working</c> and § 107.49(c) and dropped what that entry
+    /// actually said — that part 107 does not define "working properly" — which is the openness a
+    /// caller asking about § 107.49 most needs to see.
+    /// </para>
     /// </remarks>
     private static UnresolvedResult Undetermined(
         SubpartDOperation operation,
@@ -644,7 +657,8 @@ public static class Preflight
             .Where(obligation => obligation.Done is null)
             .Select(obligation =>
                 $"'{obligation.Entry.Id}' [{obligation.Entry.Locator.Citation}] did not answer "
-                + $"{obligation.Citation} ({obligation.Reason})")
+                + $"{obligation.Citation} ({obligation.Reason}); what '{obligation.Entry.Id}' recorded: "
+                + obligation.Account)
             .ToList();
 
         return new UnresolvedResult(

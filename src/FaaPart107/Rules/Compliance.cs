@@ -256,10 +256,11 @@ public static class Compliance
 
     /// <summary>
     /// This entry's own decline for an operation no constituent settled: it names the entry the
-    /// caller asked about and every constituent that did not resolve, and it carries the first of
-    /// those constituents' reason and cites that constituent's locator.
+    /// caller asked about and every constituent that did not resolve, quotes what each of those
+    /// constituents recorded, and it carries the first of them's reason and cites its locator.
     /// </summary>
     /// <remarks>
+    /// <para>
     /// It is not the constituent's decline handed back. The reason and the locator are the
     /// constituent's, because the question that blocks the answer is the constituent's question and
     /// a citation should lead to where that question is; what was attempted is this entry's, so
@@ -269,6 +270,34 @@ public static class Compliance
     /// what carries the distinction: the citation on this decline is deliberately the
     /// constituent's, so what tells the two apart is <see cref="UnresolvedResult.Attempted"/>,
     /// which names both entries (<c>docs/decisions/0001</c> records the same blind spot for speed).
+    /// </para>
+    /// <para>
+    /// <b>Each undetermined constituent's own account is quoted here</b>, after this entry has named
+    /// itself and named that constituent — the shape <c>docs/decisions/0006</c> settles, and the
+    /// shape <see cref="Weather"/> and <see cref="Yielding"/> already give their own constituents.
+    /// <see cref="LimitationOutcome.Account"/> is that entry's words and is not restated in this
+    /// entry's. Containing the constituent's account is not being the constituent's result: a caller
+    /// who asks about § 107.51's introductory text is told which entry it asked, and can still see
+    /// where the openness originates.
+    /// </para>
+    /// <para>
+    /// <b>How deep the quoting goes: exactly one hop, taken by every composite, and transitive only
+    /// by composition.</b> This entry quotes the account of the constituents its own
+    /// <c>dependsOn</c> names and nothing below them. Depth arrives anyway, because the constituent
+    /// built its account the same way: <c>weather-minimums-met</c>'s own <c>Attempted</c> already
+    /// quotes what <c>prominent-objects</c> recorded, so quoting it once carries § 107.51(c)'s
+    /// undefined term up to a caller at depth four without this entry ever reading
+    /// <c>prominent-objects</c>. The alternative — walking the graph from here and quoting
+    /// transitively — is refused for the reason <c>docs/decisions/0006</c> refuses the deeper
+    /// citation: <c>operating-limitations.dependsOn</c> does not name <c>prominent-objects</c>, so
+    /// reaching past <c>weather-minimums-met</c> would have this entry assert a relationship the map
+    /// does not give it, and it would go stale the moment its constituent's own dependencies
+    /// changed. One hop is therefore both the least and the most this entry may quote: it is the
+    /// only hop the map authorises. What bounds the length is the map — one quotation per
+    /// constituent that did not resolve, and each of those bounded in turn by its own
+    /// <c>dependsOn</c> — and not a cutoff chosen here, which is why no truncation is applied: a
+    /// truncation would drop the depth this entry exists to carry, and would drop it silently.
+    /// </para>
     /// </remarks>
     private static UnresolvedResult Undetermined(
         BoundPerson person,
@@ -277,7 +306,9 @@ public static class Compliance
     {
         var undetermined = limitations
             .Where(limitation => limitation.Met is null)
-            .Select(limitation => $"'{limitation.Entry.Id}' [{limitation.Entry.Locator.Citation}]")
+            .Select(limitation =>
+                $"'{limitation.Entry.Id}' [{limitation.Entry.Locator.Citation}] did not resolve whether the "
+                + $"limitation it states is met; what '{limitation.Entry.Id}' recorded: {limitation.Account}")
             .ToList();
 
         return new UnresolvedResult(
@@ -285,7 +316,7 @@ public static class Compliance
             $"decide whether the map entry '{MapEntries.OperatingLimitations.Id}' is complied with by {person}: "
             + "§ 107.51's introductory text requires all of the limitations it conjoins, no limitation this engine "
             + $"resolved is broken, and the map {(undetermined.Count == 1 ? "entry" : "entries")} "
-            + $"{string.Join(" and ", undetermined)} did not resolve whether the limitation it states is met",
+            + $"{string.Join(" and ", undetermined)}",
             blocking.Entry.Locator);
     }
 }
