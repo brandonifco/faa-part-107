@@ -35,7 +35,12 @@ namespace FaaPart107;
 /// <para>
 /// <see cref="Availability"/> is null exactly where <see cref="ParagraphApplies"/> is false: the two
 /// are set together by the factories below and never apart, the invariant
-/// <see cref="ObligationOutcome"/> keeps between its verdict and its reason.
+/// <see cref="ObligationOutcome"/> keeps between its verdict and its reason. The <b>constructor</b>
+/// holds it, and not the factories' discipline: both factories take the condition as a free
+/// parameter, so either could be handed the half that contradicts it, and a caller building one of
+/// these for a fixture or a replay would get a value this paragraph cannot produce (<c>#101</c>).
+/// That is the check <see cref="CivilTwilightOperationFinding.Lighting"/> already makes for
+/// § 107.29(b), on the same shape.
 /// </para>
 /// </remarks>
 public sealed record SufficientAvailablePowerFinding : IConditionalAssertion
@@ -43,7 +48,18 @@ public sealed record SufficientAvailablePowerFinding : IConditionalAssertion
     private SufficientAvailablePowerFinding(AircraftPower power, Assertion? availability)
     {
         Power = power ?? throw new ArgumentNullException(nameof(power));
-        Availability = availability;
+
+        // The condition and the assertion are one fact in two members. An aircraft the caller states
+        // is not powered was asked for nothing, and a powered one was asked and answered; either
+        // half without the other is a finding § 107.49(d) does not state, whichever factory built
+        // it. The check is here rather than in the factories because this is the one way through.
+        Availability = ParagraphApplies == (availability is not null)
+            ? availability
+            : throw new ArgumentException(
+                "§ 107.49(d) states its obligation under one condition, so a finding carries the "
+                + "assertion exactly where the small unmanned aircraft is powered: Asserted is for a "
+                + "powered aircraft, and StatesNoObligation for one the paragraph says nothing about",
+                nameof(power));
     }
 
     /// <summary>
@@ -95,6 +111,11 @@ public sealed record SufficientAvailablePowerFinding : IConditionalAssertion
     /// <param name="availability">What was asserted, as <see cref="Assertions.Stated"/> answered it.</param>
     /// <returns>The finding, carrying the assertion.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="availability"/> is null.</exception>
+    /// <exception cref="ArgumentException">
+    /// <paramref name="power"/> is not <see cref="AircraftPower.Powered"/>. § 107.49(d) demands
+    /// nothing of an aircraft the caller states is not powered, so there is no assertion for a
+    /// finding about one to carry; that case is <see cref="StatesNoObligation"/>.
+    /// </exception>
     public static SufficientAvailablePowerFinding Asserted(AircraftPower power, Assertion availability) =>
         new(power, availability ?? throw new ArgumentNullException(nameof(availability)));
 
@@ -104,6 +125,11 @@ public sealed record SufficientAvailablePowerFinding : IConditionalAssertion
     /// </summary>
     /// <param name="power">The condition, as the caller stated it.</param>
     /// <returns>The finding, carrying no assertion.</returns>
+    /// <exception cref="ArgumentException">
+    /// <paramref name="power"/> is <see cref="AircraftPower.Powered"/>. The paragraph does state its
+    /// obligation about such an operation, so a finding about one carries what was asserted for it;
+    /// that case is <see cref="Asserted"/>.
+    /// </exception>
     public static SufficientAvailablePowerFinding StatesNoObligation(AircraftPower power) => new(power, null);
 
     /// <inheritdoc/>

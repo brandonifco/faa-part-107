@@ -61,7 +61,11 @@ public sealed record AltitudeLimit(WaiverStatement Waiver)
 /// higher than 400 feet above that structure's immediate uppermost limit. False when the statement
 /// names no structure, because there is then no uppermost limit to measure against.
 /// </param>
-/// <param name="Structure">What the caller stated about the structure, recorded with the outcome.</param>
+/// <param name="Structure">
+/// What the caller stated about the structure, recorded with the outcome. A statement that names
+/// none leaves both parts of the exception unmet, and the <b>constructor</b> holds that rather than
+/// the rule's discipline holding it (<c>#101</c>).
+/// </param>
 /// <param name="Limit">The limit it was compared with, and the waiver statement it was resolved under.</param>
 public sealed record AltitudeFinding(
     decimal AltitudeAboveGroundLevelFeet,
@@ -71,6 +75,31 @@ public sealed record AltitudeFinding(
     StructureStatement Structure,
     AltitudeLimit Limit)
 {
+    /// <summary>
+    /// What the caller stated about the structure, checked against what this finding reports of
+    /// § 107.51(b)'s exception.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Both parts of the exception are claimed <em>against a structure</em>: (b)(1) is a radius of
+    /// one, and (b)(2) is an allowance above one's immediate uppermost limit. A statement that names
+    /// no structure measured neither, so neither part can be met, and
+    /// <see cref="WithinStructureRadius"/> or <see cref="WithinStructureAllowance"/> true beside it
+    /// would lift the ceiling on a structure nobody stated. False stands: it is not a comparison
+    /// this finding could not make, it is the exception simply not satisfied, which is what
+    /// <see cref="StructureStatement.NoneWithinRadius"/> says.
+    /// </para>
+    /// <para>
+    /// This is the check <see cref="WeatherMinimumsFinding.Cloud"/> makes on the same shape one
+    /// paragraph down, and the two differ only where § 107.51(b) and § 107.51(d) differ: there,
+    /// neither of the two members has an honest value with no cloud stated — false would read the
+    /// absence as a measurement, and true would decide a question the map holds open — so the
+    /// finding itself is refused, rather than one value of each member.
+    /// </para>
+    /// </remarks>
+    public StructureStatement Structure { get; } =
+        CheckStructure(Structure, WithinStructureRadius, WithinStructureAllowance, nameof(Structure));
+
     /// <summary>
     /// Whether the altitude is within the limit: the ceiling is met, or both parts of the exception are.
     /// </summary>
@@ -87,6 +116,23 @@ public sealed record AltitudeFinding(
         string.Create(
             CultureInfo.InvariantCulture,
             $"{AltitudeAboveGroundLevelFeet} feet above ground level is {(WithinLimit ? "within" : "beyond")} {Limit.AboveGroundLevelFeet} feet above ground level [{Authority}]; {Structure}; {Waiver}");
+
+    private static StructureStatement CheckStructure(
+        StructureStatement structure,
+        bool withinStructureRadius,
+        bool withinStructureAllowance,
+        string name)
+    {
+        ArgumentNullException.ThrowIfNull(structure, name);
+        return structure.NamesAStructure || !(withinStructureRadius || withinStructureAllowance)
+            ? structure
+            : throw new ArgumentException(
+                "§ 107.51(b)'s exception is claimed against a structure, so a statement that names "
+                + "none meets neither of its two parts: there is no structure the aircraft is flown "
+                + "within a 400-foot radius of, and no immediate uppermost limit to measure 400 feet "
+                + "above",
+                name);
+    }
 }
 
 /// <summary>§ 107.51(b): the altitude limit, and whether an altitude is within it.</summary>

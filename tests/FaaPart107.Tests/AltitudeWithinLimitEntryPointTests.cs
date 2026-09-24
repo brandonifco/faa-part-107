@@ -231,4 +231,63 @@ public class AltitudeWithinLimitEntryPointTests
 
         Assert.Equal(nameof(AltitudeWithinLimitRequest.AltitudeAboveGroundLevelFeet), error.ParamName);
     }
+
+    /// <summary>
+    /// And the finding will not report either part of § 107.51(b)'s exception met where the
+    /// statement names no structure, so that is a fact about the type and not only about the one
+    /// rule that builds it (<c>#101</c>). Both parts are claimed against a structure — (b)(1) a
+    /// radius of one, (b)(2) an allowance above one's immediate uppermost limit — so a statement
+    /// naming none leaves nothing for either to be met by, and either true beside it would lift the
+    /// ceiling on a structure nobody stated. False stands: that is the exception not satisfied,
+    /// which is what <see cref="StructureStatement.NoneWithinRadius"/> says, so the finding is
+    /// refused only where a part is reported met.
+    /// </summary>
+    [Fact]
+    public void With_no_structure_stated_neither_part_of_the_exception_may_be_reported_met()
+    {
+        var limit = Assert.IsType<AltitudeLimit>(Assert.IsType<Resolution<object>.Resolved>(
+            EntryPoints.AltitudeLimit.Resolve(new AltitudeLimitRequest { Waiver = NoWaiver })).Value);
+
+        var radius = Assert.Throws<ArgumentException>(() => new AltitudeFinding(
+            900m,
+            WithinGroundLevelCeiling: false,
+            WithinStructureRadius: true,
+            WithinStructureAllowance: false,
+            NoStructure,
+            limit));
+        var allowance = Assert.Throws<ArgumentException>(() => new AltitudeFinding(
+            900m,
+            WithinGroundLevelCeiling: false,
+            WithinStructureRadius: false,
+            WithinStructureAllowance: true,
+            NoStructure,
+            limit));
+        var both = Assert.Throws<ArgumentException>(() => new AltitudeFinding(
+            900m,
+            WithinGroundLevelCeiling: false,
+            WithinStructureRadius: true,
+            WithinStructureAllowance: true,
+            NoStructure,
+            limit));
+
+        foreach (var refused in new[] { radius, allowance, both })
+        {
+            Assert.Equal("Structure", refused.ParamName);
+            Assert.Contains("claimed against a structure", refused.Message, StringComparison.Ordinal);
+        }
+
+        // Both false is the exception not satisfied, which is an answer, so the finding stands --
+        // and it is the finding the rule already returns for an altitude above the ceiling with no
+        // structure stated.
+        var unmet = new AltitudeFinding(
+            900m,
+            WithinGroundLevelCeiling: false,
+            WithinStructureRadius: false,
+            WithinStructureAllowance: false,
+            NoStructure,
+            limit);
+
+        Assert.False(unmet.WithinLimit);
+        Assert.Equal(Finding(Resolve(900m, NoStructure, NoWaiver)), unmet);
+    }
 }

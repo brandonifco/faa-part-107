@@ -34,7 +34,8 @@ namespace FaaPart107;
 /// statement that names one: where the caller states that the aircraft is not operated near a
 /// cloud there is no measured distance for either minimum to be compared with, and
 /// <see cref="Weather.MinimumsMet"/> declines rather than making a finding — so neither minimum is
-/// ever reported unmet for want of a cloud to measure from.
+/// ever reported unmet for want of a cloud to measure from. The <b>constructor</b> holds that, and
+/// not the rule's discipline (<c>#101</c>).
 /// </param>
 /// <param name="Minimum">§ 107.51(c)'s figure, as <c>visibility-minimum</c> states it.</param>
 /// <param name="Clearance">§ 107.51(d)'s two figures, as <c>cloud-clearance</c> states them, and the waiver statement this was resolved under.</param>
@@ -46,6 +47,30 @@ public sealed record WeatherMinimumsFinding(
     VisibilityMinimum Minimum,
     CloudClearance Clearance)
 {
+    /// <summary>
+    /// What the caller stated about the cloud, checked to name one.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// § 107.51(d)'s two minimums are distances <em>from a cloud</em>, and
+    /// <see cref="BelowCloudMinimumMet"/> and <see cref="HorizontallyFromCloudMinimumMet"/> report
+    /// each of them as met or not met. A statement that the aircraft is not operated near a cloud
+    /// measured neither distance, so there is no value of either that this finding could honestly
+    /// carry: false says the minimum is broken, which is the stated zero this engine refuses to read
+    /// an absence as, and true says § 107.51(d) is met with no cloud, which is the question the map
+    /// does not settle and <see cref="Weather.MinimumsMet"/> declines rather than deciding. So the
+    /// whole finding is refused, which is the same answer the rule gives, made unavoidable
+    /// (<c>#101</c>).
+    /// </para>
+    /// <para>
+    /// This is the check <see cref="AltitudeFinding.Structure"/> makes on the same shape one
+    /// paragraph up, and the two differ only where § 107.51(b) and § 107.51(d) differ: there, a
+    /// statement naming no structure leaves the exception unsatisfied, which is an answer, so the
+    /// finding stands with both of its structure members false.
+    /// </para>
+    /// </remarks>
+    public CloudStatement Cloud { get; } = CheckNamesACloud(Cloud, nameof(Cloud));
+
     /// <summary>
     /// Whether § 107.51(c) and § 107.51(d) are both met: false, in every finding this engine can
     /// resolve. A finding is constructed only where neither cloud minimum is met, which makes the
@@ -68,6 +93,19 @@ public sealed record WeatherMinimumsFinding(
             $"the minimums are not met: {Cloud.FeetBelowCloud} feet below the cloud is less than {Clearance.BelowCloudFeet} and "
             + $"{Cloud.FeetHorizontallyFromCloud} feet horizontally from it is less than {Clearance.HorizontallyFromCloudFeet} "
             + $"[{Authority}]; {Cloud}; {Waiver}");
+
+    private static CloudStatement CheckNamesACloud(CloudStatement cloud, string name)
+    {
+        ArgumentNullException.ThrowIfNull(cloud, name);
+        return cloud.NamesACloud
+            ? cloud
+            : throw new ArgumentException(
+                "§ 107.51(d)'s two minimums are distances from a cloud, so a finding is made only "
+                + "from a statement that names one: a statement that the small unmanned aircraft is "
+                + "not operated near a cloud measured neither distance, and this engine neither "
+                + "reads that as both minimums broken nor decides that § 107.51(d) is met",
+                name);
+    }
 }
 
 /// <summary>
