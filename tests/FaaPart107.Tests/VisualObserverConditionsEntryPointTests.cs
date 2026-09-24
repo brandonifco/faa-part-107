@@ -7,7 +7,8 @@ namespace FaaPart107.Tests;
 
 /// <summary>
 /// <c>visual-observer-conditions</c>, § 107.33, resolved through
-/// <see cref="EntryPoints.VisualObserverConditions"/> only.
+/// <see cref="EntryPoints.VisualObserverConditions"/>, and for the last through
+/// <see cref="FaaPart107.Evaluation.OperationEvaluator"/>.
 /// </summary>
 /// <remarks>
 /// <para>

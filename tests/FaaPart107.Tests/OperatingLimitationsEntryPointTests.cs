@@ -7,7 +7,8 @@ namespace FaaPart107.Tests;
 
 /// <summary>
 /// <c>operating-limitations</c>, § 107.51's introductory text, resolved through
-/// <see cref="EntryPoints.OperatingLimitations"/> only: each of the limitations it conjoins
+/// <see cref="EntryPoints.OperatingLimitations"/>, and for the last through the evaluator: each
+/// of the limitations it conjoins
 /// failing on its own, every limitation the engine resolves met, each of the two people the
 /// introductory text names, and the waiver gate in both directions (the entry's note, and
 /// rules-factory decision 0021).

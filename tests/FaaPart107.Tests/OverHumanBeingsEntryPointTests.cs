@@ -8,7 +8,8 @@ namespace FaaPart107.Tests;
 
 /// <summary>
 /// <c>over-human-beings</c>, § 107.39, resolved through <see cref="EntryPoints.OverHumanBeings"/>
-/// only: the section's opening, which is this entry's alone, and each of the three cases its
+/// and, for the last, through the evaluator: the section's opening, which is this entry's alone,
+/// and each of the three cases its
 /// "unless—" excepts, answered by the entry the map gives it.
 /// </summary>
 /// <remarks>

@@ -32,7 +32,8 @@ public class DeterminismTests
     /// The records whose equality is the compiler's <em>and</em> which hold a collection field that
     /// compares by the identity of the object behind it. Every one is a defect of the same shape
     /// (<c>AGENTS.md</c> §8), and every one is already owned by an issue; what this list is for is
-    /// that a <em>new</em> one cannot appear unremarked.
+    /// that a new one of the kinds <see cref="ComparesByIdentity"/> recognises does not appear
+    /// unremarked.
     /// </summary>
     /// <remarks>
     /// In name order, so that a record joining it lands where a reader would look for it.
@@ -78,19 +79,53 @@ public class DeterminismTests
     /// property, so the census is over fields — the backing field of an <c>init</c> property
     /// included.
     /// </summary>
+    /// <remarks>
+    /// <c>DeclaredOnly</c>, so a record inheriting a field from a base record would have that
+    /// field counted against the base and not against it. No record here has a base record — the
+    /// only one with a base list at all is <see cref="SufficientAvailablePowerFinding"/>, whose
+    /// base is an interface — so nothing is missed today; a record hierarchy would need this
+    /// reconsidered.
+    /// </remarks>
     private static IEnumerable<FieldInfo> Fields(Type type) =>
         type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
 
     /// <summary>
     /// Whether a value of this type is compared by the identity of an object behind it rather than
-    /// by what it holds: an array, an <see cref="ImmutableArray{T}"/> (which is one), or a
-    /// collection seen through an interface.
+    /// by what it holds.
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Three cases, and only one of them is decided by naming a type. An <b>array</b> is compared
+    /// by reference. A collection seen through an <b>interface</b> could be anything at run time,
+    /// so nothing can be assumed about its equality. And a <b>concrete</b> collection class is
+    /// compared by reference exactly when it leaves <see cref="object.Equals(object)"/> where it
+    /// found it — asked of the type rather than written down, so
+    /// <c>ImmutableDictionary&lt;,&gt;</c>, <c>List&lt;T&gt;</c> and anything else of that kind is
+    /// caught without being named. <c>OperationFacts.Waivers</c> is the live example here.
+    /// </para>
+    /// <para>
+    /// <see cref="ImmutableArray{T}"/> is named, and it is the one case that has to be. It is a
+    /// value type that <em>does</em> override equality, so the reference-equality question answers
+    /// "no" for it — but what its equality compares is the array behind it, which is the same
+    /// defect. A general test for "equality that does not reach the elements" would have to build
+    /// two equal-content instances and compare them; that is more machinery than this census is
+    /// worth, so the exception is written down where it can be read instead.
+    /// </para>
+    /// </remarks>
     private static bool ComparesByIdentity(Type type) =>
         type != typeof(string)
         && (type.IsArray
             || (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(ImmutableArray<>))
-            || (type.IsInterface && typeof(IEnumerable).IsAssignableFrom(type)));
+            || (typeof(IEnumerable).IsAssignableFrom(type)
+                && (type.IsInterface || UsesReferenceEquality(type))));
+
+    /// <summary>
+    /// Whether this type leaves <see cref="object.Equals(object)"/> where it found it, which is
+    /// reference equality.
+    /// </summary>
+    private static bool UsesReferenceEquality(Type type) =>
+        type.GetMethod("Equals", BindingFlags.Instance | BindingFlags.Public, null, [typeof(object)], null)
+            ?.DeclaringType == typeof(object);
 
     /// <summary>Whether this type keeps the equality the compiler wrote for it.</summary>
     private static bool KeepsSynthesizedEquality(Type type) =>
@@ -157,12 +192,21 @@ public class DeterminismTests
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>This is the whole of what makes comparing a finding sound</b>
-    /// (<see cref="Evaluation.EvaluatedRequirement.Equals(Evaluation.EvaluatedRequirement)"/>), and
-    /// it establishes it without asking which findings are reachable: it ranges over every record
-    /// the assembly holds, so a finding no fact set this repository knows how to build could ever
-    /// produce is inside it anyway. Three attempts at answering the question by reachability were
-    /// each wrong about what they had covered; this one has nothing to be wrong about.
+    /// This is what carries most of the weight in
+    /// <see cref="Evaluation.EvaluatedRequirement.Equals(Evaluation.EvaluatedRequirement)"/>'s
+    /// comparison of a finding, and unlike the three audits that preceded it, it asks nothing
+    /// about which findings are reachable: it ranges over every record the assembly holds, so a
+    /// finding no fact set this repository knows how to build could ever produce is inside it
+    /// anyway.
+    /// </para>
+    /// <para>
+    /// <b>What it does not establish</b>, stated because four rounds of this issue were lost to
+    /// claims wider than their method. It checks <em>records</em>, so it covers findings only
+    /// while every finding is a record — true of this assembly today, and prose here rather than
+    /// a check. It says a record overrides its equality, never that the override compares its
+    /// collection by element; that is what the five <c>..._compared_by_element</c> tests are for,
+    /// and this census would stay green if one of them were gutted. And it sees only the kinds of
+    /// field <see cref="ComparesByIdentity"/> recognises, whose limits are written there.
     /// </para>
     /// <para>
     /// It fails by <em>name</em>, so a record that joins the list says which record and the reader
