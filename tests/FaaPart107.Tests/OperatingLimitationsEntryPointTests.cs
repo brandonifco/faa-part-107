@@ -1,3 +1,4 @@
+using FaaPart107.Evaluation;
 using FaaPart107.Requests;
 using RulesKernel.Resolution;
 using Xunit;
@@ -6,7 +7,8 @@ namespace FaaPart107.Tests;
 
 /// <summary>
 /// <c>operating-limitations</c>, § 107.51's introductory text, resolved through
-/// <see cref="EntryPoints.OperatingLimitations"/> only: each of the limitations it conjoins
+/// <see cref="EntryPoints.OperatingLimitations"/>, and for the last through the evaluator: each
+/// of the limitations it conjoins
 /// failing on its own, every limitation the engine resolves met, each of the two people the
 /// introductory text names, and the waiver gate in both directions (the entry's note, and
 /// rules-factory decision 0021).
@@ -457,5 +459,76 @@ public class OperatingLimitationsEntryPointTests
             Finding(Resolve(
                 Groundspeed.InKnots(120m), 1000m, person: BoundPerson.PersonManipulatingTheFlightControls)));
         Assert.NotEqual(first, Finding(Resolve(Groundspeed.InKnots(120m), 200m)));
+    }
+
+    /// <summary>
+    /// An operation the evaluator can reach this entry on, and nothing more than that: a
+    /// groundspeed beyond both printed figures so § 107.51(a) resolves not met, an altitude and a
+    /// structure statement § 107.51(b) resolves on, a cloud meeting one of § 107.51(d)'s two
+    /// minimums and not the other so <c>weather-minimums-met</c> declines, the person the
+    /// introductory text binds, the stated flight visibility, and a statement that no waiver of
+    /// § 107.51 is in force.
+    /// </summary>
+    private static OperationFacts Operation(decimal flightVisibilityStatuteMiles) => new OperationFacts
+    {
+        BoundPerson = BoundPerson.RemotePilotInCommand,
+        Groundspeed = Groundspeed.InKnots(200m),
+        AltitudeAboveGroundLevelFeet = 300m,
+        Structure = NoStructure,
+        FlightVisibilityStatuteMiles = flightVisibilityStatuteMiles,
+        Cloud = CloudStatement.Measured(500m, 100m, Caller),
+    }
+        .Stating(WaiverStatement.NoneHeld(Compliance.Regulation, Caller));
+
+    /// <summary>This entry's outcome, as a product layer receives it.</summary>
+    private static EvaluatedRequirement Outcome(decimal flightVisibilityStatuteMiles) =>
+        OperationEvaluator.Evaluate(Operation(flightVisibilityStatuteMiles))
+            .Requirement(MapEntries.OperatingLimitations.Id);
+
+    /// <summary>
+    /// The same thing <c>weather-minimums-met</c>'s last test pins, one level up and through a
+    /// collection. A constituent's <see cref="LimitationOutcome.Account"/> records what that
+    /// constituent said; <see cref="LimitationOutcome.ToString"/> prints only its id, its locator
+    /// and its verdict, and this finding's own <c>ToString</c> prints those. So two operations
+    /// differing only in the stated flight visibility — which reaches
+    /// <c>weather-minimums-met</c>'s decline and nothing else here — are one set of words and two
+    /// findings, and they are two outcomes.
+    /// </summary>
+    /// <remarks>
+    /// This is the case an enumeration of "the one finding that does this" missed, and it is why
+    /// the claim is now stated as a shape rather than as a list: the difference is not on the
+    /// finding's own fields at all, it is on the element type of
+    /// <see cref="OperatingLimitationsFinding.Limitations"/>. Comparing the rendering could not
+    /// reach it, and comparing the finding does — through
+    /// <see cref="OperatingLimitationsFinding.Equals(OperatingLimitationsFinding)"/>'s
+    /// element-by-element comparison, which is what makes the two halves of this fit together.
+    /// </remarks>
+    [Fact]
+    public void Two_operations_differing_only_in_a_constituents_recorded_account_are_different_outcomes()
+    {
+        var atFive = Outcome(5m);
+        var atFour = Outcome(4m);
+
+        var findingAtFive = Assert.IsType<OperatingLimitationsFinding>(atFive.Finding);
+        var findingAtFour = Assert.IsType<OperatingLimitationsFinding>(atFour.Finding);
+
+        // The weather limitation is the one that carries the stated figure, and it is undetermined
+        // here: found by entry id rather than by index, so a reordered conjunction still finds it.
+        var weatherAtFive = Limitation(findingAtFive, MapEntries.WeatherMinimumsMet.Id);
+        var weatherAtFour = Limitation(findingAtFour, MapEntries.WeatherMinimumsMet.Id);
+
+        Assert.Null(weatherAtFive.Met);
+        Assert.Contains("5 statute miles", weatherAtFive.Account, StringComparison.Ordinal);
+        Assert.Contains("4 statute miles", weatherAtFour.Account, StringComparison.Ordinal);
+        Assert.Equal(weatherAtFive with { Account = weatherAtFour.Account }, weatherAtFour);
+
+        // And nothing the engine prints about either operation differs: not the constituent's own
+        // rendering, not the finding's, not the outcome's explanation.
+        Assert.Equal(weatherAtFive.ToString(), weatherAtFour.ToString());
+        Assert.Equal(findingAtFive.ToString(), findingAtFour.ToString());
+        Assert.Equal(atFive.Explanation, atFour.Explanation);
+
+        Assert.NotEqual(findingAtFive, findingAtFour);
+        Assert.NotEqual(atFive, atFour);
     }
 }

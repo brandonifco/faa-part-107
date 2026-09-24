@@ -1,4 +1,5 @@
 using System.Reflection;
+using FaaPart107.Evaluation;
 using FaaPart107.Requests;
 using RulesKernel.Resolution;
 using Xunit;
@@ -7,7 +8,8 @@ namespace FaaPart107.Tests;
 
 /// <summary>
 /// <c>over-human-beings</c>, § 107.39, resolved through <see cref="EntryPoints.OverHumanBeings"/>
-/// only: the section's opening, which is this entry's alone, and each of the three cases its
+/// and, for the last, through the evaluator: the section's opening, which is this entry's alone,
+/// and each of the three cases its
 /// "unless—" excepts, answered by the entry the map gives it.
 /// </summary>
 /// <remarks>
@@ -544,5 +546,77 @@ public class OverHumanBeingsEntryPointTests
                 HumanBeingLocation.InsideAStationaryVehicle,
                 Shelter.StationaryVehicle,
                 protectionHolds: true)));
+    }
+
+    /// <summary>
+    /// An operation the evaluator resolves this entry on: a human being under a covered structure
+    /// and a covered structure to be under, so § 107.39(b) is the excepted case that settles it,
+    /// with no waiver of § 107.39 in force. <paramref name="protectionAssertedBy"/> is who made
+    /// § 107.39(b)'s assertion.
+    /// </summary>
+    private static OperationFacts Operation(string protectionAssertedBy) => new OperationFacts
+    {
+        HumanBeingLocation = HumanBeingLocation.UnderACoveredStructure,
+        Shelter = Shelter.CoveredStructure,
+    }
+        .Stating(WaiverStatement.NoneHeld(Overflight.Regulation, Caller))
+        .Asserting(new Assertion(MapEntries.ReasonableProtection, true, protectionAssertedBy));
+
+    /// <summary>This entry's outcome, as a product layer receives it.</summary>
+    private static EvaluatedRequirement Outcome(string protectionAssertedBy) =>
+        OperationEvaluator.Evaluate(Operation(protectionAssertedBy)).Requirement(Entry.Id);
+
+    /// <summary>
+    /// Who is answerable for § 107.39(b)'s assertion is recorded and is not printed, so two
+    /// operations differing only in that name are one set of words and two findings — and they are
+    /// two outcomes.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The two names are both accepted because <c>reasonable-protection</c>'s <c>assertedBy</c> is
+    /// exactly <c>["caller"]</c>, which <c>docs/decisions/0003</c> settles: the marker is not a
+    /// name to match, it records that the corpus narrows nobody, and
+    /// <c>Assertions.Stated</c>'s <c>NamesNobody</c> skips the attribution check so that the
+    /// engine attributes the assertion to whoever the caller says made it. <b>The set of asserters
+    /// this entry accepts is therefore unbounded</b>, and two of them are all this test needs.
+    /// </para>
+    /// <para>
+    /// <see cref="ExceptedCaseOutcome.Account"/> holds the answering entry's own
+    /// <c>ToString()</c>, which for an assertion entry carries "as asserted by …";
+    /// <see cref="ExceptedCaseOutcome.ToString"/> prints only the paragraph, the entry and the
+    /// verdict, and this finding's own <c>ToString</c> prints those. So the difference is real and
+    /// invisible — and it is the difference decision 0003 exists to preserve, an assertion
+    /// travelling with whoever is answerable for it.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Two_operations_differing_only_in_who_asserted_the_reasonable_protection_are_different_outcomes()
+    {
+        // Compared element by element and never as one ImmutableArray against another, which is
+        // the very identity comparison issue #97 is about.
+        Assert.Equal(["caller"], MapEntries.ReasonableProtection.AssertedBy.ToArray());
+
+        var byOne = Outcome("caller");
+        var byAnother = Outcome("Alice, a named person the corpus does not narrow to");
+
+        var findingByOne = Assert.IsType<OverHumanBeingsFinding>(byOne.Finding);
+        var findingByAnother = Assert.IsType<OverHumanBeingsFinding>(byAnother.Finding);
+
+        var protectionByOne = Case(findingByOne, "(b)");
+        var protectionByAnother = Case(findingByAnother, "(b)");
+
+        // The attribution is the one thing that differs, and the finding records it.
+        Assert.True(protectionByOne.Met);
+        Assert.Contains("as asserted by caller", protectionByOne.Account, StringComparison.Ordinal);
+        Assert.Contains("as asserted by Alice", protectionByAnother.Account, StringComparison.Ordinal);
+        Assert.Equal(protectionByOne with { Account = protectionByAnother.Account }, protectionByAnother);
+
+        // And nothing the engine prints about either operation differs.
+        Assert.Equal(protectionByOne.ToString(), protectionByAnother.ToString());
+        Assert.Equal(findingByOne.ToString(), findingByAnother.ToString());
+        Assert.Equal(byOne.Explanation, byAnother.Explanation);
+
+        Assert.NotEqual(findingByOne, findingByAnother);
+        Assert.NotEqual(byOne, byAnother);
     }
 }
