@@ -433,6 +433,48 @@ public class WeatherMinimumsMetEntryPointTests
     }
 
     /// <summary>
+    /// And the finding itself refuses the statement the rule declines on, so that the difference
+    /// above is a fact about the type and not only about the one rule that builds it (<c>#101</c>).
+    /// § 107.51(d)'s two minimums are distances from a cloud: with none stated there is nothing for
+    /// <see cref="WeatherMinimumsFinding.BelowCloudMinimumMet"/> or
+    /// <see cref="WeatherMinimumsFinding.HorizontallyFromCloudMinimumMet"/> to report in either
+    /// direction — false reads the absence as the measured zero the test above keeps apart from it,
+    /// and true decides what § 107.51(d) requires of an operation with no cloud, which this engine
+    /// does not decide — so no value of them makes an honest finding, and the constructor refuses
+    /// all four.
+    /// </summary>
+    [Fact]
+    public void A_finding_cannot_be_built_on_a_statement_that_names_no_cloud_whatever_it_would_report()
+    {
+        var noCloud = CloudStatement.NoCloud(Caller);
+        VisibilityMinimum minimum = Minimum;
+        CloudClearance clearance = Clearance;
+
+        foreach (var below in new[] { true, false })
+        {
+            foreach (var horizontal in new[] { true, false })
+            {
+                var refused = Assert.Throws<ArgumentException>(
+                    () => new WeatherMinimumsFinding(10m, below, horizontal, noCloud, minimum, clearance));
+
+                Assert.Equal("Cloud", refused.ParamName);
+                Assert.Contains("distances from a cloud", refused.Message, StringComparison.Ordinal);
+            }
+        }
+
+        // A statement that does name one still builds the finding the rule builds, unchanged.
+        var measured = new WeatherMinimumsFinding(
+            10m,
+            BelowCloudMinimumMet: false,
+            HorizontallyFromCloudMinimumMet: false,
+            CloudStatement.Measured(0m, 0m, Caller),
+            minimum,
+            clearance);
+
+        Assert.Equal(Finding(Resolve(10m, 0m, 0m, NoWaiver)), measured);
+    }
+
+    /// <summary>
     /// A negative figure is a malformed value and is refused, not answered. The flight visibility
     /// is refused by the rule; each cloud distance is refused by <see cref="CloudStatement"/>, one
     /// step earlier, so a statement carrying a negative distance cannot be made at all.

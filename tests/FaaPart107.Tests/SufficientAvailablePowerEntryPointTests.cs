@@ -247,6 +247,36 @@ public class SufficientAvailablePowerEntryPointTests
     }
 
     [Fact]
+    public void Neither_factory_will_build_a_finding_that_contradicts_the_paragraphs_condition()
+    {
+        // The finding's own remarks say the assertion is present exactly where the aircraft is
+        // powered, "set together by the factories below and never apart". Both factories take the
+        // condition as a free parameter, so either could be handed the half that contradicts it --
+        // and a caller building one of these for a fixture or a replay would get a value
+        // § 107.49(d) cannot produce: an unpowered aircraft carrying an assertion nobody was owed,
+        // or a powered one carrying none while the paragraph does state its obligation about it.
+        // The constructor refuses both, so the remark is a fact about the type rather than about
+        // the one rule that happens to build it (#101).
+        var asserted = new Assertion(Entry, Holds: true, RemotePilotInCommand);
+
+        var unpoweredButAsserted = Assert.Throws<ArgumentException>(
+            () => SufficientAvailablePowerFinding.Asserted(AircraftPower.NotPowered, asserted));
+        var poweredButSilent = Assert.Throws<ArgumentException>(
+            () => SufficientAvailablePowerFinding.StatesNoObligation(AircraftPower.Powered));
+
+        Assert.Equal("power", unpoweredButAsserted.ParamName);
+        Assert.Equal("power", poweredButSilent.ParamName);
+        Assert.Contains("exactly where", unpoweredButAsserted.Message, StringComparison.Ordinal);
+        Assert.Contains("exactly where", poweredButSilent.Message, StringComparison.Ordinal);
+
+        // The two halves the paragraph does state are built, and are what the rule already returns.
+        Assert.Equal(
+            asserted,
+            SufficientAvailablePowerFinding.Asserted(AircraftPower.Powered, asserted).Availability);
+        Assert.Null(SufficientAvailablePowerFinding.StatesNoObligation(AircraftPower.NotPowered).Availability);
+    }
+
+    [Fact]
     public void The_paragraph_is_carried_verbatim_condition_and_all()
     {
         // Quoted, not interpreted: the condition the engine tests is legible beside the answer, and
