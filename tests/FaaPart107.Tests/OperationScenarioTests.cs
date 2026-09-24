@@ -226,9 +226,21 @@ public class OperationScenarioTests
         // And the honest half of the answer, which is not a defect and must not be dressed as one.
         // § 107.51(c) defines flight visibility by the distance at which "prominent objects" may be
         // seen and identified; part 107 does not say which objects are prominent, and the map
-        // records that as unresolved. So the weather limitation cannot be decided for any operation
-        // at this head — clear air and measured cloud alike — and the engine declines, naming whose
+        // records that as unresolved. So the weather limitation can never be reported SATISFIED —
+        // clear air and a compliant measured cloud alike — and the engine declines, naming whose
         // question it is, rather than calling this flight compliant with § 107.51 as a whole.
+        //
+        // It can still be reported Violated, and that is not the same thing. § 107.51(d)'s two
+        // minimums are computable, so an operation meeting NEITHER of them resolves "the minimums
+        // are not met" without § 107.51(c)'s open term being reached at all — which is
+        // weather-minimums-met's own
+        // Neither_cloud_minimum_met_resolves_the_minimums_not_met_whatever_the_stated_visibility.
+        // The separating input from this flight is Cloud = CloudStatement.Measured(100m, 100m,
+        // Operator), which reports Violated here and at operating-limitations. Five cloud
+        // statements were put to these facts with the stated visibility held at 5 statute miles —
+        // no cloud, both minimums failed (100/100), both met (600/2500), and each met alone
+        // (600/100 and 100/2500) — and only "both failed" resolved. That is what was swept, and it
+        // is not a claim about every input.
         var weather = evaluation.Requirement("weather-minimums-met");
         Assert.Equal(RequirementState.RequiresInterpretation, weather.State);
         Assert.Equal(MapEntries.WeatherMinimumsMet.Locator, weather.Locator);
