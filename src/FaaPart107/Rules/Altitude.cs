@@ -174,7 +174,7 @@ public static class Altitude
     /// </remarks>
     /// <param name="altitudeAboveGroundLevelFeet">
     /// The altitude, in feet above ground level, not negative. Required once the entry is reachable,
-    /// and demanded after the gate (<c>docs/decisions/0007</c>).
+    /// and demanded after the gate (<c>docs/decisions/0008</c>).
     /// </param>
     /// <param name="structure">
     /// What the caller states about the structure the exception is claimed under. Required once the

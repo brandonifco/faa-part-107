@@ -8,7 +8,7 @@ namespace FaaPart107.Tests;
 
 /// <summary>
 /// One ordering, across every entry § 107.205 suspends:
-/// <c>docs/decisions/0007-the-waiver-gate-precedes-every-other-demand.md</c>.
+/// <c>docs/decisions/0008-the-waiver-gate-precedes-every-other-demand.md</c>.
 /// </summary>
 /// <remarks>
 /// <para>

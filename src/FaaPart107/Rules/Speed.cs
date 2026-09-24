@@ -98,7 +98,7 @@ public static class Speed
     /// </remarks>
     /// <param name="groundspeed">
     /// The groundspeed, as the caller states it. Required once the entry is reachable, and demanded
-    /// after the gate (<c>docs/decisions/0007</c>).
+    /// after the gate (<c>docs/decisions/0008</c>).
     /// </param>
     /// <param name="waiver">Whether a waiver of § 107.51 is in force, as the caller states it.</param>
     /// <returns>

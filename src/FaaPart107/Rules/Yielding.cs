@@ -118,7 +118,7 @@ public static class Yielding
     /// <see cref="MapEntries.WellClear"/> — reached through <c>dependsOn</c>, asked, and what it
     /// answers on the request in hand is what decides.
     /// </remarks>
-    /// <param name="encountered">What was passed, as the caller states it. Never inferred; required once the entry is reachable, and demanded after the gate (<c>docs/decisions/0007</c>).</param>
+    /// <param name="encountered">What was passed, as the caller states it. Never inferred; required once the entry is reachable, and demanded after the gate (<c>docs/decisions/0008</c>).</param>
     /// <param name="position">Where the small unmanned aircraft passed it, as the caller states it. Never inferred; required once the entry is reachable, and demanded after the gate.</param>
     /// <param name="waiver">Whether a waiver of § 107.37(a) is in force, as the caller states it.</param>
     /// <returns>

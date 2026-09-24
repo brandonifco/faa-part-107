@@ -66,7 +66,7 @@ public static class MovingAircraft
     /// <param name="fromAMovingAircraft">
     /// Whether the small unmanned aircraft system is operated from a moving aircraft, as the caller
     /// states it. Never inferred; required once the entry is reachable, and demanded after the gate
-    /// (<c>docs/decisions/0007</c>).
+    /// (<c>docs/decisions/0008</c>).
     /// </param>
     /// <param name="waiver">Whether a waiver of § 107.25 is in force, as the caller states it.</param>
     /// <returns>

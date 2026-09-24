@@ -42,7 +42,7 @@ namespace FaaPart107
         /// The waiver statement is demanded here, and only it, because
         /// <see cref="Waivers.Suspension"/> is what reads it and the gate cannot run without it.
         /// The exercise of the ability is handed over as the caller left it, so the rule demands it
-        /// after the gate (<c>docs/decisions/0007</c>).
+        /// after the gate (<c>docs/decisions/0008</c>).
         /// </para>
         /// </remarks>
         internal static partial Resolution<object> VisualLineOfSight(Requests.VisualLineOfSightRequest request) =>

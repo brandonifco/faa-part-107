@@ -288,7 +288,7 @@ public static class Observers
     /// the first requirement that was not answered blocks, and this entry declines naming itself and
     /// that entry.
     /// </remarks>
-    /// <param name="use">Whether a visual observer is used during the aircraft operation, as the caller states it. Never inferred; required once the entry is reachable, and demanded after the gate (<c>docs/decisions/0007</c>).</param>
+    /// <param name="use">Whether a visual observer is used during the aircraft operation, as the caller states it. Never inferred; required once the entry is reachable, and demanded after the gate (<c>docs/decisions/0008</c>).</param>
     /// <param name="exercise">Who exercised § 107.31(a)'s ability throughout the entire flight, as the caller states it: <c>visual-line-of-sight</c>'s input, for § 107.33(b). Required once the entry is reachable, and demanded after the gate.</param>
     /// <param name="waiver">Whether a waiver of § 107.33 is in force, as the caller states it.</param>
     /// <param name="visualLineOfSightWaiver">Whether a waiver of § 107.31 is in force, as the caller states it: the statement <c>visual-line-of-sight</c> is asked under, for § 107.33(b). It is § 107.31's gate and not this entry's, so it too is required only once <em>this</em> entry is reachable, and demanded after this entry's gate.</param>
@@ -321,7 +321,7 @@ public static class Observers
         // same statement would suspend (a) and (c) a moment later; running it here is what keeps
         // the decline in this entry's name, and stops a fact the waiver has made irrelevant from
         // being demanded — including the three demanded below, which is what
-        // docs/decisions/0007 settles for every gated entry of this engine.
+        // docs/decisions/0008 settles for every gated entry of this engine.
         if (Waivers.Suspension(MapEntries.VisualObserverConditions, Regulation, waiver) is { } suspended)
         {
             return Resolution<VisualObserverConditionsFinding>.FromUnresolved(suspended);

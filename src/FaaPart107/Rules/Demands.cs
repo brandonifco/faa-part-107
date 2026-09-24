@@ -12,7 +12,7 @@ namespace FaaPart107;
 /// </para>
 /// <para>
 /// It lives here rather than in <c>Handlers</c> because, under
-/// <c>docs/decisions/0007-the-waiver-gate-precedes-every-other-demand.md</c>, a gated entry's
+/// <c>docs/decisions/0008-the-waiver-gate-precedes-every-other-demand.md</c>, a gated entry's
 /// non-waiver inputs are demanded by its rule after § 107.205's gate has been read, while an
 /// ungated entry's are still demanded by its handler. Both say it the same way, because it is the
 /// same thing being said, and <c>Handlers.Missing</c> is this method.

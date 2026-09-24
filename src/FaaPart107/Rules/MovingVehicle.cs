@@ -74,7 +74,7 @@ public static class MovingVehicle
     /// <param name="fromMovingLandOrWaterBorneVehicle">
     /// Whether the small unmanned aircraft system is operated from a moving land or water-borne vehicle,
     /// as the caller states it. The engine does not infer it, and (a)'s moving aircraft is not this entry.
-    /// Required once the entry is reachable, and demanded after the gate (<c>docs/decisions/0007</c>).
+    /// Required once the entry is reachable, and demanded after the gate (<c>docs/decisions/0008</c>).
     /// </param>
     /// <param name="transportingAnotherPersonsPropertyForCompensationOrHire">
     /// Whether the small unmanned aircraft is transporting another person's property for compensation or

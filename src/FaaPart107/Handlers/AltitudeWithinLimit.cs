@@ -28,7 +28,7 @@ namespace FaaPart107
         /// The waiver statement is demanded here, and only it, because
         /// <see cref="Waivers.Suspension"/> is what reads it and the gate cannot run without it.
         /// The altitude and the structure statement are handed over as the caller left them, so the
-        /// rule demands each after the gate (<c>docs/decisions/0007</c>).
+        /// rule demands each after the gate (<c>docs/decisions/0008</c>).
         /// </remarks>
         internal static partial Resolution<object> AltitudeWithinLimit(Requests.AltitudeWithinLimitRequest request) =>
             Answer(Altitude.Within(

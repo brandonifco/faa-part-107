@@ -347,7 +347,7 @@ public class CivilTwilightOperationEntryPointTests
         Assert.Equal(UnresolvedReason.OutsideCurrentScope, outside.Reason);
         Assert.Contains("civil-twilight-operation", outside.Attempted, StringComparison.Ordinal);
 
-        // And before the caller's typed inputs, which is what docs/decisions/0007 settles for every
+        // And before the caller's typed inputs, which is what docs/decisions/0008 settles for every
         // § 107.205-gated entry of this engine: a waived operation the caller has not fully
         // described is declined for the waiver, not refused for the missing input. Place unset is
         // the case, because Place is what the handler used to demand first.
@@ -473,7 +473,7 @@ public class CivilTwilightOperationEntryPointTests
         // The dictionary dispatch carries no typed input at all, so nothing but those refusals
         // stands between it and an answer about an operation nobody described. The waiver
         // statement is the one it names, because the gate reads it and the gate comes first
-        // (docs/decisions/0007); the place is owed next, once a statement that no waiver is in
+        // (docs/decisions/0008); the place is owed next, once a statement that no waiver is in
         // force has put the entry back in reach.
         Assert.Equal(
             nameof(CivilTwilightOperationRequest.Waiver),

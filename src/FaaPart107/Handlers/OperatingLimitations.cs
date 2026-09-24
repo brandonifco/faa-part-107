@@ -65,7 +65,7 @@ namespace FaaPart107
         /// <see cref="Waivers.Suspension"/> is what reads it and the gate cannot run without it.
         /// The six operational facts are handed over as the caller left them, so the rule demands
         /// each after the gate, in the order § 107.51 states its limitations
-        /// (<c>docs/decisions/0007</c>).
+        /// (<c>docs/decisions/0008</c>).
         /// </remarks>
         internal static partial Resolution<object> OperatingLimitations(Requests.OperatingLimitationsRequest request) =>
             Answer(Compliance.CompliedWith(

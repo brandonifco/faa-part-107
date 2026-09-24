@@ -240,7 +240,7 @@ public static class LineOfSight
     /// <see cref="ExerciseOfTheAbility"/> tested against <see cref="Combinations"/>. A negative
     /// assertion is answered, not declined, and leaves § 107.31 not maintained.
     /// </remarks>
-    /// <param name="exercise">Who exercised the ability throughout the entire flight, as the caller states it. Required once the entry is reachable, and demanded after the gate (<c>docs/decisions/0007</c>).</param>
+    /// <param name="exercise">Who exercised the ability throughout the entire flight, as the caller states it. Required once the entry is reachable, and demanded after the gate (<c>docs/decisions/0008</c>).</param>
     /// <param name="waiver">Whether a waiver of § 107.31 is in force, as the caller states it.</param>
     /// <param name="assertions">What the caller asserts, carrying <c>unaided-visual-contact</c>'s value. Never defaulted.</param>
     /// <returns>

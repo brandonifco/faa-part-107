@@ -334,7 +334,7 @@ public class VisualLineOfSightEntryPointTests
         // Resolved by id, the request is built from the assertions alone, so it carries neither the
         // exercise nor a waiver statement — and the entry refuses rather than infer either. The
         // waiver statement is the one it names, because it is the one the gate reads and the gate
-        // comes first (docs/decisions/0007); the exercise is owed next, once a statement that no
+        // comes first (docs/decisions/0008); the exercise is owed next, once a statement that no
         // waiver is in force has put the entry back in reach.
         var error = Assert.Throws<ArgumentException>(() => Registry.Resolve(
             "visual-line-of-sight",

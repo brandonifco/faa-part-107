@@ -185,7 +185,7 @@ public static class Compliance
     /// All six caller facts below are demanded here, in the order § 107.51 states its limitations,
     /// and every one of them <em>after</em> the § 107.205 gate: a caller who states a waiver of
     /// § 107.51 is in force owes this entry nothing else, because nothing else could change what it
-    /// answers (<c>docs/decisions/0007</c>).
+    /// answers (<c>docs/decisions/0008</c>).
     /// </para>
     /// </remarks>
     /// <param name="person">Which of the two people the introductory text names the caller asks about. Required once the entry is reachable, and never inferred.</param>

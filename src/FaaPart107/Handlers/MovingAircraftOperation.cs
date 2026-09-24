@@ -31,7 +31,7 @@ namespace FaaPart107
         /// The waiver statement is demanded here, and only it, because
         /// <see cref="Waivers.Suspension"/> is what reads it and the gate cannot run without it.
         /// Whether the operation is from a moving aircraft is handed over as the caller left it, so
-        /// the rule demands it after the gate (<c>docs/decisions/0007</c>).
+        /// the rule demands it after the gate (<c>docs/decisions/0008</c>).
         /// </remarks>
         internal static partial Resolution<object> MovingAircraftOperation(Requests.MovingAircraftOperationRequest request) =>
             Answer(MovingAircraft.Operation(

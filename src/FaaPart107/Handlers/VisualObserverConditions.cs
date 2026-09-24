@@ -75,7 +75,7 @@ namespace FaaPart107
         /// it, because <see cref="Waivers.Suspension"/> is what reads it and this entry's gate
         /// cannot run without it. The other three — the chapeau's condition, the exercise of
         /// § 107.31(a)'s ability, and § 107.31's own waiver statement — are handed over as the
-        /// caller left them, so the rule demands each after the gate (<c>docs/decisions/0007</c>).
+        /// caller left them, so the rule demands each after the gate (<c>docs/decisions/0008</c>).
         /// <see cref="Requests.VisualObserverConditionsRequest.VisualLineOfSightWaiver"/> is among
         /// them because it is § 107.31's gate and not this entry's: a waiver of § 107.33 suspends
         /// this entry whatever § 107.31's statement says.

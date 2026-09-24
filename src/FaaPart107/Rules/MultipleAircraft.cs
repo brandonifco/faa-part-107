@@ -111,7 +111,7 @@ public static class MultipleAircraft
     /// </remarks>
     /// <param name="person">
     /// The person the statement is about, as the caller names them. Required once the entry is
-    /// reachable, and demanded after the gate (<c>docs/decisions/0007</c>).
+    /// reachable, and demanded after the gate (<c>docs/decisions/0008</c>).
     /// </param>
     /// <param name="engagements">
     /// Every unmanned aircraft the person is, at the same time, in one of the three roles for, each

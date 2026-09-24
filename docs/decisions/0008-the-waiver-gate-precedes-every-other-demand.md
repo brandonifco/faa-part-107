@@ -1,4 +1,4 @@
-# 0007 — The § 107.205 waiver gate precedes every other demand a gated entry makes
+# 0008 — The § 107.205 waiver gate precedes every other demand a gated entry makes
 
 **Status:** accepted.
 

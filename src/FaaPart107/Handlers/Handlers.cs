@@ -24,7 +24,7 @@ namespace FaaPart107;
 /// </para>
 /// <para>
 /// <b>Which inputs a handler demands, and which it hands over unresolved</b>, is settled by
-/// <c>docs/decisions/0007-the-waiver-gate-precedes-every-other-demand.md</c>. An entry the map
+/// <c>docs/decisions/0008-the-waiver-gate-precedes-every-other-demand.md</c>. An entry the map
 /// gives <c>suspendedBy: ["waivable-regulations"]</c> has its § 107.205 waiver statement demanded
 /// here, because <see cref="Waivers.Suspension"/> is what reads it and the gate cannot run
 /// without it; every other input of such an entry is handed to the rule as the caller left it, so

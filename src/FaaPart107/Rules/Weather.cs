@@ -190,7 +190,7 @@ public static class Weather
     /// alone, which would presume of § 107.51(d) the very thing this entry declines to decide.
     /// </para>
     /// </remarks>
-    /// <param name="flightVisibilityStatuteMiles">The flight visibility the caller states, observed from the location of the control station, in statute miles, not negative. Required once the entry is reachable, and demanded after the gate (<c>docs/decisions/0007</c>).</param>
+    /// <param name="flightVisibilityStatuteMiles">The flight visibility the caller states, observed from the location of the control station, in statute miles, not negative. Required once the entry is reachable, and demanded after the gate (<c>docs/decisions/0008</c>).</param>
     /// <param name="cloud">What the caller states about the cloud § 107.51(d)'s minimums are distances from: the two distances, or that the aircraft is not operated near one. Required once the entry is reachable, and demanded after the gate.</param>
     /// <param name="waiver">Whether a waiver of § 107.51 is in force, as the caller states it.</param>
     /// <returns>

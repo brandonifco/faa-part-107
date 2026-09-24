@@ -70,7 +70,7 @@ public static class Airspace
     /// </summary>
     /// <param name="airspace">
     /// The airspace the operation is in, as the caller states it. Never inferred; required once the
-    /// entry is reachable, and demanded after the gate (<c>docs/decisions/0007</c>).
+    /// entry is reachable, and demanded after the gate (<c>docs/decisions/0008</c>).
     /// </param>
     /// <param name="authorization">
     /// What the caller states about prior authorization from ATC. Never inferred; required once the

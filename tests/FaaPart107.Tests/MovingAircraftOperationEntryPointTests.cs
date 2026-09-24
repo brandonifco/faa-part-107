@@ -148,7 +148,7 @@ public class MovingAircraftOperationEntryPointTests
             () => Registry.Resolve("moving-aircraft-operation", RuleRequest.Empty));
 
         // The waiver statement first, because the gate reads it and the gate comes first
-        // (docs/decisions/0007). The paragraph's own fact is owed next, once a statement that no
+        // (docs/decisions/0008). The paragraph's own fact is owed next, once a statement that no
         // waiver is in force has put the entry back in reach.
         Assert.Equal(nameof(MovingAircraftOperationRequest.Waiver), error.ParamName);
         Assert.Contains("moving-aircraft-operation", error.Message, StringComparison.Ordinal);

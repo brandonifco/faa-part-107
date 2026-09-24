@@ -139,7 +139,7 @@ public static class Protection
     /// <para>
     /// That argument is not this entry's. Nothing in it is about § 107.39(b), and it holds of every
     /// entry the map gives <c>suspendedBy: ["waivable-regulations"]</c>, which is what
-    /// <c>docs/decisions/0007-the-waiver-gate-precedes-every-other-demand.md</c> records: a handler
+    /// <c>docs/decisions/0008-the-waiver-gate-precedes-every-other-demand.md</c> records: a handler
     /// demands the waiver statement and nothing else, and the rule demands the rest after the gate.
     /// This entry is one of the two that already read that way, and it is where the argument was
     /// first written down.

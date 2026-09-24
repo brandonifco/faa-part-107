@@ -467,7 +467,7 @@ public class VisualObserverConditionsEntryPointTests
             Registry.Resolve("visual-observer-conditions", RuleRequest.Empty));
 
         // This entry's own § 107.33 waiver statement first, because the gate reads it and the gate
-        // comes first (docs/decisions/0007); the chapeau's condition, the exercise and § 107.31's
+        // comes first (docs/decisions/0008); the chapeau's condition, the exercise and § 107.31's
         // own statement are owed next, once a statement that no waiver of § 107.33 is in force has
         // put the entry back in reach.
         Assert.Equal(nameof(VisualObserverConditionsRequest.Waiver), error.ParamName);

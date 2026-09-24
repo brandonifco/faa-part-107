@@ -228,7 +228,7 @@ public static class Twilight
     /// it: that entry is not asked, so nothing about the flash rate or the remote pilot in command's
     /// determination is demanded through <paramref name="assertions"/>. The caller's own
     /// <paramref name="lighting"/> statement is demanded whatever the period — but after the gate,
-    /// with the other two (<c>docs/decisions/0007</c>).
+    /// with the other two (<c>docs/decisions/0008</c>).
     /// </remarks>
     /// <param name="place">Where the operation is, as the caller states it. Never inferred; required once the entry is reachable, and demanded after the gate.</param>
     /// <param name="period">Which of § 107.29(c)(1)-(2)'s periods the operation is during, as the caller states it. Never inferred; required once the entry is reachable, and demanded after the gate.</param>
@@ -261,7 +261,7 @@ public static class Twilight
         // This entry's own gate, before the definition as well as before the requirement:
         // § 107.205(b) reaches paragraph (b), and (c) defines civil twilight only "for purposes of
         // paragraph (b)". And before the three caller facts below, which a waiver of § 107.29(a)(2)
-        // and (b) makes as beside the point as the assertions (docs/decisions/0007).
+        // and (b) makes as beside the point as the assertions (docs/decisions/0008).
         if (Waivers.Suspension(MapEntries.CivilTwilightOperation, Regulation, waiver) is { } suspended)
         {
             return Resolution<CivilTwilightOperationFinding>.FromUnresolved(suspended);

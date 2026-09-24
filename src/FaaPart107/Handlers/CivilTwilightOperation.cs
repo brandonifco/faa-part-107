@@ -78,7 +78,7 @@ namespace FaaPart107
         /// the gate: a request that states a waiver in force and leaves one of them unset is
         /// declined <see cref="UnresolvedReason.OutsideCurrentScope"/> citing § 107.205 rather than
         /// refused naming that input. That is
-        /// <c>docs/decisions/0007-the-waiver-gate-precedes-every-other-demand.md</c>, and the
+        /// <c>docs/decisions/0008-the-waiver-gate-precedes-every-other-demand.md</c>, and the
         /// ordering every § 107.205-gated entry of this engine now takes. What the gate precedes is
         /// unchanged for the assertions: no constituent is asked for a waived operation, so nothing
         /// is demanded through <see cref="RuleRequest"/> either.

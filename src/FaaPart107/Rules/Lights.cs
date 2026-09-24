@@ -216,7 +216,7 @@ public static class Lights
     /// the point, and demanding it would be asking for a fact the caller does not owe.
     /// </para>
     /// </remarks>
-    /// <param name="lighting">What the caller states about the aircraft's anti-collision lighting. Never inferred; required once the entry is reachable, and demanded after the gate (<c>docs/decisions/0007</c>).</param>
+    /// <param name="lighting">What the caller states about the aircraft's anti-collision lighting. Never inferred; required once the entry is reachable, and demanded after the gate (<c>docs/decisions/0008</c>).</param>
     /// <param name="waiver">Whether a waiver of § 107.29(a)(2) and (b) is in force, as the caller states it.</param>
     /// <param name="assertions">What the caller asserts, for the two entries this one depends on. Never defaulted.</param>
     /// <returns>
