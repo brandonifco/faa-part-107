@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using RulesKernel.Provenance;
 using RulesKernel.Resolution;
 
@@ -36,8 +35,8 @@ public sealed record RightOfWayFinding(
     /// <remarks>
     /// It is true in every finding this rule resolves, and that is the shape of the paragraph
     /// rather than a rule that always permits: where both enumerations do reach the pass, whether
-    /// it is prohibited turns on the exception "unless well clear", and the rule answers with
-    /// <see cref="MapEntries.WellClear"/>'s decline instead of resolving to false.
+    /// it is prohibited turns on the exception "unless well clear", and the rule declines on
+    /// <see cref="MapEntries.WellClear"/>'s question instead of resolving to false.
     /// </remarks>
     public bool MayPass => !(ObjectIsOneTheSectionNames && PositionIsOneTheSectionProhibits);
 
@@ -116,17 +115,17 @@ public static class Yielding
     /// object it does name, passed in none of the three relative positions it prohibits, is a pass
     /// the prohibition does not reach. Either decides the case, and the exception is not consulted.
     /// Where both reach the pass, whether it is prohibited turns on "unless well clear", which is
-    /// <see cref="MapEntries.WellClear"/> — reached through <c>dependsOn</c>, and its answer is
-    /// this entry's.
+    /// <see cref="MapEntries.WellClear"/> — reached through <c>dependsOn</c>, asked, and what it
+    /// answers on the request in hand is what decides.
     /// </remarks>
     /// <param name="encountered">What was passed, as the caller states it. Never inferred.</param>
     /// <param name="position">Where the small unmanned aircraft passed it, as the caller states it. Never inferred.</param>
     /// <param name="waiver">Whether a waiver of § 107.37(a) is in force, as the caller states it.</param>
     /// <returns>
     /// The finding; <see cref="UnresolvedReason.OutsideCurrentScope"/> citing § 107.205 while a waiver
-    /// of § 107.37(a) is in force; otherwise, where both enumerations reach the pass,
-    /// <see cref="MapEntries.WellClear"/>'s own <see cref="UnresolvedReason.RequiresInterpretation"/>
-    /// decline, unchanged.
+    /// of § 107.37(a) is in force; otherwise, where both enumerations reach the pass, this entry's
+    /// own decline, carrying the reason <see cref="MapEntries.WellClear"/> gave on this request and
+    /// citing that entry's § 107.37(a).
     /// </returns>
     /// <exception cref="ArgumentException">The waiver statement is about another regulation.</exception>
     public static Resolution<RightOfWayFinding> RightOfWay(
@@ -152,14 +151,11 @@ public static class Yielding
 
         // Both enumerations reach the pass, so the case turns on the exception "unless well
         // clear". That is the map entry this one dependsOn, and this rule asks it rather than
-        // answering it: the decline below is that entry's own, its wording and its locator
-        // unchanged, and this engine supplies no separation distance, no time to closest approach
+        // answering it: the decline below is built from what that entry actually returned on this
+        // request, and this engine supplies no separation distance, no time to closest approach
         // and no other well-clear measure to decide it with.
-        return WellClear(waiver) is Resolution<object>.Unresolved open
-            ? Resolution<RightOfWayFinding>.FromUnresolved(open.Result)
-            : throw new UnreachableException(
-                $"the map records the question of the entry '{MapEntries.WellClear.Id}' as unresolved, "
-                + "so it resolves to no value");
+        return Resolution<RightOfWayFinding>.FromUnresolved(
+            Undetermined(encountered, position, WellClear(waiver)));
     }
 
     /// <summary>
@@ -184,6 +180,55 @@ public static class Yielding
             + "\"well clear\", the term carries the whole exception to the prohibition on passing over, under "
             + "or ahead, and § 107.37(a) states no measure for it",
             MapEntries.WellClear.Locator));
+    }
+
+    /// <summary>
+    /// This entry's own decline for a pass both enumerations reach: it names the entry the caller
+    /// asked about and the entry whose question blocks the answer, carries that entry's reason,
+    /// cites that entry's locator, and quotes what that entry itself recorded.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// It is not <see cref="MapEntries.WellClear"/>'s decline handed back. The reason and the
+    /// locator are that entry's, because the question that blocks the answer is its question and a
+    /// citation should lead to where that question is; what was attempted is this entry's, so that
+    /// a caller who asked about § 107.37(a)'s two enumerations can tell this decline from the
+    /// decline of the entry it reached. The two share the locator § 107.37(a), so the citation
+    /// cannot tell them apart and only <see cref="UnresolvedResult.Attempted"/> does
+    /// (<c>docs/decisions/0001</c> records the same blind spot for speed, and
+    /// <c>docs/decisions/0006</c> the shape).
+    /// </para>
+    /// <para>
+    /// The map gives <see cref="MapEntries.WellClear"/> no verdict type — it is
+    /// <c>Resolution&lt;object&gt;</c> — so an entry that resolves is an ordinary case here and not
+    /// an impossibility: the pass is recorded as unsettled with that entry's own account beside it,
+    /// rather than a verdict being guessed out of an <see cref="object"/>. The map would have to
+    /// give that entry a verdict to read before this one could read one.
+    /// </para>
+    /// </remarks>
+    private static UnresolvedResult Undetermined(
+        EncounteredObject encountered,
+        RelativePosition position,
+        Resolution<object> exception)
+    {
+        var (reason, answered, account) = exception.Match(
+            value => (
+                (UnresolvedReason?)null,
+                "answered whether the pass is well clear with a value this entry has no verdict to read",
+                value.ToString() ?? string.Empty),
+            unresolved => (
+                (UnresolvedReason?)unresolved.Reason,
+                "did not answer whether the pass is well clear",
+                unresolved.Attempted));
+
+        return new UnresolvedResult(
+            reason ?? UnresolvedReason.RequiresInterpretation,
+            $"decide whether the map entry '{MapEntries.RightOfWay.Id}' "
+            + $"[{MapEntries.RightOfWay.Locator.Citation}] prohibits passing {position.Designation}, and it is "
+            + $"{encountered}: § 107.37(a) names it and prohibits that pass unless well clear, and the map entry "
+            + $"'{MapEntries.WellClear.Id}' [{MapEntries.WellClear.Locator.Citation}] {answered}; what "
+            + $"'{MapEntries.WellClear.Id}' recorded: {account}",
+            MapEntries.WellClear.Locator);
     }
 
     /// <summary>

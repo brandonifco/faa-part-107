@@ -81,9 +81,9 @@ public sealed record WeatherMinimumsFinding(
 /// from those entries' values, so a figure that moved there moves here.
 /// </para>
 /// <para>
-/// Its third dependency, <c>prominent-objects</c>, answers nothing: the map records its question as
-/// unresolved, and it declines <see cref="UnresolvedReason.RequiresInterpretation"/> on every
-/// request. That is not an accident of build order, and this entry is where it bites.
+/// Its third dependency, <c>prominent-objects</c>, is asked wherever § 107.51(c) is reached, and
+/// what it answers on the request in hand is what decides: nothing here records in advance that it
+/// declines. That is not an accident of build order, and this entry is where it bites.
 /// <c>visibility-minimum</c>'s note says the gap is "carried by the entry that applies the
 /// definition rather than by the one that states the figure", and this entry is the one that
 /// applies it: § 107.51(c)'s threshold is on "flight visibility", which the section defines as the
@@ -100,8 +100,9 @@ public sealed record WeatherMinimumsFinding(
 /// the map split <c>prominent-objects</c> out instead of reclassifying this entry, "classifying the
 /// whole entry by one of its clauses would have thrown away the 500-foot and 2,000-foot figures".
 /// Everywhere else a cloud is named, § 107.51(c) is reached and the answer is undetermined, so the
-/// decline cites <c>prominent-objects</c>' § 107.51(c) and names the term the corpus leaves
-/// undefined.
+/// decline is this entry's own: it names the entry the caller asked about and the entry whose
+/// question blocks it, carries that entry's reason, cites that entry's § 107.51(c), and quotes what
+/// that entry itself recorded (<c>docs/decisions/0006</c>).
 /// </para>
 /// <para>
 /// <b>The cloud is a <see cref="CloudStatement"/>, and no cloud is a case the caller states.</b>
@@ -157,8 +158,8 @@ public static class Weather
     /// <returns>
     /// The finding, the minimums not met, where the statement names a cloud and neither cloud
     /// minimum is met; <see cref="UnresolvedReason.OutsideCurrentScope"/> citing § 107.205 while a
-    /// waiver is in force; otherwise <see cref="UnresolvedReason.RequiresInterpretation"/> citing
-    /// <c>prominent-objects</c>' § 107.51(c).
+    /// waiver is in force; otherwise this entry's own decline, carrying the reason
+    /// <c>prominent-objects</c> gave on this request and citing that entry's § 107.51(c).
     /// </returns>
     /// <exception cref="ArgumentNullException"><paramref name="cloud"/> is null.</exception>
     public static Resolution<WeatherMinimumsFinding> MinimumsMet(
@@ -228,9 +229,12 @@ public static class Weather
     private static UnresolvedResult NoCloudToMeasureFrom(
         decimal flightVisibilityStatuteMiles,
         CloudStatement cloud,
-        VisibilityMinimum minimum) =>
-        new(
-            UnresolvedReason.RequiresInterpretation,
+        VisibilityMinimum minimum)
+    {
+        var prominence = AskProminentObjects(minimum.Waiver);
+
+        return new UnresolvedResult(
+            prominence.Reason ?? UnresolvedReason.RequiresInterpretation,
             string.Create(
                 CultureInfo.InvariantCulture,
                 $"decide whether the map entry '{MapEntries.WeatherMinimumsMet.Id}' is met on a stated flight "
@@ -239,10 +243,9 @@ public static class Weather
                 + $"and this engine does not decide what that paragraph requires of one, so § 107.51(d) does not "
                 + $"settle the outcome here; and § 107.51(c) is undetermined in any event, because it requires no "
                 + $"less than {minimum.StatuteMiles} statute miles of the flight "
-                + $"visibility it defines, and the map entry '{MapEntries.ProminentObjects.Id}' holds open which "
-                + $"objects are \"prominent\" — the degree that fixes the distance the definition reports — so the "
-                + $"stated figure is not yet that quantity"),
+                + $"visibility it defines, and {prominence}"),
             MapEntries.ProminentObjects.Locator);
+    }
 
     /// <summary>
     /// The decline for a situation that reaches § 107.51(c): the visibility half is undetermined
@@ -251,6 +254,8 @@ public static class Weather
     /// </summary>
     private static UnresolvedResult Undetermined(WeatherMinimumsFinding finding)
     {
+        var prominence = AskProminentObjects(finding.Waiver);
+
         var cloudHalf = finding.BelowCloudMinimumMet == finding.HorizontallyFromCloudMinimumMet
             ? string.Empty
             : string.Create(
@@ -260,15 +265,63 @@ public static class Weather
                 + $"entry '{MapEntries.CloudClearance.Id}' holds open");
 
         return new UnresolvedResult(
-            UnresolvedReason.RequiresInterpretation,
+            prominence.Reason ?? UnresolvedReason.RequiresInterpretation,
             string.Create(
                 CultureInfo.InvariantCulture,
                 $"decide whether the map entry '{MapEntries.WeatherMinimumsMet.Id}' is met on a stated flight "
                 + $"visibility of {finding.FlightVisibilityStatuteMiles} statute miles: § 107.51(c) requires no less "
-                + $"than {finding.Minimum.StatuteMiles} statute miles of the flight visibility it defines, and the "
-                + $"map entry '{MapEntries.ProminentObjects.Id}' holds open which objects are \"prominent\" — the "
-                + $"degree that fixes the distance the definition reports — so the stated figure is not yet that "
-                + $"quantity{cloudHalf}"),
+                + $"than {finding.Minimum.StatuteMiles} statute miles of the flight visibility it defines, "
+                + $"and {prominence}{cloudHalf}"),
             MapEntries.ProminentObjects.Locator);
+    }
+
+    /// <summary>
+    /// Asks <c>prominent-objects</c>, and records what it answered on this request.
+    /// </summary>
+    /// <remarks>
+    /// It is asked only where § 107.51(c) is reached, which is everywhere this entry declines and
+    /// nowhere it resolves: the one finding this entry makes is settled by § 107.51(d) alone, and
+    /// putting the call here rather than in <see cref="MinimumsMet"/> keeps that so.
+    /// </remarks>
+    private static ProminenceOutcome AskProminentObjects(WaiverStatement waiver) =>
+        Prominence.Objects(waiver).Match(
+            value => new ProminenceOutcome(null, value.ToString() ?? string.Empty),
+            unresolved => new ProminenceOutcome(unresolved.Reason, unresolved.Attempted));
+
+    /// <summary>
+    /// What <c>prominent-objects</c> answered on this request, as this entry records it: the reason
+    /// it gave where it did not resolve, and its own account either way.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The map gives <c>prominent-objects</c> no verdict type — it is <c>Resolution&lt;object&gt;</c>
+    /// — so a resolved value is recorded as one this entry has no verdict to read rather than
+    /// guessed at, which is the shape <c>over-human-beings</c> already gives a constituent with
+    /// nothing to read. The map would have to give that entry a verdict before this one could read
+    /// one, and nothing here assumes which way it answered.
+    /// </para>
+    /// <para>
+    /// <see cref="Account"/> is that entry's own words, carried into this entry's decline rather
+    /// than restated in this entry's: a caller who asked about the weather minimums is told where
+    /// the openness originates, and is still told which entry it asked
+    /// (<c>docs/decisions/0006</c>).
+    /// </para>
+    /// </remarks>
+    /// <param name="Reason">The reason it gave, or null where it resolved.</param>
+    /// <param name="Account">What it recorded: its outcome where it resolved, what it attempted where it did not.</param>
+    private sealed record ProminenceOutcome(UnresolvedReason? Reason, string Account)
+    {
+        /// <summary>What that entry did with § 107.51(c)'s definition, in this decline's words.</summary>
+        private string Answered => Reason is null
+            ? "answered which objects are \"prominent\", the degree that fixes the distance the definition "
+              + "reports, with a value this entry has no verdict to read"
+            : "did not answer which objects are \"prominent\", the degree that fixes the distance the "
+              + "definition reports";
+
+        /// <inheritdoc/>
+        public override string ToString() =>
+            $"the map entry '{MapEntries.ProminentObjects.Id}' [{MapEntries.ProminentObjects.Locator.Citation}] "
+            + $"{Answered}, so the stated figure is not yet that quantity; what "
+            + $"'{MapEntries.ProminentObjects.Id}' recorded: {Account}";
     }
 }
