@@ -15,6 +15,15 @@ namespace FaaPart107;
 /// the composite's evidence and in no constituent's.
 /// </para>
 /// <para>
+/// <b>Two requests declare a value of this type, and only one of them reads it.</b>
+/// <c>SufficientAvailablePowerRequest.Power</c> is where the condition is tested, by
+/// <see cref="AvailablePower.Enough"/>. <c>PreflightActionsRequest.Power</c> exists because § 107.49
+/// is the entry a caller asking "what must be done before this flight" actually reaches, so the
+/// statement has to be accepted there; <see cref="Preflight"/> hands it to that same rule without
+/// reading it, and § 107.49(d) is therefore conjoined exactly where this entry says the paragraph
+/// reaches the operation (<c>#99</c>). One condition, one implementation, two callers.
+/// </para>
+/// <para>
 /// <b>This is the antecedent and never the assertion.</b> Whether the aircraft <em>is powered</em>
 /// is the condition the paragraph reaches an operation under; whether there is <em>enough available
 /// power for the small unmanned aircraft system to operate for the intended operational time</em>

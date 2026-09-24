@@ -192,7 +192,15 @@ public static class OperationEvaluator
         "sufficient-available-power" => facts => EntryPoints.SufficientAvailablePower.Resolve(
             new Requests.SufficientAvailablePowerRequest(facts.Assertions) { Power = facts.AircraftPower }),
         "preflight-actions" => facts => EntryPoints.PreflightActions.Resolve(
-            new Requests.PreflightActionsRequest(facts.Assertions) { Operation = facts.SubpartDOperation }),
+            new Requests.PreflightActionsRequest(facts.Assertions)
+            {
+                Operation = facts.SubpartDOperation,
+
+                // The same fact the arm above hands sufficient-available-power, and deliberately the
+                // same field: § 107.49(d)'s condition is one fact about one operation, so the two
+                // entries read it from one place and cannot be given different answers (#99).
+                Power = facts.AircraftPower,
+            }),
         "over-human-beings" => facts => EntryPoints.OverHumanBeings.Resolve(
             new Requests.OverHumanBeingsRequest(facts.Assertions)
             {
@@ -418,6 +426,15 @@ public static class OperationEvaluator
         // entries' limit and not this arm's — nothing here needs to know it, and if they ever
         // answer an obligation done this arm follows them unchanged. What varies for a caller is
         // which reason and which locator come back, and Reason and DeclineCites carry both.
+        //
+        // And it stays two-valued where § 107.33's and § 107.29(b)-(c)'s arms are three-valued,
+        // which is not an oversight. Those sections state a condition on the WHOLE of what the
+        // entry answers, so a condition that fails leaves the entry with nothing to say. § 107.49
+        // states its two conditions on single paragraphs, and a paragraph that reaches no
+        // obligation about the operation is simply not one of the conjuncts (Preflight.Actions,
+        // and #99) — the section still conjoins the rest, so AllDone is a bool and not a bool?.
+        // The third answer #95 introduced lives where the condition does, on
+        // sufficient-available-power's own outcome, which Recorded reports Informational.
         PreflightActionsFinding finding => Met(finding.AllDone),
 
         // § 107.39: true when one of the section's excepted cases is met, which is the rule's own

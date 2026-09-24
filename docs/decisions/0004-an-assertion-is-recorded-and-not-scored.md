@@ -188,6 +188,27 @@ is the engine working, not the engine failing — the same posture §6 records f
   covered the day it is built, the same way one without an antecedent already is.
   `OperationEvaluatorTests.A_paragraph_that_does_not_reach_the_operation_is_informational_and_not_an_assertion_recorded`
   pins both halves.
+
+  **A consuming entry follows that answer rather than having one of its own** (`#99`). § 107.49
+  conjoins § 107.49(d), and it reached the paragraph through the shared `Assertions.Stated` rather
+  than through `sufficient-available-power`'s rule, so it never saw the antecedent: on one unpowered
+  operation the engine reported `Informational` for the paragraph and `HumanAssertionRequired` for
+  the section that conjoins it, naming the very assertion the paragraph had just said nobody owes.
+  Being in the composite's `evidence` too is not what decides who reads such a condition — a
+  composite's evidence quotes the whole section and therefore carries every constituent's words. What
+  decides it is whether any constituent's evidence carries it: § 107.49(d)'s does, so
+  `sufficient-available-power` reads it and `preflight-actions` hands the caller's statement to that
+  entry's rule unread; § 107.49(f)'s does not, so `preflight-actions` reads that one itself. **A
+  condition implemented twice is two answers that can disagree**, which is what this cost.
+
+  **What the conjunction does with such a paragraph is "not conjoined", and that is not a fourth
+  verdict.** `ObligationOutcome`'s three — done, not done, undetermined — are answers about an
+  obligation, and a paragraph whose antecedent fails states none about the operation, so no outcome
+  is built for it. Folding the case into "undetermined" would be the one certainly wrong reading:
+  an undetermined conjunct makes the section decline, so a completely described operation would be
+  declined over a paragraph nobody was owed anything under. The composite reads
+  `IConditionalAssertion.ParagraphApplies` for this, not a list of entries or finding types — the
+  same test this record already requires of the evaluator, and for the same reason.
 - **What this costs a caller, measured rather than asserted.** A consuming entry supplies the
   polarity by *using* the fact: where a built entry's own verdict requires an assertion to hold,
   that entry has said which way the assertion points, and a product reads compliance off the
@@ -204,7 +225,7 @@ is the engine working, not the engine failing — the same posture §6 records f
   | `observer-coordination` | `visual-observer-conditions` | § 107.33(c), `finding => finding.Holds`, **and only where a visual observer is used** — § 107.33's chapeau is a condition |
   | `preflight-risk-assessment` | `preflight-actions` | § 107.49(a): an obligation answered **not done** settles the section's conjunction against the operation |
   | `participant-briefing` | `preflight-actions` | § 107.49(b), the same way |
-  | `sufficient-available-power` | `preflight-actions` | § 107.49(d), the same way |
+  | `sufficient-available-power` | `preflight-actions` | § 107.49(d), the same way, **and only where the small unmanned aircraft is stated powered** — § 107.49(d) states its own antecedent, so the section conjoins it only where that entry says the paragraph reaches the operation (`#99`), the same shape `observer-coordination` has under § 107.33's chapeau |
   | `attached-object-no-adverse-effect` | `preflight-actions` | § 107.49(e)'s second conjunct, the same way |
 
   The four § 107.49 constituents are worth one qualification, because it is the difference between

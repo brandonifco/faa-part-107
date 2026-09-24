@@ -19,6 +19,17 @@ namespace FaaPart107;
 /// somewhere, and the corpus states it as a condition about the operation.
 /// </para>
 /// <para>
+/// <b>That is what distinguishes it from § 107.49(d)'s condition, which the same request also
+/// carries.</b> <c>PreflightActionsRequest</c> declares two conditions, and a reader who takes them
+/// for the same kind of input will draw the wrong conclusion from one of them. This one is read
+/// where it is declared, because no constituent's evidence carries it. <see cref="AircraftPower"/>
+/// is in <see cref="MapEntries.SufficientAvailablePower"/>'s evidence as well as the composite's, so
+/// it is that entry's to read (<c>#95</c>) and the composite hands it over unread (<c>#99</c>).
+/// Standing in the composite's evidence is not what decides it: the composite's evidence is § 107.49
+/// entire, so it carries every constituent's words too. What decides it is whether any constituent's
+/// evidence carries it as well.
+/// </para>
+/// <para>
 /// <b>It is stated, never inferred and never defaulted.</b> The two members below are the
 /// condition's two sides and a caller picks one. There is no absent third case that the engine
 /// reads as either: an operation the caller has not described is not an operation outside subpart D,

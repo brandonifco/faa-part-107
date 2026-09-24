@@ -29,6 +29,21 @@ namespace FaaPart107;
 /// invent a reason for an obligation it could not read, which is the fallback <c>#92</c> names in
 /// four merged composites.
 /// </para>
+/// <para>
+/// <b>Three verdicts, and "the paragraph states no obligation" is not a fourth.</b> Done, not done
+/// and undetermined are the three answers to one question — did the remote pilot in command do what
+/// this paragraph requires <em>of this operation</em>. § 107.49(d) and § 107.49(f) each state their
+/// obligation under a condition, and where the caller states that condition is not satisfied the
+/// paragraph requires nothing of the operation at all: there is no obligation for any of the three
+/// verdicts to be about, so no outcome is built for it and the paragraph is simply <b>not
+/// conjoined</b> (<see cref="Preflight.Actions"/>, and <c>#99</c>). A fourth verdict here would put a
+/// conjunct in <see cref="PreflightActionsFinding.Obligations"/> that
+/// <see cref="PreflightActionsFinding.AllDone"/> and the blocking search in
+/// <see cref="Preflight.Actions"/> would each then have to except; and folding the case into
+/// <see cref="Verdict"/> "undetermined" instead is the one answer that is certainly wrong, because
+/// an undetermined conjunct makes this entry decline — so § 107.49 would decline on an operation the
+/// caller described completely, over a paragraph nobody was ever owed anything under.
+/// </para>
 /// </remarks>
 public sealed record ObligationOutcome
 {
@@ -159,12 +174,17 @@ public sealed record ObligationOutcome
 /// </remarks>
 /// <param name="Operation">
 /// Whether the operation will be conducted over human beings under subpart D of this part, as the
-/// caller stated it: § 107.49(f)'s condition.
+/// caller stated it: § 107.49(f)'s condition. § 107.49(d)'s condition is deliberately <b>not</b>
+/// beside it — that one is <see cref="MapEntries.SufficientAvailablePower"/>'s, and
+/// <see cref="SufficientAvailablePowerFinding.Power"/> is where it is recorded, the same way
+/// <see cref="VisualObserverConditionsFinding"/> carries § 107.33's own chapeau and not
+/// <c>visual-line-of-sight</c>'s waiver statement.
 /// </param>
 /// <param name="Obligations">
 /// The obligations the section conjoins, in the section's own paragraph order, each as the entry
-/// that states it answered it. § 107.49(f) is among them exactly where the caller stated the
-/// condition it applies under is satisfied, because the paragraph states no obligation otherwise.
+/// that states it answered it. The two paragraphs that state a condition are among them exactly
+/// where that condition is satisfied, because each states no obligation otherwise: § 107.49(f) on
+/// the condition this entry carries, and § 107.49(d) on the one its own entry carries and tests.
 /// </param>
 public sealed record PreflightActionsFinding(SubpartDOperation Operation, IReadOnlyList<ObligationOutcome> Obligations)
 {
@@ -177,7 +197,7 @@ public sealed record PreflightActionsFinding(SubpartDOperation Operation, IReadO
 
     /// <summary>
     /// Whether the remote pilot in command did all of them prior to flight: true only where every
-    /// obligation the section states was answered done.
+    /// obligation the section states <em>about this operation</em> was answered done.
     /// </summary>
     /// <remarks>
     /// This is computed from what the constituents answered on this operation, and is not a constant
@@ -268,7 +288,7 @@ public sealed record PreflightActionsFinding(SubpartDOperation Operation, IReadO
 /// it records no ambiguity, so there is no open question here for an input to stand in for.
 /// </para>
 /// <para>
-/// <b>§ 107.49(f) is a condition, and it is this entry's one input.</b> "If the operation will be
+/// <b>§ 107.49(f) is a condition, and it is this entry's own to test.</b> "If the operation will be
 /// conducted over human beings under subpart D of this part" is in this entry's evidence and in no
 /// constituent's — <see cref="MapEntries.SubpartDCategories"/>' evidence is subpart D's own
 /// applicability sentence — so, like § 107.33's chapeau in <see cref="Observers"/>, the condition is
@@ -276,6 +296,35 @@ public sealed record PreflightActionsFinding(SubpartDOperation Operation, IReadO
 /// Where it is not satisfied the paragraph states no obligation about the operation, so there is
 /// nothing to conjoin and the entry it defers to is not asked at all; where it is satisfied, what
 /// § 107.49(f) then requires is that entry's, and this engine asks it rather than deciding it.
+/// </para>
+/// <para>
+/// <b>§ 107.49(d) is a condition too, and it is emphatically not this entry's to test.</b> "If the
+/// small unmanned aircraft is powered" stands in this entry's evidence as well — the map quotes
+/// § 107.49 entire — but it also stands in <see cref="MapEntries.SufficientAvailablePower"/>'s, and
+/// it is the only antecedent of that kind in this map that is in two entries' evidence
+/// (<see cref="AvailablePower"/>). Being in the constituent's evidence is what made it the
+/// constituent's to implement (<c>#95</c>), and an antecedent implemented in one place must not be
+/// implemented a second time in another: two implementations of one condition are two answers that
+/// can disagree, and the defect <c>#99</c> reports is exactly that disagreement — this entry reached
+/// § 107.49(d) through the shared <see cref="Assertions.Stated"/>, never saw the condition, and
+/// demanded an assertion of an unpowered aircraft that <c>sufficient-available-power</c> had already
+/// said nobody owes. So (d) is reached here through <see cref="AvailablePower.Enough"/>, that
+/// entry's own rule, condition and all, and nothing in this class compares an
+/// <see cref="AircraftPower"/> with anything. The caller's statement of it is an input to this
+/// entry's request only because the caller has to state it somewhere and this is the entry being
+/// asked; it is handed to that rule unread, the way <see cref="Observers.Conditions"/> hands
+/// <c>visual-line-of-sight</c>'s § 107.31 waiver statement to <see cref="LineOfSight.Maintained"/>
+/// without reading it.
+/// </para>
+/// <para>
+/// <b>What the two conditions do to the conjunction is the same, and it is not a verdict.</b> Where
+/// either condition is not satisfied the paragraph states no obligation about the operation, so
+/// there is nothing of it to conjoin and no <see cref="ObligationOutcome"/> is built for it at all.
+/// That is not an obligation left undetermined: an undetermined conjunct makes this entry decline,
+/// and a paragraph that asks nothing of the operation must not make a completely described operation
+/// decline. What differs between them is only <em>where</em> the condition is read — this entry for
+/// (f), because there is no constituent whose evidence carries it; that constituent's own rule for
+/// (d), because there is.
 /// </para>
 /// <para>
 /// <b>What (f) being out of scope does to this entry, the map settles.</b> Its note calls (f) "a
@@ -353,11 +402,21 @@ public static class Preflight
     /// flight, all of what § 107.49 requires on the operation the caller states.
     /// </summary>
     /// <remarks>
+    /// <para>
     /// Each obligation is asked, in the section's own paragraph order, and each is answered by the
     /// entry the map gives it. The conjunction is then read off those answers: any obligation
     /// answered not done makes the whole not done; all of them answered done makes it done;
     /// otherwise the first obligation that was not answered blocks, and this entry declines naming
     /// itself and every obligation that went unanswered.
+    /// </para>
+    /// <para>
+    /// Two paragraphs state their obligation under a condition, and where the caller states that
+    /// condition is not satisfied the paragraph is not among the obligations at all: § 107.49(f) on
+    /// the condition this entry's own evidence carries and this rule tests, and § 107.49(d) on the
+    /// condition <see cref="MapEntries.SufficientAvailablePower"/>'s evidence carries and
+    /// <see cref="AvailablePower.Enough"/> tests. Not conjoined is not undetermined — see
+    /// <see cref="ObligationOutcome"/>.
+    /// </para>
     /// </remarks>
     /// <param name="operation">
     /// Whether the operation will be conducted over human beings under subpart D of this part, as
@@ -365,26 +424,39 @@ public static class Preflight
     /// reads subpart B, and an engine that decided which operations subpart D reaches would be
     /// working a subpart the map declares out of scope.
     /// </param>
+    /// <param name="power">
+    /// Whether the small unmanned aircraft is powered, as the caller states it: § 107.49(d)'s
+    /// condition, which is <see cref="MapEntries.SufficientAvailablePower"/>'s own and is carried
+    /// here only to be handed to that entry's rule. Nothing in this class reads it. Required, and
+    /// never inferred — an aircraft the caller has not described is not an unpowered aircraft.
+    /// </param>
     /// <param name="assertions">
-    /// What the caller asserts. The four obligations § 107.49 leaves to the remote pilot in command
-    /// to report arrive here under their own entries' ids, and each is demanded by its own entry and
-    /// never defaulted in either direction.
+    /// What the caller asserts. The obligations § 107.49 leaves to the remote pilot in command to
+    /// report arrive here under their own entries' ids, and each is demanded by its own entry and
+    /// never defaulted in either direction — § 107.49(d)'s only where that entry's own condition is
+    /// satisfied, because a paragraph that states no obligation demands no assertion.
     /// </param>
     /// <returns>
     /// The finding; otherwise, where no obligation is answered not done and one went unanswered,
     /// this entry's own decline, carrying the blocking obligation's reason and citing its locator.
     /// </returns>
     /// <exception cref="AssertionRequiredException">
-    /// The caller asserted nothing for one of the four obligations § 107.49 gives the remote pilot in
-    /// command to report.
+    /// The caller asserted nothing for one of the obligations § 107.49 gives the remote pilot in
+    /// command to report <em>and states about this operation</em>. There are four of them on a
+    /// powered aircraft and three on an unpowered one, because § 107.49(d) asks nothing of an
+    /// aircraft its own condition does not reach.
     /// </exception>
     /// <exception cref="ArgumentException">
     /// An asserted value is not an <see cref="Assertion"/>, is about another entry, or is attributed
     /// to somebody § 107.49's lead-in does not name.
     /// </exception>
-    public static Resolution<PreflightActionsFinding> Actions(SubpartDOperation operation, RuleRequest assertions)
+    public static Resolution<PreflightActionsFinding> Actions(
+        SubpartDOperation operation,
+        AircraftPower power,
+        RuleRequest assertions)
     {
         ArgumentNullException.ThrowIfNull(operation);
+        ArgumentNullException.ThrowIfNull(power);
         ArgumentNullException.ThrowIfNull(assertions);
 
         // Every obligation is asked, in § 107.49's own lettering, and the answer below is read off
@@ -395,10 +467,24 @@ public static class Preflight
             Stated(MapEntries.PreflightRiskAssessment, "(a)", assertions),
             Stated(MapEntries.ParticipantBriefing, "(b)", assertions),
             Untyped(MapEntries.ControlLinksWorking, "(c)", ControlLinks.Working()),
-            Stated(MapEntries.SufficientAvailablePower, "(d)", assertions),
-            Untyped(MapEntries.AttachedObjectSecure, "(e)", AttachedObject.Secure()),
-            Stated(MapEntries.AttachedObjectNoAdverseEffect, "(e)", assertions),
         };
+
+        // § 107.49(d), through the entry whose evidence carries the paragraph's own condition. That
+        // entry tests "If the small unmanned aircraft is powered" and this one does not: the
+        // condition is asked once, where #95 put it, so the section and the paragraph cannot answer
+        // one operation two ways (#99). Where the paragraph states no obligation about the
+        // operation, Conditional returns none and there is nothing of (d) to conjoin.
+        if (Conditional(
+            MapEntries.SufficientAvailablePower,
+            "(d)",
+            AvailablePower.Enough(power, assertions),
+            availability => availability.Holds) is { } availablePower)
+        {
+            obligations.Add(availablePower);
+        }
+
+        obligations.Add(Untyped(MapEntries.AttachedObjectSecure, "(e)", AttachedObject.Secure()));
+        obligations.Add(Stated(MapEntries.AttachedObjectNoAdverseEffect, "(e)", assertions));
 
         // § 107.49(f)'s condition. Where the caller states it is not satisfied the paragraph states
         // no obligation about this operation, so there is nothing to conjoin for it and the entry it
@@ -423,15 +509,28 @@ public static class Preflight
     }
 
     /// <summary>
-    /// One of the four obligations § 107.49 leaves to the remote pilot in command to report, as that
+    /// One of the obligations § 107.49 leaves to the remote pilot in command to report and states
+    /// unconditionally — § 107.49(a), § 107.49(b) and the second conjunct of § 107.49(e) — as that
     /// obligation's own entry answers it: the fact unchanged, on the map's entry.
     /// </summary>
     /// <remarks>
+    /// <para>
     /// <see cref="Assertions.Stated"/> is the mechanism each of those entries' own handler uses, and
     /// it is what is called here: the assertion is demanded under that entry's id, refused if it is
     /// about another entry or attributed to somebody the map does not name, and answered unchanged.
     /// An assertion entry has no unresolved outcome of its own — correspondence row 8 — so this
     /// reads the verdict straight off the fact the caller reported, in either direction.
+    /// </para>
+    /// <para>
+    /// <b>The fourth such obligation, § 107.49(d), is not read this way, and that is the point of
+    /// <c>#99</c>.</b> Calling the shared mechanism reaches the assertion past the entry that states
+    /// it, so a paragraph whose own evidence carries an antecedent has that antecedent skipped: an
+    /// unpowered aircraft was asked here for a fact <c>sufficient-available-power</c> had already
+    /// answered nobody owes. Those three paragraphs state no antecedent at all — their evidence is
+    /// "(a) Assess …", "(b) Ensure that all persons directly participating …" and "does not adversely
+    /// affect …" — so for them the shared mechanism and the entry's own rule cannot differ, and this
+    /// stays the way they are read. § 107.49(d) goes through <see cref="Conditional"/>.
+    /// </para>
     /// </remarks>
     private static ObligationOutcome Stated(MapEntry entry, string paragraph, RuleRequest assertions) =>
         Outcome(entry, paragraph, Assertions.Stated(entry, assertions), assertion => assertion.Holds);
@@ -452,6 +551,47 @@ public static class Preflight
         Outcome(entry, paragraph, resolution, value => value as bool?);
 
     /// <summary>
+    /// An obligation whose own paragraph states the condition it is owed under, answered by the
+    /// entry whose evidence carries that condition: the outcome where the paragraph states an
+    /// obligation about this operation, and <see langword="null"/> where it states none.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Null is "not conjoined", and it is the only honest answer this type can give.</b> An
+    /// <see cref="ObligationOutcome"/> is a verdict on an obligation, and where the paragraph's
+    /// antecedent fails there is no obligation to have one: not done would convict an operation the
+    /// paragraph says nothing about, done would excuse it, and undetermined would make § 107.49
+    /// decline on facts the caller stated completely. So the conjunction is over the obligations the
+    /// section states <em>about this operation</em>, which is what its lead-in's "must" ranges over.
+    /// </para>
+    /// <para>
+    /// <b>The condition is the answering entry's and is never re-tested here.</b> What this reads is
+    /// <see cref="IConditionalAssertion.ParagraphApplies"/> — the rule's own declaration that its
+    /// paragraph did not reach the operation — and never the caller's statement of the condition.
+    /// That is the same test <c>Evaluation.OperationEvaluator</c> makes, for the same reason
+    /// <c>docs/decisions/0004</c> gives: it names no entry and no finding type, so a constituent a
+    /// later map version states under an antecedent of its own is conjoined correctly the day it is
+    /// built. § 107.49(d) is the one such constituent today (<c>#95</c>, <c>#99</c>).
+    /// </para>
+    /// <para>
+    /// A decline is still an unanswered obligation and is conjoined as one. An entry that could not
+    /// answer has not said its paragraph fails to reach the operation; it has said it could not say,
+    /// and those are different, which is the whole of why this returns null only on the resolved
+    /// branch.
+    /// </para>
+    /// </remarks>
+    private static ObligationOutcome? Conditional<T>(
+        MapEntry entry,
+        string paragraph,
+        Resolution<T> resolution,
+        Func<T, bool?> done)
+        where T : notnull, IConditionalAssertion =>
+        resolution.Match<ObligationOutcome?>(
+            value => value.ParagraphApplies ? Read(entry, paragraph, value, done) : null,
+            unresolved => ObligationOutcome.Unanswered(
+                entry, paragraph, unresolved.Attempted, unresolved.Reason));
+
+    /// <summary>
     /// One obligation's answer, as this entry records it: the verdict <paramref name="done"/> reads
     /// off what the answering entry resolved, or the reason and the account of its decline.
     /// </summary>
@@ -462,11 +602,23 @@ public static class Preflight
         Func<T, bool?> done)
         where T : notnull =>
         resolution.Match(
-            value => done(value) is { } verdict
-                ? ObligationOutcome.Answered(entry, paragraph, verdict, value.ToString() ?? string.Empty)
-                : ObligationOutcome.Unreadable(entry, paragraph, value.ToString() ?? string.Empty),
+            value => Read(entry, paragraph, value, done),
             unresolved => ObligationOutcome.Unanswered(
                 entry, paragraph, unresolved.Attempted, unresolved.Reason));
+
+    /// <summary>
+    /// The verdict read off a value an answering entry resolved: what <paramref name="done"/> found,
+    /// or an obligation this entry has no verdict to read from.
+    /// </summary>
+    /// <remarks>
+    /// The account is the answering entry's own <c>ToString()</c> and is never restated in this
+    /// entry's words, which is what keeps § 107.49 from speaking for its constituents.
+    /// </remarks>
+    private static ObligationOutcome Read<T>(MapEntry entry, string paragraph, T value, Func<T, bool?> done)
+        where T : notnull =>
+        done(value) is { } verdict
+            ? ObligationOutcome.Answered(entry, paragraph, verdict, value.ToString() ?? string.Empty)
+            : ObligationOutcome.Unreadable(entry, paragraph, value.ToString() ?? string.Empty);
 
     /// <summary>
     /// This entry's own decline for an operation no obligation settled: it names the entry the

@@ -167,12 +167,18 @@ public sealed record OperationFacts
 
     /// <summary>
     /// Whether the small unmanned aircraft is powered — § 107.49(d)'s condition
-    /// (<c>sufficient-available-power</c>). Never inferred in either direction, and never read off
-    /// the assertion made under that entry: whether the aircraft is powered is the condition the
-    /// paragraph states its obligation under, and whether there is enough available power for the
-    /// small unmanned aircraft system to operate for the intended operational time is the fact the
-    /// remote pilot in command reports under it.
+    /// (<c>sufficient-available-power</c>, and <c>preflight-actions</c>, which conjoins that
+    /// paragraph). Never inferred in either direction, and never read off the assertion made under
+    /// that entry: whether the aircraft is powered is the condition the paragraph states its
+    /// obligation under, and whether there is enough available power for the small unmanned aircraft
+    /// system to operate for the intended operational time is the fact the remote pilot in command
+    /// reports under it.
     /// </summary>
+    /// <remarks>
+    /// One field feeds both entries, which is how the two cannot answer one operation differently:
+    /// <c>sufficient-available-power</c> tests it, and <c>preflight-actions</c> hands it to that
+    /// entry's rule rather than testing it again (<c>#99</c>).
+    /// </remarks>
     public AircraftPower? AircraftPower { get; init; }
 
     /// <summary>The airspace the operation is in (<c>airspace-authorized</c>, § 107.41).</summary>
