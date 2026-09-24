@@ -117,18 +117,24 @@ scope guards stand ahead of those**, so that a census looking at nothing cannot 
 `OperationEvaluatorTests`, `DeterminismTests` and `WeatherMinimumsMetEntryPointTests` are each
 inside what was counted, and that the generated-class harvest returned something. **None of the four
 has been watched**; §7's bar is one watched mutation per test, which the four record checks clear
-several times over, and watching these would be work this issue does not need. What fires each is
-worth stating exactly, because the obvious answer is wrong for three of them:
+several times over, and watching these would be work this issue does not need.
 
-- **Not a rename.** The three classes are named through `nameof`, which the compiler checks, so a
-  rename that updates the `nameof` cannot fire the guard, and one that does not is a compile error
-  rather than an assertion failure. What fires a `Contains` guard is the named class contributing no
-  `[Fact]` or `[Theory]` to what was counted: its tests moved out or were deleted, or — the case the
-  guard is really for — a `Generated/*.g.cs` came to declare a class of that short name, and the
-  exemption above swallowed a hand-written class whole.
-- **A harvest that finds none.** `Assert.NotEmpty` fires when `tests/FaaPart107.Tests/Generated/`
-  yields no class at all: the directory emptied or renamed, or `\bclass\s+(\w+)` stopping to match.
-  Nothing would then be exempt, which fails loudly here rather than quietly widening the census.
+Three revisions of this paragraph described what would fire them, at increasing length, and a review
+found each description wrong in some particular — which is this record's own subject arrived at from
+the other side: a mechanism nobody ran, written about rather than watched. What stands here is what
+has been checked against the source, and nothing else stands here:
+
+- The three classes are named through `nameof`, so the compiler checks the name. A `Contains` guard
+  fires when its named class contributes no `[Fact]` or `[Theory]` to what was counted.
+- One way that could happen is the short-name exemption below swallowing a hand-written class whole.
+  **That is not reachable today**: both files under `tests/FaaPart107.Tests/Generated/` declare
+  `namespace FaaPart107.Tests;`, which is the namespace every hand-written test class is in, so a
+  generated class sharing a hand-written class's name would be a duplicate type definition and a
+  compile error. It becomes reachable if the factory ever emits into another namespace.
+- `Assert.NotEmpty` fires when that directory exists and yields no class name: no `*.g.cs` in it, or
+  a `*.g.cs` that `\bclass\s+(\w+)` does not match. A directory that is **absent** does not reach
+  that guard at all — `Directory.EnumerateFiles` throws out of `FactoryGeneratedClasses()` first, and
+  the test goes red by unhandled exception rather than by the guard.
 
 Its scope is
 every `[Fact]` and `[Theory]` in the built test assembly **except** those declared by a class in
