@@ -450,7 +450,14 @@ public class OperatingLimitationsEntryPointTests
         var error = Assert.Throws<ArgumentException>(() =>
             Registry.Resolve("operating-limitations", RuleRequest.Empty));
 
-        Assert.Equal(nameof(OperatingLimitationsRequest.Person), error.ParamName);
+        // The waiver statement first, because the gate reads it and the gate comes first
+        // (docs/decisions/0008); the six operational facts are owed next, once a statement that no
+        // waiver is in force has put the entry back in reach.
+        Assert.Equal(nameof(OperatingLimitationsRequest.Waiver), error.ParamName);
+        Assert.Equal(
+            nameof(OperatingLimitationsRequest.Person),
+            Assert.Throws<ArgumentException>(() => EntryPoints.OperatingLimitations.Resolve(
+                new OperatingLimitationsRequest(RuleRequest.Empty) { Waiver = NoWaiver })).ParamName);
     }
 
     /// <summary>

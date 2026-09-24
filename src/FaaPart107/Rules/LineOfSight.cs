@@ -240,7 +240,7 @@ public static class LineOfSight
     /// <see cref="ExerciseOfTheAbility"/> tested against <see cref="Combinations"/>. A negative
     /// assertion is answered, not declined, and leaves § 107.31 not maintained.
     /// </remarks>
-    /// <param name="exercise">Who exercised the ability throughout the entire flight, as the caller states it.</param>
+    /// <param name="exercise">Who exercised the ability throughout the entire flight, as the caller states it. Required once the entry is reachable, and demanded after the gate (<c>docs/decisions/0008</c>).</param>
     /// <param name="waiver">Whether a waiver of § 107.31 is in force, as the caller states it.</param>
     /// <param name="assertions">What the caller asserts, carrying <c>unaided-visual-contact</c>'s value. Never defaulted.</param>
     /// <returns>
@@ -252,16 +252,16 @@ public static class LineOfSight
     /// No waiver is in force and the caller asserted nothing for <c>unaided-visual-contact</c>.
     /// </exception>
     /// <exception cref="ArgumentException">
-    /// The waiver statement is about another regulation, or the value asserted for
+    /// The waiver statement is about another regulation; or no waiver is in force and
+    /// <paramref name="exercise"/> was not stated; or the value asserted for
     /// <c>unaided-visual-contact</c> is not an <see cref="Assertion"/>, is about another entry, or is
     /// attributed to somebody § 107.31(a) does not name.
     /// </exception>
     public static Resolution<VisualLineOfSightFinding> Maintained(
-        ExerciseOfTheAbility exercise,
+        ExerciseOfTheAbility? exercise,
         WaiverStatement waiver,
         RuleRequest assertions)
     {
-        ArgumentNullException.ThrowIfNull(exercise);
         ArgumentNullException.ThrowIfNull(assertions);
 
         if (Waivers.Suspension(MapEntries.VisualLineOfSight, Regulation, waiver) is { } suspended)
@@ -269,8 +269,11 @@ public static class LineOfSight
             return Resolution<VisualLineOfSightFinding>.FromUnresolved(suspended);
         }
 
+        var stated = Demands.Of(
+            exercise, MapEntries.VisualLineOfSight, nameof(Requests.VisualLineOfSightRequest.Exercise));
+
         return UnaidedVision.SeenThroughoutTheFlight(waiver, assertions).Match(
-            ability => Resolution<VisualLineOfSightFinding>.FromValue(new VisualLineOfSightFinding(exercise, ability)),
+            ability => Resolution<VisualLineOfSightFinding>.FromValue(new VisualLineOfSightFinding(stated, ability)),
             Resolution<VisualLineOfSightFinding>.FromUnresolved);
     }
 }

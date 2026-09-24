@@ -288,10 +288,10 @@ public static class Observers
     /// the first requirement that was not answered blocks, and this entry declines naming itself and
     /// that entry.
     /// </remarks>
-    /// <param name="use">Whether a visual observer is used during the aircraft operation, as the caller states it. Never inferred.</param>
-    /// <param name="exercise">Who exercised § 107.31(a)'s ability throughout the entire flight, as the caller states it: <c>visual-line-of-sight</c>'s input, for § 107.33(b).</param>
+    /// <param name="use">Whether a visual observer is used during the aircraft operation, as the caller states it. Never inferred; required once the entry is reachable, and demanded after the gate (<c>docs/decisions/0008</c>).</param>
+    /// <param name="exercise">Who exercised § 107.31(a)'s ability throughout the entire flight, as the caller states it: <c>visual-line-of-sight</c>'s input, for § 107.33(b). Required once the entry is reachable, and demanded after the gate.</param>
     /// <param name="waiver">Whether a waiver of § 107.33 is in force, as the caller states it.</param>
-    /// <param name="visualLineOfSightWaiver">Whether a waiver of § 107.31 is in force, as the caller states it: the statement <c>visual-line-of-sight</c> is asked under, for § 107.33(b).</param>
+    /// <param name="visualLineOfSightWaiver">Whether a waiver of § 107.31 is in force, as the caller states it: the statement <c>visual-line-of-sight</c> is asked under, for § 107.33(b). It is § 107.31's gate and not this entry's, so it too is required only once <em>this</em> entry is reachable, and demanded after this entry's gate.</param>
     /// <param name="assertions">What the caller asserts, carrying <c>unaided-visual-contact</c>'s and <c>observer-coordination</c>'s values. Never defaulted.</param>
     /// <returns>
     /// The finding; <see cref="UnresolvedReason.OutsideCurrentScope"/> citing § 107.205 while a
@@ -309,32 +309,40 @@ public static class Observers
     /// not name.
     /// </exception>
     public static Resolution<VisualObserverConditionsFinding> Conditions(
-        VisualObserverUse use,
-        ExerciseOfTheAbility exercise,
+        VisualObserverUse? use,
+        ExerciseOfTheAbility? exercise,
         WaiverStatement waiver,
-        WaiverStatement visualLineOfSightWaiver,
+        WaiverStatement? visualLineOfSightWaiver,
         RuleRequest assertions)
     {
-        ArgumentNullException.ThrowIfNull(use);
-        ArgumentNullException.ThrowIfNull(exercise);
         ArgumentNullException.ThrowIfNull(assertions);
 
         // This entry's own gate, before anything else. § 107.205(d) lists § 107.33 whole, so the
         // same statement would suspend (a) and (c) a moment later; running it here is what keeps
         // the decline in this entry's name, and stops a fact the waiver has made irrelevant from
-        // being demanded.
+        // being demanded — including the three demanded below, which is what
+        // docs/decisions/0008 settles for every gated entry of this engine.
         if (Waivers.Suspension(MapEntries.VisualObserverConditions, Regulation, waiver) is { } suspended)
         {
             return Resolution<VisualObserverConditionsFinding>.FromUnresolved(suspended);
         }
 
+        var stated = Demands.Of(
+            use, MapEntries.VisualObserverConditions, nameof(Requests.VisualObserverConditionsRequest.Use));
+        var exercised = Demands.Of(
+            exercise, MapEntries.VisualObserverConditions, nameof(Requests.VisualObserverConditionsRequest.Exercise));
+        var sightWaiver = Demands.Of(
+            visualLineOfSightWaiver,
+            MapEntries.VisualObserverConditions,
+            nameof(Requests.VisualObserverConditionsRequest.VisualLineOfSightWaiver));
+
         // The chapeau's condition. Where it is not satisfied the section states no requirement, so
         // there is nothing to ask and nothing to conjoin — and the finding says that rather than
         // saying the requirements are met.
-        if (use != VisualObserverUse.Used)
+        if (stated != VisualObserverUse.Used)
         {
             return Resolution<VisualObserverConditionsFinding>.FromValue(
-                new VisualObserverConditionsFinding(use, SectionApplies: false, [], waiver));
+                new VisualObserverConditionsFinding(stated, SectionApplies: false, [], waiver));
         }
 
         // Every requirement is asked, in the section's paragraph order, and the answer below is read
@@ -351,7 +359,7 @@ public static class Observers
             Outcome(
                 "(b)",
                 MapEntries.VisualLineOfSight,
-                LineOfSight.Maintained(exercise, visualLineOfSightWaiver, assertions),
+                LineOfSight.Maintained(exercised, sightWaiver, assertions),
                 finding => finding.Ability.Holds),
             Outcome(
                 "(c)",
@@ -367,8 +375,8 @@ public static class Observers
         // answered leaves nothing open.
         return Array.Exists(requirements, requirement => requirement.Met == false) || blocking is null
             ? Resolution<VisualObserverConditionsFinding>.FromValue(
-                new VisualObserverConditionsFinding(use, SectionApplies: true, requirements, waiver))
-            : Resolution<VisualObserverConditionsFinding>.FromUnresolved(Undetermined(use, requirements, blocking));
+                new VisualObserverConditionsFinding(stated, SectionApplies: true, requirements, waiver))
+            : Resolution<VisualObserverConditionsFinding>.FromUnresolved(Undetermined(stated, requirements, blocking));
     }
 
     /// <summary>

@@ -172,34 +172,50 @@ public static class Altitude
     /// <c>altitude-limit</c>'s, reached through <c>dependsOn</c> and not restated here.
     /// </para>
     /// </remarks>
-    /// <param name="altitudeAboveGroundLevelFeet">The altitude, in feet above ground level, not negative.</param>
-    /// <param name="structure">What the caller states about the structure the exception is claimed under.</param>
+    /// <param name="altitudeAboveGroundLevelFeet">
+    /// The altitude, in feet above ground level, not negative. Required once the entry is reachable,
+    /// and demanded after the gate (<c>docs/decisions/0008</c>).
+    /// </param>
+    /// <param name="structure">
+    /// What the caller states about the structure the exception is claimed under. Required once the
+    /// entry is reachable, and demanded after the gate.
+    /// </param>
     /// <param name="waiver">Whether a waiver of § 107.51 is in force, as the caller states it.</param>
     /// <returns>
     /// The finding; <see cref="UnresolvedReason.OutsideCurrentScope"/> citing § 107.205 while a waiver is in
     /// force.
     /// </returns>
+    /// <exception cref="ArgumentException">
+    /// The waiver statement is about another regulation; or no waiver is in force and
+    /// <paramref name="altitudeAboveGroundLevelFeet"/> or <paramref name="structure"/> was not stated.
+    /// </exception>
     public static Resolution<AltitudeFinding> Within(
-        decimal altitudeAboveGroundLevelFeet,
-        StructureStatement structure,
+        decimal? altitudeAboveGroundLevelFeet,
+        StructureStatement? structure,
         WaiverStatement waiver)
     {
-        ArgumentNullException.ThrowIfNull(structure);
-        ArgumentOutOfRangeException.ThrowIfNegative(altitudeAboveGroundLevelFeet);
-
         if (Waivers.Suspension(MapEntries.AltitudeWithinLimit, Regulation, waiver) is { } suspended)
         {
             return Resolution<AltitudeFinding>.FromUnresolved(suspended);
         }
 
+        var feet = Demands.Of(
+            altitudeAboveGroundLevelFeet,
+            MapEntries.AltitudeWithinLimit,
+            nameof(Requests.AltitudeWithinLimitRequest.AltitudeAboveGroundLevelFeet));
+        var stated = Demands.Of(
+            structure, MapEntries.AltitudeWithinLimit, nameof(Requests.AltitudeWithinLimitRequest.Structure));
+
+        ArgumentOutOfRangeException.ThrowIfNegative(feet, nameof(altitudeAboveGroundLevelFeet));
+
         return Limit(waiver).Match(
             limit => Resolution<AltitudeFinding>.FromValue(new AltitudeFinding(
-                altitudeAboveGroundLevelFeet,
-                WithinGroundLevelCeiling: altitudeAboveGroundLevelFeet <= limit.AboveGroundLevelFeet,
-                WithinStructureRadius: structure.DistanceFeet is { } distance && distance <= limit.StructureRadiusFeet,
-                WithinStructureAllowance: structure.ImmediateUppermostLimitFeet is { } uppermost
-                    && altitudeAboveGroundLevelFeet <= uppermost + limit.AboveStructureUppermostLimitFeet,
-                structure,
+                feet,
+                WithinGroundLevelCeiling: feet <= limit.AboveGroundLevelFeet,
+                WithinStructureRadius: stated.DistanceFeet is { } distance && distance <= limit.StructureRadiusFeet,
+                WithinStructureAllowance: stated.ImmediateUppermostLimitFeet is { } uppermost
+                    && feet <= uppermost + limit.AboveStructureUppermostLimitFeet,
+                stated,
                 limit)),
             Resolution<AltitudeFinding>.FromUnresolved);
     }

@@ -492,7 +492,14 @@ public class WeatherMinimumsMetEntryPointTests
         var error = Assert.Throws<ArgumentException>(() =>
             Registry.Resolve("weather-minimums-met", RuleRequest.Empty));
 
-        Assert.Equal(nameof(WeatherMinimumsMetRequest.FlightVisibilityStatuteMiles), error.ParamName);
+        // The waiver statement first, because the gate reads it and the gate comes first
+        // (docs/decisions/0008); the two measurements are owed next, once a statement that no
+        // waiver is in force has put the entry back in reach.
+        Assert.Equal(nameof(WeatherMinimumsMetRequest.Waiver), error.ParamName);
+        Assert.Equal(
+            nameof(WeatherMinimumsMetRequest.FlightVisibilityStatuteMiles),
+            Assert.Throws<ArgumentException>(() => EntryPoints.WeatherMinimumsMet.Resolve(
+                new WeatherMinimumsMetRequest(RuleRequest.Empty) { Waiver = NoWaiver })).ParamName);
     }
 
     /// <summary>

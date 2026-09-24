@@ -66,29 +66,29 @@ namespace FaaPart107
         /// </summary>
         /// <remarks>
         /// <para>
-        /// The handler decides nothing. It demands the four inputs the rule needs, never defaulting
-        /// any of them, and hands the caller's assertions through unchanged so that the entries
-        /// this one reaches answer on their own terms and cite their own locators. The map gives
-        /// this entry no <c>assertedBy</c>, so nothing asserted under its own id is an input here.
+        /// The handler decides nothing. None of the four inputs the rule needs is ever defaulted,
+        /// and the caller's assertions are handed through unchanged so that the entries this one
+        /// reaches answer on their own terms and cite their own locators. The map gives this entry
+        /// no <c>assertedBy</c>, so nothing asserted under its own id is an input here.
         /// </para>
         /// <para>
-        /// <b>All four are demanded here, before the rule's waiver gate is read</b>, because they
-        /// are the arguments of the call: a request that states a waiver in force and leaves one of
-        /// them unset is refused naming that input rather than declined
-        /// <see cref="UnresolvedReason.OutsideCurrentScope"/>. What the gate precedes is the
-        /// assertion — no constituent is asked for a waived operation, so nothing is demanded
-        /// through <see cref="RuleRequest"/>. This is <c>operating-limitations</c>',
-        /// <c>visual-observer-conditions</c>' and <c>anti-collision-lighting</c>' ordering;
-        /// <c>reasonable-protection</c> takes the other one, passing its input in unresolved so its
-        /// rule can demand it after the gate. Which is right is not recorded anywhere in this
-        /// repository and is not this entry's to settle (<c>AGENTS.md</c> §6).
+        /// <b>Only the waiver statement is demanded here</b>, because
+        /// <see cref="Waivers.Suspension"/> is what reads it and the gate cannot run without it.
+        /// The other three are handed over as the caller left them, so the rule demands each after
+        /// the gate: a request that states a waiver in force and leaves one of them unset is
+        /// declined <see cref="UnresolvedReason.OutsideCurrentScope"/> citing § 107.205 rather than
+        /// refused naming that input. That is
+        /// <c>docs/decisions/0008-the-waiver-gate-precedes-every-other-demand.md</c>, and the
+        /// ordering every § 107.205-gated entry of this engine now takes. What the gate precedes is
+        /// unchanged for the assertions: no constituent is asked for a waived operation, so nothing
+        /// is demanded through <see cref="RuleRequest"/> either.
         /// </para>
         /// </remarks>
         internal static partial Resolution<object> CivilTwilightOperation(Requests.CivilTwilightOperationRequest request) =>
             Answer(Twilight.Operation(
-                Demand(request.Place, request.EntryId, nameof(request.Place)),
-                Demand(request.Period, request.EntryId, nameof(request.Period)),
-                Demand(request.Lighting, request.EntryId, nameof(request.Lighting)),
+                request.Place,
+                request.Period,
+                request.Lighting,
                 Demand(request.Waiver, request.EntryId, nameof(request.Waiver)),
                 request.Assertions));
     }

@@ -38,10 +38,16 @@ namespace FaaPart107
         /// <c>unaided-visual-contact</c>'s and this entry asserts nothing of its own: the map gives
         /// <c>visual-line-of-sight</c> no <c>assertedBy</c>, so a value asserted under this entry's
         /// own id is not an input to anything here.
+        /// <para>
+        /// The waiver statement is demanded here, and only it, because
+        /// <see cref="Waivers.Suspension"/> is what reads it and the gate cannot run without it.
+        /// The exercise of the ability is handed over as the caller left it, so the rule demands it
+        /// after the gate (<c>docs/decisions/0008</c>).
+        /// </para>
         /// </remarks>
         internal static partial Resolution<object> VisualLineOfSight(Requests.VisualLineOfSightRequest request) =>
             Answer(LineOfSight.Maintained(
-                Demand(request.Exercise, request.EntryId, nameof(request.Exercise)),
+                request.Exercise,
                 Demand(request.Waiver, request.EntryId, nameof(request.Waiver)),
                 request.Assertions));
     }

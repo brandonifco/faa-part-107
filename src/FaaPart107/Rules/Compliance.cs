@@ -173,19 +173,27 @@ public static class Compliance
     /// with all of the operating limitations § 107.51 lists, on the operation the caller states.
     /// </summary>
     /// <remarks>
+    /// <para>
     /// Each constituent entry is asked, in the order this entry's <c>dependsOn</c> lists them, and
     /// each answers on its own terms with the facts the caller stated for it. The conjunction is
     /// then read off those answers: any limitation resolved not met makes the whole not complied
     /// with; all of them resolved met makes it complied with; otherwise the first constituent that
     /// did not resolve blocks the answer and this entry declines, naming itself and that
     /// constituent.
+    /// </para>
+    /// <para>
+    /// All six caller facts below are demanded here, in the order § 107.51 states its limitations,
+    /// and every one of them <em>after</em> the § 107.205 gate: a caller who states a waiver of
+    /// § 107.51 is in force owes this entry nothing else, because nothing else could change what it
+    /// answers (<c>docs/decisions/0008</c>).
+    /// </para>
     /// </remarks>
-    /// <param name="person">Which of the two people the introductory text names the caller asks about. Required, and never inferred.</param>
-    /// <param name="groundspeed">The small unmanned aircraft's groundspeed, for § 107.51(a).</param>
-    /// <param name="altitudeAboveGroundLevelFeet">The small unmanned aircraft's altitude, in feet above ground level, for § 107.51(b).</param>
-    /// <param name="structure">What the caller states about the structure § 107.51(b)'s exception is claimed under.</param>
-    /// <param name="flightVisibilityStatuteMiles">The flight visibility the caller states, observed from the location of the control station, in statute miles, for § 107.51(c).</param>
-    /// <param name="cloud">What the caller states about the cloud § 107.51(d)'s two minimums are distances from, or that the aircraft is not operated near one.</param>
+    /// <param name="person">Which of the two people the introductory text names the caller asks about. Required once the entry is reachable, and never inferred.</param>
+    /// <param name="groundspeed">The small unmanned aircraft's groundspeed, for § 107.51(a). Required once the entry is reachable.</param>
+    /// <param name="altitudeAboveGroundLevelFeet">The small unmanned aircraft's altitude, in feet above ground level, for § 107.51(b). Required once the entry is reachable.</param>
+    /// <param name="structure">What the caller states about the structure § 107.51(b)'s exception is claimed under. Required once the entry is reachable.</param>
+    /// <param name="flightVisibilityStatuteMiles">The flight visibility the caller states, observed from the location of the control station, in statute miles, for § 107.51(c). Required once the entry is reachable.</param>
+    /// <param name="cloud">What the caller states about the cloud § 107.51(d)'s two minimums are distances from, or that the aircraft is not operated near one. Required once the entry is reachable.</param>
     /// <param name="waiver">Whether a waiver of § 107.51 is in force, as the caller states it.</param>
     /// <returns>
     /// The finding; <see cref="UnresolvedReason.OutsideCurrentScope"/> citing § 107.205 while a
@@ -193,24 +201,39 @@ public static class Compliance
     /// constituent did not resolve, this entry's own decline, carrying that constituent's reason
     /// and citing its locator.
     /// </returns>
-    /// <exception cref="ArgumentException">The waiver statement is about another regulation.</exception>
+    /// <exception cref="ArgumentException">
+    /// The waiver statement is about another regulation; or no waiver is in force and one of the
+    /// six caller facts was not stated.
+    /// </exception>
     public static Resolution<OperatingLimitationsFinding> CompliedWith(
-        BoundPerson person,
-        Groundspeed groundspeed,
-        decimal altitudeAboveGroundLevelFeet,
-        StructureStatement structure,
-        decimal flightVisibilityStatuteMiles,
-        CloudStatement cloud,
+        BoundPerson? person,
+        Groundspeed? groundspeed,
+        decimal? altitudeAboveGroundLevelFeet,
+        StructureStatement? structure,
+        decimal? flightVisibilityStatuteMiles,
+        CloudStatement? cloud,
         WaiverStatement waiver)
     {
-        ArgumentNullException.ThrowIfNull(person);
-        ArgumentNullException.ThrowIfNull(structure);
-        ArgumentNullException.ThrowIfNull(cloud);
-
         if (Waivers.Suspension(MapEntries.OperatingLimitations, Regulation, waiver) is { } suspended)
         {
             return Resolution<OperatingLimitationsFinding>.FromUnresolved(suspended);
         }
+
+        var asked = Demands.Of(person, MapEntries.OperatingLimitations, nameof(Requests.OperatingLimitationsRequest.Person));
+        var speed = Demands.Of(
+            groundspeed, MapEntries.OperatingLimitations, nameof(Requests.OperatingLimitationsRequest.Groundspeed));
+        var feet = Demands.Of(
+            altitudeAboveGroundLevelFeet,
+            MapEntries.OperatingLimitations,
+            nameof(Requests.OperatingLimitationsRequest.AltitudeAboveGroundLevelFeet));
+        var structureStated = Demands.Of(
+            structure, MapEntries.OperatingLimitations, nameof(Requests.OperatingLimitationsRequest.Structure));
+        var miles = Demands.Of(
+            flightVisibilityStatuteMiles,
+            MapEntries.OperatingLimitations,
+            nameof(Requests.OperatingLimitationsRequest.FlightVisibilityStatuteMiles));
+        var cloudStated = Demands.Of(
+            cloud, MapEntries.OperatingLimitations, nameof(Requests.OperatingLimitationsRequest.Cloud));
 
         // Every constituent is asked, and the answer below is read off what each one actually
         // returned. Nothing here records in advance which of them can resolve: an entry whose
@@ -220,15 +243,15 @@ public static class Compliance
         [
             Outcome(
                 MapEntries.SpeedWithinLimit,
-                Speed.Within(groundspeed, waiver),
+                Speed.Within(speed, waiver),
                 finding => finding.WithinLimit),
             Outcome(
                 MapEntries.AltitudeWithinLimit,
-                Altitude.Within(altitudeAboveGroundLevelFeet, structure, waiver),
+                Altitude.Within(feet, structureStated, waiver),
                 finding => finding.WithinLimit),
             Outcome(
                 MapEntries.WeatherMinimumsMet,
-                Weather.MinimumsMet(flightVisibilityStatuteMiles, cloud, waiver),
+                Weather.MinimumsMet(miles, cloudStated, waiver),
                 finding => finding.MinimumsMet),
         ];
 
@@ -239,9 +262,9 @@ public static class Compliance
         // resolved leaves nothing open.
         return Array.Exists(limitations, limitation => limitation.Met == false) || blocking is null
             ? Resolution<OperatingLimitationsFinding>.FromValue(
-                new OperatingLimitationsFinding(person, limitations, waiver))
+                new OperatingLimitationsFinding(asked, limitations, waiver))
             : Resolution<OperatingLimitationsFinding>.FromUnresolved(
-                Undetermined(person, limitations, blocking));
+                Undetermined(asked, limitations, blocking));
     }
 
     /// <summary>

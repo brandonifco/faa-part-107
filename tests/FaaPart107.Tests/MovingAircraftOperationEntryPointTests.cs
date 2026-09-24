@@ -147,7 +147,15 @@ public class MovingAircraftOperationEntryPointTests
         var error = Assert.Throws<ArgumentException>(
             () => Registry.Resolve("moving-aircraft-operation", RuleRequest.Empty));
 
-        Assert.Equal(nameof(MovingAircraftOperationRequest.FromAMovingAircraft), error.ParamName);
+        // The waiver statement first, because the gate reads it and the gate comes first
+        // (docs/decisions/0008). The paragraph's own fact is owed next, once a statement that no
+        // waiver is in force has put the entry back in reach.
+        Assert.Equal(nameof(MovingAircraftOperationRequest.Waiver), error.ParamName);
         Assert.Contains("moving-aircraft-operation", error.Message, StringComparison.Ordinal);
+
+        Assert.Equal(
+            nameof(MovingAircraftOperationRequest.FromAMovingAircraft),
+            Assert.Throws<ArgumentException>(() => EntryPoints.MovingAircraftOperation.Resolve(
+                new MovingAircraftOperationRequest(RuleRequest.Empty) { Waiver = NoWaiver })).ParamName);
     }
 }

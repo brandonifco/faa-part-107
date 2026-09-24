@@ -74,10 +74,12 @@ public static class MovingVehicle
     /// <param name="fromMovingLandOrWaterBorneVehicle">
     /// Whether the small unmanned aircraft system is operated from a moving land or water-borne vehicle,
     /// as the caller states it. The engine does not infer it, and (a)'s moving aircraft is not this entry.
+    /// Required once the entry is reachable, and demanded after the gate (<c>docs/decisions/0008</c>).
     /// </param>
     /// <param name="transportingAnotherPersonsPropertyForCompensationOrHire">
     /// Whether the small unmanned aircraft is transporting another person's property for compensation or
     /// hire, as the caller states it. The engine does not infer the commercial character of a flight.
+    /// Required once the entry is reachable, and demanded after the gate.
     /// </param>
     /// <param name="waiver">Whether a waiver of § 107.25 is in force, as the caller states it.</param>
     /// <returns>
@@ -85,9 +87,13 @@ public static class MovingVehicle
     /// in force; <see cref="UnresolvedReason.RequiresInterpretation"/> citing § 107.25 where the answer
     /// turns on "sparsely populated area".
     /// </returns>
+    /// <exception cref="ArgumentException">
+    /// The waiver statement is about another regulation; or no waiver is in force and either fact
+    /// about the operation was not stated.
+    /// </exception>
     public static Resolution<MovingVehicleFinding> Operation(
-        bool fromMovingLandOrWaterBorneVehicle,
-        bool transportingAnotherPersonsPropertyForCompensationOrHire,
+        bool? fromMovingLandOrWaterBorneVehicle,
+        bool? transportingAnotherPersonsPropertyForCompensationOrHire,
         WaiverStatement waiver)
     {
         if (Waivers.Suspension(MapEntries.MovingVehicleOperation, Regulation, waiver) is { } suspended)
@@ -95,20 +101,29 @@ public static class MovingVehicle
             return Resolution<MovingVehicleFinding>.FromUnresolved(suspended);
         }
 
-        if (!fromMovingLandOrWaterBorneVehicle)
+        var fromVehicle = Demands.Of(
+            fromMovingLandOrWaterBorneVehicle,
+            MapEntries.MovingVehicleOperation,
+            nameof(Requests.MovingVehicleOperationRequest.FromMovingLandOrWaterBorneVehicle));
+        var transporting = Demands.Of(
+            transportingAnotherPersonsPropertyForCompensationOrHire,
+            MapEntries.MovingVehicleOperation,
+            nameof(Requests.MovingVehicleOperationRequest.TransportingAnotherPersonsPropertyForCompensationOrHire));
+
+        if (!fromVehicle)
         {
             return Resolution<MovingVehicleFinding>.FromValue(new MovingVehicleFinding(
-                fromMovingLandOrWaterBorneVehicle,
-                transportingAnotherPersonsPropertyForCompensationOrHire,
+                fromVehicle,
+                transporting,
                 Prohibited: false,
                 waiver));
         }
 
-        if (transportingAnotherPersonsPropertyForCompensationOrHire)
+        if (transporting)
         {
             return Resolution<MovingVehicleFinding>.FromValue(new MovingVehicleFinding(
-                fromMovingLandOrWaterBorneVehicle,
-                transportingAnotherPersonsPropertyForCompensationOrHire,
+                fromVehicle,
+                transporting,
                 Prohibited: true,
                 waiver));
         }

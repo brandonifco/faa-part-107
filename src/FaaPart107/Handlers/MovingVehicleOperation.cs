@@ -27,13 +27,16 @@ namespace FaaPart107
     internal static partial class Handlers
     {
         /// <summary><c>moving-vehicle-operation</c>: <see cref="MovingVehicle.Operation"/>, the finding, or the rule's decline.</summary>
+        /// <remarks>
+        /// The waiver statement is demanded here, and only it, because
+        /// <see cref="Waivers.Suspension"/> is what reads it and the gate cannot run without it.
+        /// The two facts about the operation are handed over as the caller left them, so the rule
+        /// demands each after the gate (<c>docs/decisions/0008</c>).
+        /// </remarks>
         internal static partial Resolution<object> MovingVehicleOperation(Requests.MovingVehicleOperationRequest request) =>
             Answer(MovingVehicle.Operation(
-                Demand(request.FromMovingLandOrWaterBorneVehicle, request.EntryId, nameof(request.FromMovingLandOrWaterBorneVehicle)),
-                Demand(
-                    request.TransportingAnotherPersonsPropertyForCompensationOrHire,
-                    request.EntryId,
-                    nameof(request.TransportingAnotherPersonsPropertyForCompensationOrHire)),
+                request.FromMovingLandOrWaterBorneVehicle,
+                request.TransportingAnotherPersonsPropertyForCompensationOrHire,
                 Demand(request.Waiver, request.EntryId, nameof(request.Waiver))));
     }
 }

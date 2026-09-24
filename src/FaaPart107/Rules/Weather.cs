@@ -190,8 +190,8 @@ public static class Weather
     /// alone, which would presume of § 107.51(d) the very thing this entry declines to decide.
     /// </para>
     /// </remarks>
-    /// <param name="flightVisibilityStatuteMiles">The flight visibility the caller states, observed from the location of the control station, in statute miles, not negative.</param>
-    /// <param name="cloud">What the caller states about the cloud § 107.51(d)'s minimums are distances from: the two distances, or that the aircraft is not operated near one.</param>
+    /// <param name="flightVisibilityStatuteMiles">The flight visibility the caller states, observed from the location of the control station, in statute miles, not negative. Required once the entry is reachable, and demanded after the gate (<c>docs/decisions/0008</c>).</param>
+    /// <param name="cloud">What the caller states about the cloud § 107.51(d)'s minimums are distances from: the two distances, or that the aircraft is not operated near one. Required once the entry is reachable, and demanded after the gate.</param>
     /// <param name="waiver">Whether a waiver of § 107.51 is in force, as the caller states it.</param>
     /// <returns>
     /// The finding, the minimums not met, where the statement names a cloud and neither cloud
@@ -199,19 +199,28 @@ public static class Weather
     /// waiver is in force; otherwise this entry's own decline, carrying the reason
     /// <c>prominent-objects</c> gave on this request and citing that entry's § 107.51(c).
     /// </returns>
-    /// <exception cref="ArgumentNullException"><paramref name="cloud"/> is null.</exception>
+    /// <exception cref="ArgumentException">
+    /// The waiver statement is about another regulation; or no waiver is in force and
+    /// <paramref name="flightVisibilityStatuteMiles"/> or <paramref name="cloud"/> was not stated.
+    /// </exception>
     public static Resolution<WeatherMinimumsFinding> MinimumsMet(
-        decimal flightVisibilityStatuteMiles,
-        CloudStatement cloud,
+        decimal? flightVisibilityStatuteMiles,
+        CloudStatement? cloud,
         WaiverStatement waiver)
     {
-        ArgumentNullException.ThrowIfNull(cloud);
-        ArgumentOutOfRangeException.ThrowIfNegative(flightVisibilityStatuteMiles);
-
         if (Waivers.Suspension(MapEntries.WeatherMinimumsMet, Regulation, waiver) is { } suspended)
         {
             return Resolution<WeatherMinimumsFinding>.FromUnresolved(suspended);
         }
+
+        var miles = Demands.Of(
+            flightVisibilityStatuteMiles,
+            MapEntries.WeatherMinimumsMet,
+            nameof(Requests.WeatherMinimumsMetRequest.FlightVisibilityStatuteMiles));
+        var stated = Demands.Of(
+            cloud, MapEntries.WeatherMinimumsMet, nameof(Requests.WeatherMinimumsMetRequest.Cloud));
+
+        ArgumentOutOfRangeException.ThrowIfNegative(miles, nameof(flightVisibilityStatuteMiles));
 
         return Visibility.Minimum(waiver).Match(
             minimum => Clouds.Clearance(waiver).Match(
@@ -221,17 +230,17 @@ public static class Weather
                     // a statement that names no cloud measured none. Nothing here supplies one:
                     // there is no figure to compare, so there is no comparison, and the entry says
                     // so rather than answering from the absence.
-                    if (cloud.FeetBelowCloud is not { } below || cloud.FeetHorizontallyFromCloud is not { } horizontal)
+                    if (stated.FeetBelowCloud is not { } below || stated.FeetHorizontallyFromCloud is not { } horizontal)
                     {
                         return Resolution<WeatherMinimumsFinding>.FromUnresolved(
-                            NoCloudToMeasureFrom(flightVisibilityStatuteMiles, cloud, minimum));
+                            NoCloudToMeasureFrom(miles, stated, minimum));
                     }
 
                     var finding = new WeatherMinimumsFinding(
-                        flightVisibilityStatuteMiles,
+                        miles,
                         BelowCloudMinimumMet: below >= clearance.BelowCloudFeet,
                         HorizontallyFromCloudMinimumMet: horizontal >= clearance.HorizontallyFromCloudFeet,
-                        cloud,
+                        stated,
                         minimum,
                         clearance);
 

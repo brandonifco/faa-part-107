@@ -234,11 +234,21 @@ public static class Overflight
     /// unmanned aircraft over a human being the caller states is <paramref name="location"/>.
     /// </summary>
     /// <remarks>
+    /// <para>
     /// Each of the three cases § 107.39 excepts is asked, in the section's own paragraph order, and
     /// each answers on its own terms. The disjunction is then read off those answers: any case met
     /// makes § 107.39 not prohibit the operation; every case answered and none met makes it prohibit
     /// it; otherwise the first case that did not answer blocks it and this entry declines, naming
     /// itself and every case that did not answer.
+    /// </para>
+    /// <para>
+    /// The § 107.205(g) gate runs before either of the other two caller facts is demanded, which is
+    /// <c>docs/decisions/0008-the-waiver-gate-precedes-every-other-demand.md</c>, and this entry
+    /// goes further than that record requires: <paramref name="shelter"/> is demanded later still,
+    /// only once the caller has located the human being under one of § 107.39(b)'s two places,
+    /// because a human being under neither makes the place the standard was asserted over
+    /// irrelevant in its own right. The gate first is the floor, not the schedule.
+    /// </para>
     /// </remarks>
     /// <param name="location">
     /// Where the human being is located, as the caller states it. Required once the entry is

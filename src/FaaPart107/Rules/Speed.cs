@@ -96,30 +96,40 @@ public static class Speed
     /// and does not exceed the limit, which is <see cref="MapEntries.SpeedLimit"/>'s open question
     /// reached through <c>dependsOn</c>, so the decline cites that entry.
     /// </remarks>
-    /// <param name="groundspeed">The groundspeed.</param>
+    /// <param name="groundspeed">
+    /// The groundspeed, as the caller states it. Required once the entry is reachable, and demanded
+    /// after the gate (<c>docs/decisions/0008</c>).
+    /// </param>
     /// <param name="waiver">Whether a waiver of § 107.51 is in force, as the caller states it.</param>
     /// <returns>
     /// The finding; <see cref="UnresolvedReason.OutsideCurrentScope"/> citing § 107.205 while a waiver is in
     /// force; <see cref="UnresolvedReason.RequiresInterpretation"/> citing <c>speed-limit</c>'s § 107.51(a)
     /// between the two figures.
     /// </returns>
-    public static Resolution<GroundspeedFinding> Within(Groundspeed groundspeed, WaiverStatement waiver)
+    /// <exception cref="ArgumentException">
+    /// The waiver statement is about another regulation; or no waiver is in force and
+    /// <paramref name="groundspeed"/> was not stated.
+    /// </exception>
+    public static Resolution<GroundspeedFinding> Within(Groundspeed? groundspeed, WaiverStatement waiver)
     {
         if (Waivers.Suspension(MapEntries.SpeedWithinLimit, Regulation, waiver) is { } suspended)
         {
             return Resolution<GroundspeedFinding>.FromUnresolved(suspended);
         }
 
+        var stated = Demands.Of(
+            groundspeed, MapEntries.SpeedWithinLimit, nameof(Requests.SpeedWithinLimitRequest.Groundspeed));
+
         return Limit(waiver).Match(
             limit =>
             {
-                var beyondKnots = groundspeed.Exceeds(limit.Knots);
-                var beyondMilesPerHour = groundspeed.Exceeds(limit.MilesPerHour);
+                var beyondKnots = stated.Exceeds(limit.Knots);
+                var beyondMilesPerHour = stated.Exceeds(limit.MilesPerHour);
                 return beyondKnots == beyondMilesPerHour
-                    ? Resolution<GroundspeedFinding>.FromValue(new GroundspeedFinding(groundspeed, !beyondKnots, limit))
+                    ? Resolution<GroundspeedFinding>.FromValue(new GroundspeedFinding(stated, !beyondKnots, limit))
                     : Resolution<GroundspeedFinding>.FromUnresolved(new UnresolvedResult(
                         UnresolvedReason.RequiresInterpretation,
-                        $"decide whether {groundspeed} exceeds {limit.Knots} ({limit.MilesPerHour}): it exceeds one printed figure "
+                        $"decide whether {stated} exceeds {limit.Knots} ({limit.MilesPerHour}): it exceeds one printed figure "
                         + $"and not the other, and the map entry '{MapEntries.SpeedLimit.Id}' does not say which governs",
                         MapEntries.SpeedLimit.Locator));
             },

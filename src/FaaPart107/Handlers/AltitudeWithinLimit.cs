@@ -24,10 +24,16 @@ namespace FaaPart107
     internal static partial class Handlers
     {
         /// <summary><c>altitude-within-limit</c>: <see cref="Altitude.Within"/>, the finding, or the rule's decline.</summary>
+        /// <remarks>
+        /// The waiver statement is demanded here, and only it, because
+        /// <see cref="Waivers.Suspension"/> is what reads it and the gate cannot run without it.
+        /// The altitude and the structure statement are handed over as the caller left them, so the
+        /// rule demands each after the gate (<c>docs/decisions/0008</c>).
+        /// </remarks>
         internal static partial Resolution<object> AltitudeWithinLimit(Requests.AltitudeWithinLimitRequest request) =>
             Answer(Altitude.Within(
-                Demand(request.AltitudeAboveGroundLevelFeet, request.EntryId, nameof(request.AltitudeAboveGroundLevelFeet)),
-                Demand(request.Structure, request.EntryId, nameof(request.Structure)),
+                request.AltitudeAboveGroundLevelFeet,
+                request.Structure,
                 Demand(request.Waiver, request.EntryId, nameof(request.Waiver))));
     }
 }

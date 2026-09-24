@@ -21,10 +21,16 @@ namespace FaaPart107
     internal static partial class Handlers
     {
         /// <summary><c>airspace-authorized</c>: <see cref="Airspace.Authorized"/>, the finding, or the rule's decline.</summary>
+        /// <remarks>
+        /// The waiver statement is demanded here, and only it, because
+        /// <see cref="Waivers.Suspension"/> is what reads it and the gate cannot run without it.
+        /// The airspace and the ATC authorization statement are handed over as the caller left
+        /// them, so the rule demands each after the gate (<c>docs/decisions/0008</c>).
+        /// </remarks>
         internal static partial Resolution<object> AirspaceAuthorized(Requests.AirspaceAuthorizedRequest request) =>
             Answer(Airspace.Authorized(
-                Demand(request.Airspace, request.EntryId, nameof(request.Airspace)),
-                Demand(request.Authorization, request.EntryId, nameof(request.Authorization)),
+                request.Airspace,
+                request.Authorization,
                 Demand(request.Waiver, request.EntryId, nameof(request.Waiver))));
     }
 }
