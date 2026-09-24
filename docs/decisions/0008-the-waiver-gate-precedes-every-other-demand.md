@@ -27,10 +27,11 @@ The other twelve gated entries demand no typed input at all, so the ordering is 
 them; they already declined.
 
 **The divergence lived entirely in the handler layer.** Every one of the fifteen rules reached its
-gate before it did anything with a non-waiver input. (Not before *everything*: the gate was the
-rule's first statement in only three of the fifteen — `speed-within-limit`,
-`moving-vehicle-operation` and `moving-aircraft-operation` — and the other twelve validated their
-arguments first. That distinction is drawn where it bites, under "The majority's defence" below.)
+gate before it *demanded* a non-waiver input. (Not before it touched one: twelve of the fifteen
+validated their arguments first — `ThrowIfNull`, and in three cases a value check — and the gate
+was the rule's first statement in only three, `speed-within-limit`, `moving-vehicle-operation` and
+`moving-aircraft-operation`. The distinction between touching an argument and demanding it is
+drawn where it bites, under "The majority's defence" below.)
 What differed was whether the handler wrapped the rule's other arguments in `Demand(...)` — which
 throws `ArgumentException` at the call site, before the rule is entered — or passed them through as
 the caller left them so the rule could demand them after the gate. No fact in the map discriminates
@@ -88,8 +89,11 @@ makes a certificate authorise deviation only "to the extent specified".
 fact — carriage of property of another *by aircraft* for compensation or hire — is on no request in
 this engine. The nearest thing is
 `MovingVehicleOperationRequest.TransportingAnotherPersonsPropertyForCompensationOrHire`, and it is
-a **different** fact: it is § 107.25(b)'s own condition, about an operation from a moving land or
-water-borne vehicle, while the proviso is about carriage by aircraft. § 107.205(a) suspends the
+**not obviously the same fact, and this engine reads neither**: it is § 107.25(b)'s own condition,
+about an operation from a moving land or water-borne vehicle, while the proviso says "by aircraft".
+Whether "by aircraft" there reaches the small unmanned aircraft is a reading, and on the reading
+that it does the two are the same operational fact; the corpus does not settle it and nothing here
+turns on which way it goes. § 107.205(a) suspends the
 whole of § 107.25 — both `moving-vehicle-operation` and `moving-aircraft-operation` — and that
 input is on one of the two requests; § 107.205(c)'s identical proviso reaches
 `visual-line-of-sight`, whose request has nothing of the kind at all. So the engine records the
@@ -114,10 +118,12 @@ exactly the right thing to say about a suspended entry, and is not what the thir
 **The majority's defence does not survive contact with the code.** Three things are wrong with
 "the inputs are the arguments of the call":
 
-- The arguments were already ordered, inside the rule. **No rule read a demanded input before its
-  gate**: in all fifteen, the first thing done with a non-waiver input was done after
-  `Waivers.Suspension` had run. That is the narrow true claim, and it is worth stating narrowly,
-  because the gate was the rule's *first statement* in only **three** of the fifteen —
+- The arguments were already ordered, inside the rule. **No rule demanded a non-waiver input
+  before its gate**: in all fifteen, the first use that could *fail for want of a value the caller
+  had not given* came after `Waivers.Suspension` had run. That is the narrow true claim, and it
+  needs stating narrowly, because plenty was done with those arguments first — they were validated
+  in twelve of the fifteen — and because the gate was the rule's *first statement* in only
+  **three** of the fifteen —
   `speed-within-limit`, `moving-vehicle-operation` and `moving-aircraft-operation`. The other
   twelve validated their arguments first, and three of those validations were observable, not
   merely defensive: `Altitude.Within`'s `ThrowIfNegative(altitudeAboveGroundLevelFeet)`,
@@ -251,12 +257,13 @@ what produced this.
   signature change. Through `EntryPoints` and `Registry`, which is how the engine is meant to be
   reached and how every test reaches it, nothing moves: those callers were passing the request's
   own nullable property all along.
-- **Twenty-nine mutation records elsewhere quote code this change renamed or deleted, and this is
+- **Thirty-four mutation records elsewhere quote code this change renamed or deleted, and this is
   the list.** Making each rule's demanded value a new local meant renaming the use sites — `lighting`
   became `stated`, `place` became `where`, `use` became `stated`, `fromAMovingAircraft` became
   `stated`, `person` became `asked`, `flightVisibilityStatuteMiles` became `miles`, `authorization`
-  became `held`, `exercise` became `exercised` — and thirteen handler `Demand(...)` calls were
-  deleted outright. Every record below was true when it was observed and none of its *claims*
+  became `held`, `exercise` became `exercised` — and across thirteen handlers **twenty-eight**
+  `Demand(...)` call sites were deleted outright (41 → 13; `operating-limitations` alone loses six,
+  `civil-twilight-operation` and `visual-observer-conditions` three each). Every record below was true when it was observed and none of its *claims*
   changes; what changes is that re-running one means translating an identifier, or moving the
   substitution from a handler to the rule. The list lives here rather than in the pull request
   because `docs/decisions/0007` rejects the pull request as a place for mutation evidence in terms
@@ -295,16 +302,33 @@ what produced this.
 | `weather-minimums-met` | `WeatherMinimumsMetEntryPointTests.While_a_waiver_of_107_51_is_stated_in_force_it_declines_OutsideCurrentScope_citing_107_205_and_records_the_statement` | `NoCloudToMeasureFrom(flightVisibilityStatuteMiles, cloud, …)` |
 | `weather-minimums-met` | `WeatherMinimumsMetEntryPointTests.Without_a_stated_figure_it_refuses_rather_than_assume_one` | `Demand(request.Cloud,`; `Demand(request.FlightVisibilityStatuteMiles,` |
 | cross-cutting | `OperationEvaluatorTests.The_cost_recorded_in_decision_0004_is_the_cost_the_engine_actually_has` | `rate => lighting.IntensityReduced` |
+| `altitude-within-limit` | `AltitudeWithinLimitEntryPointTests.Within_the_radius_but_higher_than_400_feet_above_the_structures_immediate_uppermost_limit_is_beyond_the_limit` | `structure.ImmediateUppermostLimitFeet is { } uppermost && altitudeAboveGroundLevelFeet <= uppermost + limit.AboveSt…` |
+| `right-of-way` | `RightOfWayEntryPointTests.An_object_107_37_a_names_passed_over_under_or_ahead_declines_with_this_entrys_own_decline_on_well_clears_question` | `Undetermined(encountered, position, WellClear(waiver))` |
+| `weather-minimums-met` | `WeatherMinimumsMetEntryPointTests.Stated_that_the_aircraft_is_not_operated_near_a_cloud_it_declines_and_says_107_51_d_has_no_measured_distance` | `if (cloud.FeetBelowCloud is not { } below \|\| cloud.FeetHorizontallyFromCloud is not { } horizontal) { return ...…` |
+| `operating-limitations` | `OperatingLimitationsEntryPointTests.An_ordinary_clear_air_operation_is_not_reported_as_breaking_the_operating_limitations` | `if (cloud.FeetBelowCloud is not { } below \|\| cloud.FeetHorizontallyFromCloud is not { } horizontal) { return ...…` |
 
   **How the list was made, and what the method cannot see.** Every backtick-quoted fragment in
   `corpus-map.overlay.json` and `cross-cutting-mutations.json` was taken, and those present in
-  `src/` and `tests/` at `684cb7d` and absent after this change were kept. It is a lower bound, not
-  a census: a fragment that elides with `...` is only matched up to the ellipsis, so one whose
-  elision is in the *middle* is missed — the two `weather-minimums-met` rows above were found by
-  hand for exactly that reason, and they are the worst of the set, because
-  `flightVisibilityStatuteMiles` is `decimal?` now and those fragments no longer type-check. A
-  fragment that is the mutation's *inserted* code rather than the original is also skipped, since
-  it is not meant to be in the tree. Four further records were found the same way and **are**
+  `src/` and `tests/` at `684cb7d` and absent after this change were kept. **It is a lower bound
+  and not a census**, in three ways, and the third was found by review rather than by the sweep:
+
+  1. A fragment that elides with `...` is only matched up to the ellipsis, so one whose elision is
+     in the *middle* is missed. The two `weather-minimums-met` rows quoting
+     `NoCloudToMeasureFrom(flightVisibilityStatuteMiles, …)` and
+     `new WeatherMinimumsFinding(flightVisibilityStatuteMiles, …)` were found by hand for exactly
+     that reason, and they are the worst of the set, because `flightVisibilityStatuteMiles` is
+     `decimal?` now and those fragments no longer type-check.
+  2. A fragment that is the mutation's *inserted* code rather than the original is skipped, since
+     it is not meant to be in the tree.
+  3. **A fragment spanning a source line break never matches literally**, because the record writes
+     it on one line and the source wraps it. The last four rows of the table are that case, and
+     they were found by the semantic review of `5526466`, not by the sweep.
+
+  So a follow-up that wants the real set needs **whitespace normalisation**, not just an ellipsis
+  fix — and even that is not enough on its own. Of those four, only `altitude-within-limit`'s
+  matches once whitespace is collapsed; the other three are hand-written reconstructions of the
+  original (an `if` and its body rendered as one line, a `return` recomposed), which no literal
+  matcher finds at any normalisation. Some of this list will always have to be read for. Four further records were found the same way and **are**
   reworded on freshly observed mutations rather than left: `speed-within-limit`'s
   `Without_a_groundspeed_it_refuses`, whose substitution moves from the handler to the rule, and
   the three `moving-aircraft-operation` rows that quoted `Prohibited: fromAMovingAircraft`.
