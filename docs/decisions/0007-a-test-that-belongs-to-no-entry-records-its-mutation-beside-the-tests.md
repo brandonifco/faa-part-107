@@ -52,6 +52,18 @@ file a test happens to live in. A test that exercises one entry's rule *through*
 home already, and this repository has used it: `sufficient-available-power` and `preflight-actions`
 each already name a test in `OperationEvaluatorTests.cs`.
 
+**Neither of those two rows satisfies the rule stated below, and that is worth knowing before
+either is read as an example.** `corpus-map.overlay.json:392` files
+`An_assertion_is_wrapped_exactly_where_a_caller_fact_is_demanded_ahead_of_it` under
+`sufficient-available-power`, and that test is a census over every row 8 entry rather than a test of
+that entry's rule; `corpus-map.overlay.json:1864` files
+`A_paragraph_and_the_section_that_conjoins_it_answer_one_operation_the_same_way` under
+`preflight-actions` and records its mutation **inside `Evaluation.OperationEvaluator`** — the one
+place this record says a correctly filed test's mutation never is. Both predate this change and
+re-filing them is out of scope for it. What the precedent establishes is that an evaluator-level
+test *can* be filed under an entry; where the line falls is what the rule below fixes, and these two
+rows are on the far side of it.
+
 The rule this record fixes:
 
 > A test belongs to map entry **E** when the property it exists to prove is **E**'s own rule's
@@ -105,7 +117,22 @@ every `[Fact]` and `[Theory]` in the built test assembly **except** those declar
 `tests/FaaPart107.Tests/Generated/*.g.cs` — a `generated` row in `ownership.py`, rewritten from the
 map by every `factory produce` and not this engine's to name a mutation for. The exemption is read
 off that directory at run time rather than written down as a list of class names, so a hand-written
-class cannot be exempted by being added to a list: it would have to be generated.
+class cannot be exempted by being added to a list: it would have to be **named after a generated
+class**. That is the exemption's limit, stated rather than left to be discovered — the match is on
+the class's short name, harvested from those files with `\bclass\s+(\w+)`, so a hand-written
+`CorrespondenceTests` in another namespace would be exempt. The narrower check would be on the
+declaring type's source file, which reflection does not carry.
+
+Two more limits of the same kind, neither of which a class in this engine reaches today:
+
+- `EveryTest()` reads `BindingFlags.DeclaredOnly`, so a test method **inherited** from a base class
+  would be enumerated under the base class's name while xunit and `named-tests` see the derived
+  one — the record would have to name a class that does not run it. No test class here has a base
+  class.
+- Both records are keyed by `Class.Method` with the class's short name, which is the convention
+  `named-tests` uses and inherits its blind spot: two classes of that name in different namespaces
+  cannot be told apart. `named-tests` refuses such a name rather than guessing; this check does not
+  see the ambiguity at all.
 
 ## What was rejected
 
@@ -142,9 +169,10 @@ say so if the overlay cannot hold it. It cannot, and this is where it goes inste
 
 ## Consequences
 
-- **Forty-five tests now carry a mutation that was watched failing**: the forty-four above and
-  `RecordedMutationTests`' own, whose mutation is a row removed from the cross-cutting record so
-  that the check fails on the condition it exists for.
+- **Forty-five tests now carry a mutation that was watched failing**: the forty-four above with one
+  each, and `RecordedMutationTests` with four — one per assertion it makes, because an xUnit test
+  stops at the first assertion that fires and a mutation that trips an earlier one proves nothing
+  about a later one. Its row records all four and the message each printed.
 - **A test deleted along with its row is now caught from one side and a test added without a row
   from the other.** `named-tests` fails on an overlay row whose test no longer runs;
   `RecordedMutationTests` fails on a test that runs and is named by nobody, and on a cross-cutting
