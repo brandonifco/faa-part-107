@@ -1,3 +1,4 @@
+using FaaPart107.Evaluation;
 using FaaPart107.Requests;
 using RulesKernel.Resolution;
 using Xunit;
@@ -6,7 +7,7 @@ namespace FaaPart107.Tests;
 
 /// <summary>
 /// <c>weather-minimums-met</c>, § 107.51(c)-(d), resolved through
-/// <see cref="EntryPoints.WeatherMinimumsMet"/> only: each cloud minimum at, just below and just
+/// <see cref="EntryPoints.WeatherMinimumsMet"/>: each cloud minimum at, just below and just
 /// above its printed figure and each independently of the other, the operation the caller states
 /// is not near a cloud at all, a stated flight visibility at, just below and just above 3 statute
 /// miles, and the waiver gate in both directions (the entry's note, and rules-factory decision
@@ -31,6 +32,16 @@ namespace FaaPart107.Tests;
 /// nothing was measured, so neither minimum was found unmet — and it is not § 107.51(d) met
 /// either, which would be this engine answering a question the map does not settle. It declines,
 /// and the decline says which of those two it is not.
+/// </para>
+/// <para>
+/// The last two reach the entry through <see cref="OperationEvaluator"/> rather than through its
+/// entry point, because what they pin is about the finding and can only be seen there: this
+/// entry's finding records § 107.51(c)'s stated flight visibility and its
+/// <see cref="WeatherMinimumsFinding.ToString"/> does not print it, so it is the one finding in
+/// this engine that tells apart two outcomes the engine says the same words about. That makes it
+/// the worked case for <see cref="EvaluatedRequirement.Equals(EvaluatedRequirement)"/> comparing
+/// the finding rather than the rendering, and each of the two is red on a mutation to this
+/// entry's own rule as well as on one to that comparison.
 /// </para>
 /// </remarks>
 public class WeatherMinimumsMetEntryPointTests
@@ -407,5 +418,79 @@ public class WeatherMinimumsMetEntryPointTests
             Registry.Resolve("weather-minimums-met", RuleRequest.Empty));
 
         Assert.Equal(nameof(WeatherMinimumsMetRequest.FlightVisibilityStatuteMiles), error.ParamName);
+    }
+
+    /// <summary>
+    /// An operation the evaluator can reach this entry on, and nothing more than that: the two
+    /// distances § 107.51(d) measures, both well short of their figures so the entry resolves, the
+    /// stated flight visibility, and a statement that no waiver of § 107.51 is in force. Every
+    /// other entry wants a fact these do not supply and says so, which is no part of what the two
+    /// tests below pin.
+    /// </summary>
+    private static OperationFacts Operation(decimal flightVisibilityStatuteMiles) => new OperationFacts
+    {
+        FlightVisibilityStatuteMiles = flightVisibilityStatuteMiles,
+        Cloud = CloudStatement.Measured(100m, 100m, Caller),
+    }
+        .Stating(WaiverStatement.NoneHeld(Weather.Regulation, Caller));
+
+    /// <summary>This entry's outcome, as a product layer receives it.</summary>
+    private static EvaluatedRequirement Outcome(decimal flightVisibilityStatuteMiles) =>
+        OperationEvaluator.Evaluate(Operation(flightVisibilityStatuteMiles))
+            .Requirement(MapEntries.WeatherMinimumsMet.Id);
+
+    /// <summary>
+    /// Two evaluations of one operation are the same outcome, and the finding is what was compared
+    /// to say so: each evaluation builds its own <see cref="WeatherMinimumsFinding"/>, so they are
+    /// two objects, and they are equal because their values are equal and not because one was
+    /// reached twice. That is the property <c>AGENTS.md</c> §8 asks for — same inputs, same output
+    /// — held at the level of the value rather than of the words printed about it.
+    /// </summary>
+    [Fact]
+    public void Two_evaluations_of_one_operation_are_the_same_outcome_with_the_finding_itself_compared()
+    {
+        var first = Outcome(10m);
+        var second = Outcome(10m);
+
+        var firstFinding = Assert.IsType<WeatherMinimumsFinding>(first.Finding);
+        var secondFinding = Assert.IsType<WeatherMinimumsFinding>(second.Finding);
+
+        // Two objects, not one reached twice: what follows is a comparison of values.
+        Assert.NotSame(firstFinding, secondFinding);
+        Assert.Equal(firstFinding, secondFinding);
+
+        Assert.Equal(first, second);
+        Assert.Equal(first.GetHashCode(), second.GetHashCode());
+    }
+
+    /// <summary>
+    /// The consequence of comparing the rendering rather than the finding, pinned from the side it
+    /// used to be wrong on. § 107.51(c)'s stated flight visibility is recorded on the finding and
+    /// is not printed by it, so two operations that differ only in that figure are two different
+    /// findings the engine says identical words about. They are different outcomes, and the
+    /// identical words are asserted here too — without them the test would pass on a comparison
+    /// that never looked at the finding at all.
+    /// </summary>
+    [Fact]
+    public void Two_operations_differing_only_in_the_stated_visibility_the_finding_does_not_print_are_different_outcomes()
+    {
+        var atFive = Outcome(5m);
+        var atFour = Outcome(4m);
+
+        var findingAtFive = Assert.IsType<WeatherMinimumsFinding>(atFive.Finding);
+        var findingAtFour = Assert.IsType<WeatherMinimumsFinding>(atFour.Finding);
+
+        // The stated figure is the one thing that differs, and the finding records it.
+        Assert.Equal(5m, findingAtFive.FlightVisibilityStatuteMiles);
+        Assert.Equal(4m, findingAtFour.FlightVisibilityStatuteMiles);
+        Assert.Equal(findingAtFive with { FlightVisibilityStatuteMiles = 4m }, findingAtFour);
+
+        // And the engine says exactly the same words about both, so the rendering cannot tell them
+        // apart: this is what the outcomes were compared by before, and why they compared equal.
+        Assert.Equal(findingAtFive.ToString(), findingAtFour.ToString());
+        Assert.Equal(atFive.Explanation, atFour.Explanation);
+
+        Assert.NotEqual(findingAtFive, findingAtFour);
+        Assert.NotEqual(atFive, atFour);
     }
 }

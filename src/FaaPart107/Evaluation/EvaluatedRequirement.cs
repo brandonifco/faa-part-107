@@ -175,35 +175,53 @@ public sealed record EvaluatedRequirement
     /// <see cref="MultipleAircraftFinding"/> gives for overriding its own.
     /// </para>
     /// <para>
-    /// <b><see cref="Finding"/> is deliberately not compared, and <see cref="Explanation"/> stands
-    /// for it. That is a workaround, and it is meant to be undone.</b> The defect it was working
-    /// around is gone: every finding this engine resolves that carries a collection now compares
-    /// that collection by element rather than by the identity of the list object —
-    /// <see cref="OperatingLimitationsFinding"/>, <see cref="OverHumanBeingsFinding"/>,
-    /// <see cref="PreflightActionsFinding"/> and <see cref="VisualObserverConditionsFinding"/> each
-    /// override their own equality for the reason
+    /// <b><see cref="Finding"/> is compared, and it is compared by value.</b> The rule's own
+    /// finding is what the engine resolved, so it is what tells two outcomes apart — not the
+    /// words the engine printed about it. Every finding this engine can resolve is a record, so
+    /// its equality is its fields'; and every one of them that carries a collection overrides that
+    /// equality to compare the collection by element rather than by the identity of the list
+    /// object — <see cref="OperatingLimitationsFinding"/>, <see cref="OverHumanBeingsFinding"/>,
+    /// <see cref="PreflightActionsFinding"/>, <see cref="VisualObserverConditionsFinding"/> and
+    /// <see cref="MultipleAircraftFinding"/>, each for the reason
     /// <see cref="MultipleAircraftFinding.Equals(MultipleAircraftFinding)"/> gives and cites,
-    /// <c>AGENTS.md</c> §8. So comparing findings here no longer makes two resolutions of one
+    /// <c>AGENTS.md</c> §8. So comparing findings here does not make two resolutions of one
     /// request unequal over which list object happened to carry them.
     /// </para>
     /// <para>
-    /// <b>Restoring the comparison is <c>#97</c>, and not <c>#90</c>.</b> #90 is the equality fix in
-    /// those four findings, and it lands without touching this method: putting <c>Finding</c> back
-    /// is a change to this API rather than to a rule, with its own tests and its own review, and a
-    /// branch that closes #90 may not widen into it (<c>AGENTS.md</c> §4). What #97
-    /// does here is one line, <c>&amp;&amp; Equals(Finding, other.Finding)</c>, which was here
-    /// before, with <see cref="GetHashCode"/> and a test to match; whether
-    /// <see cref="Explanation"/> then stays beside it — the rule's own rendering of the same value,
-    /// so not wrong, only redundant — is that issue's question too.
+    /// <b>What that catches, and a rendered string did not.</b> A finding field the rule does not
+    /// print is inside this comparison now. It was not while <see cref="Explanation"/> stood in
+    /// for the finding: two outcomes could be equal while their findings differed in a field the
+    /// rule kept to itself, and <see cref="WeatherMinimumsFinding"/> is the worked case —
+    /// § 107.51(c)'s stated flight visibility is recorded on the finding and
+    /// <see cref="WeatherMinimumsFinding.ToString"/> omits it, so two operations stating different
+    /// visibilities produced the same words. They differ here now, because what is compared is the
+    /// finding.
     /// </para>
     /// <para>
-    /// Until then one consequence is live and worth knowing. What the engine <em>says</em> about
-    /// the finding is <see cref="Explanation"/>, the rule's own <c>ToString()</c>, compared
-    /// ordinally, so a finding whose reported content differs still makes the outcomes differ — but
-    /// a finding field the rule does not print is outside this comparison, and two outcomes can be
-    /// equal while their findings differ in a field the rule kept to itself.
-    /// <see cref="WeatherMinimumsFinding.ToString"/> omits the stated flight visibility, for
-    /// instance.
+    /// <b><see cref="Explanation"/> stays beside it, and that is a decision rather than an
+    /// oversight.</b> On a resolved outcome it is redundant: it is the finding's own
+    /// <c>ToString()</c> and nothing else, so an equal finding forces an equal explanation. On
+    /// every outcome that is not a resolution there is no finding at all — a decline carries
+    /// <see cref="UnresolvedResult.Attempted"/>, a demanded assertion carries what was demanded,
+    /// a missing fact carries the refusal — and <see cref="Explanation"/> is then the only member
+    /// here holding what the engine said. Dropping it to be rid of the redundancy would make two
+    /// declines that cite the same locator for the same reason in different words the same
+    /// outcome, and those words are the engine's account of why it could not answer. Redundant
+    /// where the finding speaks, load-bearing where nothing else does: it is kept.
+    /// </para>
+    /// <para>
+    /// <b>One condition this rests on, which is not this type's to fix.</b> Comparing findings
+    /// reduces, one level down, to record equality on the values a finding carries, and the only
+    /// map-side value among them is <see cref="Assertion.Entry"/>, a <see cref="MapEntry"/>, whose
+    /// <see cref="MapEntry.AssertedBy"/> is an <see cref="ImmutableArray{T}"/> and so is compared
+    /// by the identity of the array behind it — the very defect this method overrides its own
+    /// equality to avoid. It is sound today for two reasons and no others: every
+    /// <see cref="MapEntry"/> this engine hands out is one of <see cref="MapEntries"/>' shared
+    /// statics, and a record's generated equality short-circuits on reference identity; and where
+    /// an entry names nobody, <c>AssertedBy</c> is the <c>ImmutableArray&lt;string&gt;.Empty</c>
+    /// singleton, which is one array. <see cref="MapEntry"/> is generated, so the fix belongs to
+    /// the generator and not here: it is <c>#110</c>, raised upstream as
+    /// <c>rules-factory#462</c>.
     /// </para>
     /// </remarks>
     public bool Equals(EvaluatedRequirement? other) =>
@@ -217,6 +235,7 @@ public sealed record EvaluatedRequirement
         && string.Equals(AssertionOwed, other.AssertionOwed, StringComparison.Ordinal)
         && AssertionCites == other.AssertionCites
         && string.Equals(Explanation, other.Explanation, StringComparison.Ordinal)
+        && Equals(Finding, other.Finding)
         && string.Equals(MissingInput, other.MissingInput, StringComparison.Ordinal)
         && citations.SequenceEqual(other.citations)
         && assertedBy.SequenceEqual(other.assertedBy, StringComparer.Ordinal);
@@ -229,6 +248,7 @@ public sealed record EvaluatedRequirement
         hash.Add(State);
         hash.Add(Reason);
         hash.Add(Explanation, StringComparer.Ordinal);
+        hash.Add(Finding);
         foreach (var citation in citations)
         {
             hash.Add(citation);
