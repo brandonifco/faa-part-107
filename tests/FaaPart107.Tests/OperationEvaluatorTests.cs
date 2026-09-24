@@ -912,6 +912,54 @@ public class OperationEvaluatorTests
     }
 
     [Fact]
+    public void A_paragraph_and_the_section_that_conjoins_it_answer_one_operation_the_same_way()
+    {
+        // The defect #99 reports, reachable here and nowhere else: on one unpowered operation the
+        // engine said two things — sufficient-available-power reported Informational, because
+        // § 107.49(d) states no obligation about an unpowered aircraft (#95), while preflight-actions
+        // reported HumanAssertionRequired naming that same entry, because it reached the assertion
+        // through the shared mechanism and never saw the condition. Every § 107.49 assertion but that
+        // one is supplied here, so both halves are visible: who is asked, and what is answered.
+        var facts = Registry.Entries
+            .Where(entry => entry.Row == CorrespondenceRow.Assertion
+                && entry.Status == EntryStatus.Implemented
+                && !string.Equals(entry.Id, MapEntries.SufficientAvailablePower.Id, StringComparison.Ordinal))
+            .Aggregate(Stated(), (built, entry) => built.Asserting(new Assertion(MapEntry(entry.Id), true, entry.AssertedBy[0])));
+
+        // Powered: the paragraph states the obligation, so both entries ask the same person for the
+        // same fact, and the section names the constituent whose assertion it is owed.
+        var powered = facts with { AircraftPower = AircraftPower.Powered };
+
+        Assert.Equal(RequirementState.HumanAssertionRequired, State("sufficient-available-power", powered));
+        Assert.Equal(RequirementState.HumanAssertionRequired, State("preflight-actions", powered));
+        Assert.Equal(MapEntries.SufficientAvailablePower.Id, Outcome("preflight-actions", powered).AssertionOwed);
+
+        // Unpowered: the paragraph states no obligation, so nobody owes that assertion — to the
+        // paragraph or through the section. The section is back to its own open question, § 107.49(c).
+        var unpowered = facts with { AircraftPower = AircraftPower.NotPowered };
+        var section = Outcome("preflight-actions", unpowered);
+
+        Assert.Equal(RequirementState.Informational, State("sufficient-available-power", unpowered));
+        Assert.NotEqual(RequirementState.HumanAssertionRequired, section.State);
+        Assert.Null(section.AssertionOwed);
+        Assert.Equal(RequirementState.RequiresInterpretation, section.State);
+        Assert.Equal(MapEntries.ControlLinksWorking.Locator, section.DeclineCites);
+
+        // And the section's own answer stays two-valued: the third answer is the paragraph's, on the
+        // paragraph's own outcome, and it never becomes an undetermined conjunct here (#99). With the
+        // assertion supplied and one obligation reported not done, the section still resolves.
+        var notDone = Outcome(
+            "preflight-actions",
+            unpowered.Asserting(new Assertion(MapEntries.PreflightRiskAssessment, false, RemotePilotInCommand)));
+
+        Assert.Equal(RequirementState.Violated, notDone.State);
+        Assert.DoesNotContain(
+            Assert.IsType<PreflightActionsFinding>(notDone.Finding).Obligations,
+            obligation => string.Equals(
+                obligation.Entry.Id, MapEntries.SufficientAvailablePower.Id, StringComparison.Ordinal));
+    }
+
+    [Fact]
     public void A_stated_place_can_move_an_entry_into_what_the_engine_cannot_determine()
     {
         var facts = Complete();

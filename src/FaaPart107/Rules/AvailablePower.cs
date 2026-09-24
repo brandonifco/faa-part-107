@@ -144,12 +144,22 @@ public sealed record SufficientAvailablePowerFinding : IConditionalAssertion
 /// and what makes it the constituent's to implement.
 /// § 107.49(f)'s runs the other way — <see cref="SubpartDOperation"/>'s condition is in the
 /// composite's evidence and in no constituent's, <c>subpart-d-categories</c>' evidence being
-/// subpart D's own scope sentence, which does not carry it — which is why the composite takes that
-/// one as an input of its own. The evidence therefore does not by itself make the composite follow
-/// this entry, and today it does not: <see cref="Preflight"/> reaches § 107.49(d) through the shared
-/// <see cref="Assertions.Stated"/> and never sees the condition, so an unpowered aircraft put to
-/// <c>preflight-actions</c> is still asked for this assertion. That gap is <c>#99</c>, which is also
-/// where <i>how</i> the composite should follow is to be settled. Nothing here closes it.
+/// subpart D's own scope sentence, which does not carry it — which is why the composite tests that
+/// one itself: there is no constituent to route it through.
+/// </para>
+/// <para>
+/// <b>That asymmetry is what settled how the composite follows this entry</b> (<c>#99</c>). Being in
+/// the composite's evidence too does not make the condition the composite's to read a second time —
+/// the composite's evidence is the whole section, so it carries every constituent's words, and
+/// reading the antecedent there as well would put one condition in two implementations that can
+/// disagree. They did disagree: <see cref="Preflight"/> reached § 107.49(d) through the shared
+/// <see cref="Assertions.Stated"/>, never saw the condition, and demanded this assertion of an
+/// unpowered aircraft that this entry had already answered nobody owes. So § 107.49(d) is now
+/// reached through <see cref="Enough"/>, and the caller's statement of the condition travels on
+/// <c>PreflightActionsRequest.Power</c> unread by that rule; § 107.49(f)'s condition stays the
+/// composite's own input <em>and</em> the composite's own test, because no constituent's evidence
+/// carries it. Where the paragraph states no obligation, the composite conjoins nothing for it,
+/// which is not an undetermined conjunct.
 /// </para>
 /// <para>
 /// <b>The condition comes first, and the assertion only past it</b>, the order

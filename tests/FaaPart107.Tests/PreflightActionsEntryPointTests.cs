@@ -20,6 +20,15 @@ namespace FaaPart107.Tests;
 /// states no obligation about — the entry it defers to is then not asked at all.
 /// </para>
 /// <para>
+/// § 107.49(d) states a condition too, and the tests keep the two apart because the map does.
+/// "If the small unmanned aircraft is powered" is in <c>sufficient-available-power</c>'s evidence as
+/// well as this entry's, so that entry reads it (<c>#95</c>) and this one reaches the paragraph
+/// through <c>AvailablePower.Enough</c> rather than testing it again (<c>#99</c>). The caller states
+/// it on this request because this is the entry being asked, and nothing else follows from that: an
+/// unpowered aircraft is asked for no assertion here, and § 107.49(d) is then <b>not conjoined</b>,
+/// which is a different thing from an undetermined conjunct — an undetermined conjunct blocks.
+/// </para>
+/// <para>
 /// Then the composite's shape (#78): every obligation is asked and the answer follows what each one
 /// returned, and where an unanswered obligation decides the outcome the decline emitted is this
 /// entry's own, naming both entries and citing the blocking entry's locator. That citation is
@@ -68,20 +77,27 @@ public class PreflightActionsEntryPointTests
         holds is { } fact ? assertions.Assert(entry.Id, new Assertion(entry, fact, assertedBy)) : assertions;
 
     /// <summary>
-    /// An operation outside subpart D with all four obligations reported done — the situation every
-    /// obligation this engine can answer is answered done on.
+    /// An operation outside subpart D, on a powered aircraft, with all four obligations reported
+    /// done — the situation every obligation this engine can answer is answered done on.
     /// </summary>
+    /// <remarks>
+    /// The aircraft is powered unless a test says otherwise, because that is the case in which
+    /// § 107.49(d) states the obligation this section conjoins. An unpowered one is the case the
+    /// paragraph states nothing about, and the tests that are about that say so.
+    /// </remarks>
     private static Resolution<object> Resolve(
         SubpartDOperation? operation = null,
         bool? assessed = true,
         bool? briefed = true,
         bool? powered = true,
         bool? noAdverseEffect = true,
-        string assertedBy = RemotePilotInCommand) =>
+        string assertedBy = RemotePilotInCommand,
+        AircraftPower? aircraft = null) =>
         EntryPoints.PreflightActions.Resolve(
             new PreflightActionsRequest(Asserted(assessed, briefed, powered, noAdverseEffect, assertedBy))
             {
                 Operation = operation ?? SubpartDOperation.NotOverHumanBeings,
+                Power = aircraft ?? AircraftPower.Powered,
             });
 
     private static PreflightActionsFinding Finding(Resolution<object> resolution) =>
@@ -106,7 +122,7 @@ public class PreflightActionsEntryPointTests
         Declined(EntryPoints.SubpartDCategories.Resolve(SubpartDCategoriesRequest.Empty));
 
     [Fact]
-    public void The_chapeau_adds_the_conjunction_and_no_input_of_its_own_and_107_49_fs_condition_is_the_entrys_one_input()
+    public void The_chapeau_adds_the_conjunction_and_no_input_of_its_own_and_the_entrys_inputs_are_the_two_paragraph_conditions()
     {
         // "Prior to flight, the remote pilot in command must:" is this entry's evidence and no
         // constituent's, and it is carried quoted rather than interpreted.
@@ -116,7 +132,8 @@ public class PreflightActionsEntryPointTests
         // constituent's, through the assertedBy the map read out of this very sentence, so the
         // refusal of an assertion attributed to anybody else happens on the constituent's own row;
         // and "prior to flight" is when the obligations it conjoins are owed, not a second verdict
-        // about them. So the request declares exactly one input, and it is § 107.49(f)'s condition.
+        // about them. So every input this request declares is a condition some paragraph of
+        // § 107.49 states its obligation under, and there are exactly two such paragraphs.
         Assert.Equal(
             new[] { RemotePilotInCommand },
             EntryPoints.PreflightRiskAssessment.Registered.AssertedBy,
@@ -127,9 +144,9 @@ public class PreflightActionsEntryPointTests
             .OrderBy(name => name, StringComparer.Ordinal)
             .ToArray();
 
-        Assert.Equal(["Assertions", "EntryId", "Operation"], declared);
+        Assert.Equal(["Assertions", "EntryId", "Operation", "Power"], declared);
 
-        // And the condition's two sides are the only two, in § 107.49(f)'s own terms.
+        // And each condition's two sides are the only two, in the paragraph's own terms.
         Assert.Equal(
             new[]
             {
@@ -138,6 +155,30 @@ public class PreflightActionsEntryPointTests
             },
             SubpartDOperation.All.Select(operation => operation.Designation),
             StringComparer.Ordinal);
+        Assert.Equal(
+            new[]
+            {
+                "the small unmanned aircraft is powered",
+                "the small unmanned aircraft is not powered",
+            },
+            AircraftPower.All.Select(power => power.Designation),
+            StringComparer.Ordinal);
+
+        // The two are not the same kind of input, and the finding is where that shows. § 107.49(f)'s
+        // condition is in this entry's evidence and in no constituent's, so this entry reads it and
+        // records it. § 107.49(d)'s is in sufficient-available-power's evidence too, so that entry
+        // reads it and records it, and this one carries the caller's statement through unread (#99).
+        // A second copy of it here would be one condition with two places to disagree.
+        Assert.Contains(
+            nameof(PreflightActionsFinding.Operation),
+            typeof(PreflightActionsFinding).GetProperties().Select(property => property.Name),
+            StringComparer.Ordinal);
+        Assert.DoesNotContain(
+            typeof(AircraftPower),
+            typeof(PreflightActionsFinding).GetProperties().Select(property => property.PropertyType));
+        Assert.Contains(
+            typeof(AircraftPower),
+            typeof(SufficientAvailablePowerFinding).GetProperties().Select(property => property.PropertyType));
     }
 
     [Fact]
@@ -284,6 +325,110 @@ public class PreflightActionsEntryPointTests
     }
 
     [Fact]
+    public void An_unpowered_aircraft_is_not_asked_for_107_49_ds_assertion_and_that_paragraph_is_not_conjoined()
+    {
+        // § 107.49(d)'s own evidence carries its antecedent — "If the small unmanned aircraft is
+        // powered" — so an unpowered aircraft is one the paragraph states no obligation about and
+        // nobody owes its assertion (#95). This entry conjoins that paragraph, and until #99 it
+        // reached the assertion past the entry that states it and demanded it anyway. Nothing is
+        // asserted for it here, and the section still answers.
+        var finding = Finding(Resolve(assessed: false, powered: null, aircraft: AircraftPower.NotPowered));
+
+        // Five obligations, and § 107.49(d) is not one of them: not done, not "not done", and — the
+        // reading this test exists to refuse — not undetermined either. There is no obligation for a
+        // verdict to be about.
+        Assert.Equal(5, finding.Obligations.Count);
+        Assert.Equal(
+            new[] { "(a)", "(b)", "(c)", "(e)", "(e)" },
+            finding.Obligations.Select(obligation => obligation.Paragraph),
+            StringComparer.Ordinal);
+        Assert.DoesNotContain(
+            finding.Obligations,
+            obligation => obligation.Entry.Id == MapEntries.SufficientAvailablePower.Id);
+
+        // The section is still settled, by § 107.49(a), which the caller reported not done. The two
+        // paragraphs left undetermined are the two the map holds open, and neither is (d).
+        Assert.False(finding.AllDone);
+        Assert.Equal(
+            new[] { "control-links-working", "attached-object-secure" },
+            finding.Obligations.Where(obligation => obligation.Done is null).Select(obligation => obligation.Entry.Id),
+            StringComparer.Ordinal);
+
+        // And with every obligation this engine can answer reported done, the decline is the one it
+        // already was: § 107.49(c)'s question, cited at § 107.49(c). An undetermined (d) would have
+        // been a third open paragraph, and on an operation the caller described completely.
+        var declined = Declined(Resolve(powered: null, aircraft: AircraftPower.NotPowered));
+
+        Assert.Equal(UnresolvedReason.RequiresInterpretation, declined.Reason);
+        Assert.Equal(EntryPoints.ControlLinksWorking.Registered.Locator, declined.Locator);
+        Assert.DoesNotContain("sufficient-available-power", declined.Attempted, StringComparison.Ordinal);
+        Assert.DoesNotContain("§ 107.49(d)", declined.Attempted, StringComparison.Ordinal);
+
+        // The same request on a powered aircraft demands the assertion, so what stops the demand is
+        // § 107.49(d)'s condition and not an engine that has stopped asking.
+        Assert.Throws<AssertionRequiredException>(() => Resolve(powered: null, aircraft: AircraftPower.Powered));
+    }
+
+    [Fact]
+    public void Section_107_49_conjoins_d_exactly_where_that_paragraphs_own_entry_says_it_reaches_the_operation()
+    {
+        // How this entry follows § 107.49(d) is the question #99 settles, and it is settled from the
+        // map: the antecedent is in sufficient-available-power's evidence as well as this entry's,
+        // so it is that entry's to implement (#95) and this entry reaches the paragraph through
+        // AvailablePower.Enough rather than testing the condition a second time. What that buys is
+        // measured here — the two cannot disagree on one operation, on either side of the condition.
+        foreach (var power in AircraftPower.All)
+        {
+            var constituent = Assert.IsType<SufficientAvailablePowerFinding>(
+                Assert.IsType<Resolution<object>.Resolved>(
+                    EntryPoints.SufficientAvailablePower.Resolve(
+                        new SufficientAvailablePowerRequest(Asserted()) { Power = power })).Value);
+
+            var conjoined = Finding(Resolve(assessed: false, aircraft: power)).Obligations
+                .Where(obligation => obligation.Entry.Id == MapEntries.SufficientAvailablePower.Id)
+                .ToArray();
+
+            // Conjoined exactly where that entry says its paragraph reaches the operation.
+            Assert.Equal(constituent.ParagraphApplies, conjoined.Length == 1);
+
+            if (!constituent.ParagraphApplies)
+            {
+                continue;
+            }
+
+            // And where it is conjoined, the verdict and the account are that entry's own, so a
+            // later change to what § 107.49(d) answers moves this entry with nothing changed here.
+            Assert.Equal(constituent.Holds, conjoined[0].Done);
+            Assert.Equal(constituent.ToString(), conjoined[0].Account);
+            Assert.Equal("(d)", conjoined[0].Paragraph);
+        }
+    }
+
+    [Fact]
+    public void Without_a_statement_about_107_49_ds_condition_it_refuses_rather_than_infer_one()
+    {
+        // Whether a paragraph of the corpus reaches the operation is not decided from an absence,
+        // and that holds for the condition this entry carries on a constituent's behalf exactly as
+        // it holds for its own. An aircraft the caller has not described is not an unpowered one.
+        Assert.Equal(
+            nameof(PreflightActionsRequest.Power),
+            Assert.Throws<ArgumentException>(() =>
+                EntryPoints.PreflightActions.Resolve(
+                    new PreflightActionsRequest(Asserted())
+                    {
+                        Operation = SubpartDOperation.NotOverHumanBeings,
+                    })).ParamName);
+
+        // Both are demanded, and this entry's own comes first: a caller who stated neither is told
+        // about § 107.49(f)'s condition before the one § 107.49(d)'s entry will read.
+        Assert.Equal(
+            nameof(PreflightActionsRequest.Operation),
+            Assert.Throws<ArgumentException>(() =>
+                EntryPoints.PreflightActions.Resolve(
+                    new PreflightActionsRequest(Asserted()) { Power = AircraftPower.Powered })).ParamName);
+    }
+
+    [Fact]
     public void Where_107_49_f_is_reached_its_OutsideCurrentScope_stays_that_entrys_own_and_never_becomes_this_entrys_reason()
     {
         // The entry's note: (f) "is reachable only through subpart D and is a dependency on
@@ -359,20 +504,25 @@ public class PreflightActionsEntryPointTests
         var finding = Finding(Resolve(SubpartDOperation.OverHumanBeings, powered: false));
 
         // § 107.49(d) states its obligation under a condition of its own, "If the small unmanned
-        // aircraft is powered" (#95), so that entry is asked about a powered aircraft — the case in
-        // which the paragraph states the obligation this section conjoins — and what it recorded is
-        // the assertion this entry read.
-        var power = Assert.IsType<Assertion>(Assert.IsType<SufficientAvailablePowerFinding>(
+        // aircraft is powered" (#95), so this entry reaches it through that entry's own rule rather
+        // than past it (#99): what comes back is the constituent's whole finding, and the verdict
+        // and the account are read off that.
+        var power = Assert.IsType<SufficientAvailablePowerFinding>(
             Assert.IsType<Resolution<object>.Resolved>(
                 EntryPoints.SufficientAvailablePower.Resolve(
                     new SufficientAvailablePowerRequest(Asserted(powered: false))
                     {
                         Power = AircraftPower.Powered,
-                    })).Value).Availability);
+                    })).Value);
 
-        // The verdict is what that entry answered, and the account is what it printed.
+        // The verdict is what that entry answered, and the account is what it printed — the
+        // constituent's own ToString(), condition and all, and not the shared mechanism's.
         Assert.Equal(power.Holds, Obligation(finding, "sufficient-available-power").Done);
         Assert.Equal(power.ToString(), Obligation(finding, "sufficient-available-power").Account);
+        Assert.Contains(
+            AircraftPower.Powered.Designation,
+            Obligation(finding, "sufficient-available-power").Account,
+            StringComparison.Ordinal);
         Assert.Equal("§ 107.49(d)", Obligation(finding, "sufficient-available-power").Entry.Locator.Citation);
 
         // § 107.49(c), the first conjunct of § 107.49(e) and § 107.49(f) resolve nothing, so what is
@@ -463,7 +613,11 @@ public class PreflightActionsEntryPointTests
         Assert.Contains(
             "preflight-risk-assessment",
             Assert.Throws<ArgumentException>(() => EntryPoints.PreflightActions.Resolve(
-                new PreflightActionsRequest(crossed) { Operation = SubpartDOperation.NotOverHumanBeings })).Message,
+                new PreflightActionsRequest(crossed)
+                {
+                    Operation = SubpartDOperation.NotOverHumanBeings,
+                    Power = AircraftPower.Powered,
+                })).Message,
             StringComparison.Ordinal);
     }
 
