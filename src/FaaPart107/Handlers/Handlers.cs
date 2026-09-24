@@ -17,10 +17,19 @@ namespace FaaPart107;
 /// </para>
 /// <para>
 /// A request built by the dictionary dispatch (<see cref="Registry.Resolve(string, RuleRequest)"/>)
-/// has every input at its default. A handler whose rule needs an input it was not given throws
+/// has every input at its default. An entry that needs an input it was not given throws
 /// <see cref="ArgumentException"/> naming it: a missing input is the caller's error, not a gap in
 /// the corpus, so it is not an unresolved result. That includes the waiver statement, which is
 /// never defaulted (rules-factory decision 0021).
+/// </para>
+/// <para>
+/// <b>Which inputs a handler demands, and which it hands over unresolved</b>, is settled by
+/// <c>docs/decisions/0007-the-waiver-gate-precedes-every-other-demand.md</c>. An entry the map
+/// gives <c>suspendedBy: ["waivable-regulations"]</c> has its § 107.205 waiver statement demanded
+/// here, because <see cref="Waivers.Suspension"/> is what reads it and the gate cannot run
+/// without it; every other input of such an entry is handed to the rule as the caller left it, so
+/// that the rule demands it <em>after</em> the gate and a waived request is never asked for a fact
+/// the waiver has made irrelevant. An entry with no gate demands everything here, as before.
 /// </para>
 /// </remarks>
 internal static partial class Handlers
@@ -37,6 +46,5 @@ internal static partial class Handlers
         where T : struct =>
         input ?? throw Missing(entryId, name);
 
-    private static ArgumentException Missing(string entryId, string name) =>
-        new($"resolving the map entry '{entryId}' needs its request's {name}, and it was not set", name);
+    private static ArgumentException Missing(string entryId, string name) => Demands.Missing(entryId, name);
 }

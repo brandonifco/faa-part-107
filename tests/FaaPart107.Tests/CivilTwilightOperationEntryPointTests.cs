@@ -347,12 +347,24 @@ public class CivilTwilightOperationEntryPointTests
         Assert.Equal(UnresolvedReason.OutsideCurrentScope, outside.Reason);
         Assert.Contains("civil-twilight-operation", outside.Attempted, StringComparison.Ordinal);
 
-        // What the gate does not precede is the caller's typed inputs. They are demanded by the
-        // handler as the arguments of the call, so a waived operation the caller has not fully
-        // described is refused for the missing input rather than declined for the waiver — the
-        // ordering operating-limitations, visual-observer-conditions and anti-collision-lighting
-        // take, and not the one reasonable-protection takes, where the rule demands its input after
-        // the gate. Nothing in this repository records which is right; this pins which one is here.
+        // And before the caller's typed inputs, which is what docs/decisions/0007 settles for every
+        // § 107.205-gated entry of this engine: a waived operation the caller has not fully
+        // described is declined for the waiver, not refused for the missing input. Place unset is
+        // the case, because Place is what the handler used to demand first.
+        var underDescribed = Declined(EntryPoints.CivilTwilightOperation.Resolve(
+            new CivilTwilightOperationRequest(Asserting(null))
+            {
+                Period = OperationPeriod.NeitherPeriod,
+                Lighting = Lit,
+                Waiver = waiver,
+            }));
+
+        Assert.Equal(UnresolvedReason.OutsideCurrentScope, underDescribed.Reason);
+        Assert.Equal(EntryPoints.WaivableRegulations.Registered.Locator, underDescribed.Locator);
+        Assert.Contains("civil-twilight-operation", underDescribed.Attempted, StringComparison.Ordinal);
+
+        // Stated that no waiver is in force, the same request owes Place, and says so by name: the
+        // gate is what moved, and not what a reachable entry demands.
         Assert.Equal(
             nameof(CivilTwilightOperationRequest.Place),
             Assert.Throws<ArgumentException>(() =>
@@ -360,7 +372,7 @@ public class CivilTwilightOperationEntryPointTests
                 {
                     Period = OperationPeriod.NeitherPeriod,
                     Lighting = Lit,
-                    Waiver = waiver,
+                    Waiver = NoWaiver,
                 })).ParamName);
     }
 
@@ -459,10 +471,17 @@ public class CivilTwilightOperationEntryPointTests
                     () => EntryPoints.CivilTwilightOperation.Resolve(missing.Request)).ParamName));
 
         // The dictionary dispatch carries no typed input at all, so nothing but those refusals
-        // stands between it and an answer about an operation nobody described.
+        // stands between it and an answer about an operation nobody described. The waiver
+        // statement is the one it names, because the gate reads it and the gate comes first
+        // (docs/decisions/0007); the place is owed next, once a statement that no waiver is in
+        // force has put the entry back in reach.
         Assert.Equal(
-            nameof(CivilTwilightOperationRequest.Place),
+            nameof(CivilTwilightOperationRequest.Waiver),
             Assert.Throws<ArgumentException>(() =>
                 Registry.Resolve("civil-twilight-operation", RuleRequest.Empty)).ParamName);
+        Assert.Equal(
+            nameof(CivilTwilightOperationRequest.Place),
+            Assert.Throws<ArgumentException>(() => EntryPoints.CivilTwilightOperation.Resolve(
+                new CivilTwilightOperationRequest(RuleRequest.Empty) { Waiver = NoWaiver })).ParamName);
     }
 }

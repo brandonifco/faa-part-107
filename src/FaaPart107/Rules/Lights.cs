@@ -216,7 +216,7 @@ public static class Lights
     /// the point, and demanding it would be asking for a fact the caller does not owe.
     /// </para>
     /// </remarks>
-    /// <param name="lighting">What the caller states about the aircraft's anti-collision lighting. Never inferred.</param>
+    /// <param name="lighting">What the caller states about the aircraft's anti-collision lighting. Never inferred; required once the entry is reachable, and demanded after the gate (<c>docs/decisions/0007</c>).</param>
     /// <param name="waiver">Whether a waiver of § 107.29(a)(2) and (b) is in force, as the caller states it.</param>
     /// <param name="assertions">What the caller asserts, for the two entries this one depends on. Never defaulted.</param>
     /// <returns>
@@ -229,15 +229,15 @@ public static class Lights
     /// A constituent was asked and the caller asserted nothing for it.
     /// </exception>
     /// <exception cref="ArgumentException">
-    /// The waiver statement is about another regulation, or an asserted value is not an
+    /// The waiver statement is about another regulation; or no waiver is in force and
+    /// <paramref name="lighting"/> was not stated; or an asserted value is not an
     /// <see cref="Assertion"/> or is about another entry.
     /// </exception>
     public static Resolution<AntiCollisionLightingFinding> AsRequired(
-        LightingStatement lighting,
+        LightingStatement? lighting,
         WaiverStatement waiver,
         RuleRequest assertions)
     {
-        ArgumentNullException.ThrowIfNull(lighting);
         ArgumentNullException.ThrowIfNull(assertions);
 
         if (Waivers.Suspension(MapEntries.AntiCollisionLighting, Regulation, waiver) is { } suspended)
@@ -245,29 +245,32 @@ public static class Lights
             return Resolution<AntiCollisionLightingFinding>.FromUnresolved(suspended);
         }
 
+        var stated = Demands.Of(
+            lighting, MapEntries.AntiCollisionLighting, nameof(Requests.AntiCollisionLightingRequest.Lighting));
+
         // "has lighted anti-collision lighting …": an aircraft with none, and one whose lighting has
         // been extinguished, has no lighted anti-collision lighting, and the conjunction is false
         // whatever its other conjuncts would say. Neither constituent is asked, because neither
         // question is reached: there is no lighting here whose flash rate could avoid a collision,
         // and extinguishing is outside the second sentence's bound however the remote pilot in
         // command determined.
-        if (!lighting.Lighted)
+        if (!stated.Lighted)
         {
             return Resolution<AntiCollisionLightingFinding>.FromValue(
-                new AntiCollisionLightingFinding(lighting, null, null, waiver));
+                new AntiCollisionLightingFinding(stated, null, null, waiver));
         }
 
         return FlashRate.SufficientToAvoidACollision(waiver, assertions).Match(
-            rate => lighting.IntensityReduced
+            rate => stated.IntensityReduced
                 ? Lighting.IntensityReduction(waiver, assertions).Match(
                     reduction => Resolution<AntiCollisionLightingFinding>.FromValue(
-                        new AntiCollisionLightingFinding(lighting, rate, reduction, waiver)),
+                        new AntiCollisionLightingFinding(stated, rate, reduction, waiver)),
                     open => Resolution<AntiCollisionLightingFinding>.FromUnresolved(
-                        Undetermined(MapEntries.IntensityReductionInInterestOfSafety, open, lighting)))
+                        Undetermined(MapEntries.IntensityReductionInInterestOfSafety, open, stated)))
                 : Resolution<AntiCollisionLightingFinding>.FromValue(
-                    new AntiCollisionLightingFinding(lighting, rate, null, waiver)),
+                    new AntiCollisionLightingFinding(stated, rate, null, waiver)),
             open => Resolution<AntiCollisionLightingFinding>.FromUnresolved(
-                Undetermined(MapEntries.FlashRateSufficient, open, lighting)));
+                Undetermined(MapEntries.FlashRateSufficient, open, stated)));
     }
 
     /// <summary>

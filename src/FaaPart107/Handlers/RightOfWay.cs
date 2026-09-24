@@ -28,10 +28,16 @@ namespace FaaPart107
     internal static partial class Handlers
     {
         /// <summary><c>right-of-way</c>: <see cref="Yielding.RightOfWay"/>, the finding, or the rule's decline.</summary>
+        /// <remarks>
+        /// The waiver statement is demanded here, and only it, because
+        /// <see cref="Waivers.Suspension"/> is what reads it and the gate cannot run without it.
+        /// What was passed and where it was passed are handed over as the caller left them, so the
+        /// rule demands each after the gate (<c>docs/decisions/0007</c>).
+        /// </remarks>
         internal static partial Resolution<object> RightOfWay(Requests.RightOfWayRequest request) =>
             Answer(Yielding.RightOfWay(
-                Demand(request.Encountered, request.EntryId, nameof(request.Encountered)),
-                Demand(request.Position, request.EntryId, nameof(request.Position)),
+                request.Encountered,
+                request.Position,
                 Demand(request.Waiver, request.EntryId, nameof(request.Waiver))));
     }
 }

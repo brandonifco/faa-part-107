@@ -36,10 +36,16 @@ namespace FaaPart107
     internal static partial class Handlers
     {
         /// <summary><c>weather-minimums-met</c>: <see cref="Weather.MinimumsMet"/>, the finding, or the rule's decline.</summary>
+        /// <remarks>
+        /// The waiver statement is demanded here, and only it, because
+        /// <see cref="Waivers.Suspension"/> is what reads it and the gate cannot run without it.
+        /// The flight visibility and the cloud statement are handed over as the caller left them,
+        /// so the rule demands each after the gate (<c>docs/decisions/0007</c>).
+        /// </remarks>
         internal static partial Resolution<object> WeatherMinimumsMet(Requests.WeatherMinimumsMetRequest request) =>
             Answer(Weather.MinimumsMet(
-                Demand(request.FlightVisibilityStatuteMiles, request.EntryId, nameof(request.FlightVisibilityStatuteMiles)),
-                Demand(request.Cloud, request.EntryId, nameof(request.Cloud)),
+                request.FlightVisibilityStatuteMiles,
+                request.Cloud,
                 Demand(request.Waiver, request.EntryId, nameof(request.Waiver))));
     }
 }

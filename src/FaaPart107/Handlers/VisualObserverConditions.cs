@@ -70,13 +70,23 @@ namespace FaaPart107
         /// <c>unaided-visual-contact</c>'s and <c>observer-coordination</c>'s and this entry asserts
         /// nothing of its own: the map gives <c>visual-observer-conditions</c> no <c>assertedBy</c>,
         /// so a value asserted under this entry's own id is not an input to anything here.
+        /// <para>
+        /// <see cref="Requests.VisualObserverConditionsRequest.Waiver"/> is demanded here, and only
+        /// it, because <see cref="Waivers.Suspension"/> is what reads it and this entry's gate
+        /// cannot run without it. The other three — the chapeau's condition, the exercise of
+        /// § 107.31(a)'s ability, and § 107.31's own waiver statement — are handed over as the
+        /// caller left them, so the rule demands each after the gate (<c>docs/decisions/0007</c>).
+        /// <see cref="Requests.VisualObserverConditionsRequest.VisualLineOfSightWaiver"/> is among
+        /// them because it is § 107.31's gate and not this entry's: a waiver of § 107.33 suspends
+        /// this entry whatever § 107.31's statement says.
+        /// </para>
         /// </remarks>
         internal static partial Resolution<object> VisualObserverConditions(Requests.VisualObserverConditionsRequest request) =>
             Answer(Observers.Conditions(
-                Demand(request.Use, request.EntryId, nameof(request.Use)),
-                Demand(request.Exercise, request.EntryId, nameof(request.Exercise)),
+                request.Use,
+                request.Exercise,
                 Demand(request.Waiver, request.EntryId, nameof(request.Waiver)),
-                Demand(request.VisualLineOfSightWaiver, request.EntryId, nameof(request.VisualLineOfSightWaiver)),
+                request.VisualLineOfSightWaiver,
                 request.Assertions));
     }
 }

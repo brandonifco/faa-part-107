@@ -60,14 +60,21 @@ namespace FaaPart107
     internal static partial class Handlers
     {
         /// <summary><c>operating-limitations</c>: <see cref="Compliance.CompliedWith"/>, the finding, or the rule's decline.</summary>
+        /// <remarks>
+        /// The waiver statement is demanded here, and only it, because
+        /// <see cref="Waivers.Suspension"/> is what reads it and the gate cannot run without it.
+        /// The six operational facts are handed over as the caller left them, so the rule demands
+        /// each after the gate, in the order § 107.51 states its limitations
+        /// (<c>docs/decisions/0007</c>).
+        /// </remarks>
         internal static partial Resolution<object> OperatingLimitations(Requests.OperatingLimitationsRequest request) =>
             Answer(Compliance.CompliedWith(
-                Demand(request.Person, request.EntryId, nameof(request.Person)),
-                Demand(request.Groundspeed, request.EntryId, nameof(request.Groundspeed)),
-                Demand(request.AltitudeAboveGroundLevelFeet, request.EntryId, nameof(request.AltitudeAboveGroundLevelFeet)),
-                Demand(request.Structure, request.EntryId, nameof(request.Structure)),
-                Demand(request.FlightVisibilityStatuteMiles, request.EntryId, nameof(request.FlightVisibilityStatuteMiles)),
-                Demand(request.Cloud, request.EntryId, nameof(request.Cloud)),
+                request.Person,
+                request.Groundspeed,
+                request.AltitudeAboveGroundLevelFeet,
+                request.Structure,
+                request.FlightVisibilityStatuteMiles,
+                request.Cloud,
                 Demand(request.Waiver, request.EntryId, nameof(request.Waiver))));
     }
 }

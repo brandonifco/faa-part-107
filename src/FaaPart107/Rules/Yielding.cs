@@ -118,8 +118,8 @@ public static class Yielding
     /// <see cref="MapEntries.WellClear"/> — reached through <c>dependsOn</c>, asked, and what it
     /// answers on the request in hand is what decides.
     /// </remarks>
-    /// <param name="encountered">What was passed, as the caller states it. Never inferred.</param>
-    /// <param name="position">Where the small unmanned aircraft passed it, as the caller states it. Never inferred.</param>
+    /// <param name="encountered">What was passed, as the caller states it. Never inferred; required once the entry is reachable, and demanded after the gate (<c>docs/decisions/0007</c>).</param>
+    /// <param name="position">Where the small unmanned aircraft passed it, as the caller states it. Never inferred; required once the entry is reachable, and demanded after the gate.</param>
     /// <param name="waiver">Whether a waiver of § 107.37(a) is in force, as the caller states it.</param>
     /// <returns>
     /// The finding; <see cref="UnresolvedReason.OutsideCurrentScope"/> citing § 107.205 while a waiver
@@ -127,26 +127,29 @@ public static class Yielding
     /// own decline, carrying the reason <see cref="MapEntries.WellClear"/> gave on this request and
     /// citing that entry's § 107.37(a).
     /// </returns>
-    /// <exception cref="ArgumentException">The waiver statement is about another regulation.</exception>
+    /// <exception cref="ArgumentException">
+    /// The waiver statement is about another regulation; or no waiver is in force and
+    /// <paramref name="encountered"/> or <paramref name="position"/> was not stated.
+    /// </exception>
     public static Resolution<RightOfWayFinding> RightOfWay(
-        EncounteredObject encountered,
-        RelativePosition position,
+        EncounteredObject? encountered,
+        RelativePosition? position,
         WaiverStatement waiver)
     {
-        ArgumentNullException.ThrowIfNull(encountered);
-        ArgumentNullException.ThrowIfNull(position);
-
         if (Waivers.Suspension(MapEntries.RightOfWay, Regulation, waiver) is { } suspended)
         {
             return Resolution<RightOfWayFinding>.FromUnresolved(suspended);
         }
 
-        var named = Names(encountered);
-        var prohibited = Prohibits(position);
+        var passed = Demands.Of(encountered, MapEntries.RightOfWay, nameof(Requests.RightOfWayRequest.Encountered));
+        var relative = Demands.Of(position, MapEntries.RightOfWay, nameof(Requests.RightOfWayRequest.Position));
+
+        var named = Names(passed);
+        var prohibited = Prohibits(relative);
         if (!named || !prohibited)
         {
             return Resolution<RightOfWayFinding>.FromValue(
-                new RightOfWayFinding(encountered, position, named, prohibited, waiver));
+                new RightOfWayFinding(passed, relative, named, prohibited, waiver));
         }
 
         // Both enumerations reach the pass, so the case turns on the exception "unless well
@@ -155,7 +158,7 @@ public static class Yielding
         // request, and this engine supplies no separation distance, no time to closest approach
         // and no other well-clear measure to decide it with.
         return Resolution<RightOfWayFinding>.FromUnresolved(
-            Undetermined(encountered, position, WellClear(waiver)));
+            Undetermined(passed, relative, WellClear(waiver)));
     }
 
     /// <summary>

@@ -227,12 +227,12 @@ public static class Twilight
     /// during neither period resolves a finding that says the paragraph states no prohibition about
     /// it: that entry is not asked, so nothing about the flash rate or the remote pilot in command's
     /// determination is demanded through <paramref name="assertions"/>. The caller's own
-    /// <paramref name="lighting"/> statement is demanded whatever the period, by the handler, before
-    /// this method is entered.
+    /// <paramref name="lighting"/> statement is demanded whatever the period — but after the gate,
+    /// with the other two (<c>docs/decisions/0007</c>).
     /// </remarks>
-    /// <param name="place">Where the operation is, as the caller states it. Never inferred.</param>
-    /// <param name="period">Which of § 107.29(c)(1)-(2)'s periods the operation is during, as the caller states it. Never inferred.</param>
-    /// <param name="lighting">What the caller states about the aircraft's anti-collision lighting: <c>anti-collision-lighting</c>'s input.</param>
+    /// <param name="place">Where the operation is, as the caller states it. Never inferred; required once the entry is reachable, and demanded after the gate.</param>
+    /// <param name="period">Which of § 107.29(c)(1)-(2)'s periods the operation is during, as the caller states it. Never inferred; required once the entry is reachable, and demanded after the gate.</param>
+    /// <param name="lighting">What the caller states about the aircraft's anti-collision lighting: <c>anti-collision-lighting</c>'s input. Required once the entry is reachable, and demanded after the gate.</param>
     /// <param name="waiver">Whether a waiver of § 107.29(a)(2) and (b) is in force, as the caller states it.</param>
     /// <param name="assertions">What the caller asserts, for the entries this one reaches. Never defaulted.</param>
     /// <returns>
@@ -245,34 +245,39 @@ public static class Twilight
     /// An entry this one reached was asked for an assertion the caller did not make.
     /// </exception>
     /// <exception cref="ArgumentException">
-    /// The waiver statement is about another regulation, or an asserted value is not an
-    /// <see cref="Assertion"/> or is about another entry.
+    /// The waiver statement is about another regulation; or no waiver is in force and
+    /// <paramref name="place"/>, <paramref name="period"/> or <paramref name="lighting"/> was not
+    /// stated; or an asserted value is not an <see cref="Assertion"/> or is about another entry.
     /// </exception>
     public static Resolution<CivilTwilightOperationFinding> Operation(
-        OperationPlace place,
-        OperationPeriod period,
-        LightingStatement lighting,
+        OperationPlace? place,
+        OperationPeriod? period,
+        LightingStatement? lighting,
         WaiverStatement waiver,
         RuleRequest assertions)
     {
-        ArgumentNullException.ThrowIfNull(place);
-        ArgumentNullException.ThrowIfNull(period);
-        ArgumentNullException.ThrowIfNull(lighting);
         ArgumentNullException.ThrowIfNull(assertions);
 
         // This entry's own gate, before the definition as well as before the requirement:
         // § 107.205(b) reaches paragraph (b), and (c) defines civil twilight only "for purposes of
-        // paragraph (b)". It is not before everything — the four inputs above were demanded by the
-        // handler to make this call at all.
+        // paragraph (b)". And before the three caller facts below, which a waiver of § 107.29(a)(2)
+        // and (b) makes as beside the point as the assertions (docs/decisions/0007).
         if (Waivers.Suspension(MapEntries.CivilTwilightOperation, Regulation, waiver) is { } suspended)
         {
             return Resolution<CivilTwilightOperationFinding>.FromUnresolved(suspended);
         }
 
+        var where = Demands.Of(
+            place, MapEntries.CivilTwilightOperation, nameof(Requests.CivilTwilightOperationRequest.Place));
+        var statedPeriod = Demands.Of(
+            period, MapEntries.CivilTwilightOperation, nameof(Requests.CivilTwilightOperationRequest.Period));
+        var lit = Demands.Of(
+            lighting, MapEntries.CivilTwilightOperation, nameof(Requests.CivilTwilightOperationRequest.Lighting));
+
         // § 107.29(c): what civil twilight refers to here. In Alaska that is (c)(3)'s, so the entry
         // that holds it is asked, and what it answers — not what this engine expects it to answer —
         // is what this entry reports.
-        if (place == OperationPlace.InAlaska)
+        if (where == OperationPlace.InAlaska)
         {
             return Resolution<CivilTwilightOperationFinding>.FromUnresolved(
                 EntryPoints.CivilTwilightAlaska
@@ -281,35 +286,35 @@ public static class Twilight
                         answered => Undetermined(
                             MapEntries.CivilTwilightAlaska,
                             null,
-                            place.ToString(),
+                            where.ToString(),
                             InAlaska($"answered with a value this engine can read no period of civil twilight from: {answered}")),
                         open => Undetermined(
                             MapEntries.CivilTwilightAlaska,
                             open.Reason,
-                            place.ToString(),
+                            where.ToString(),
                             InAlaska("did not resolve it"))));
         }
 
         // Outside Alaska it is (c)(1)-(2)'s, which is civil-twilight-window's value: the periods are
         // read off that entry and no figure of them is stated here.
-        var during = Stated(period, CivilTwilight.Windows());
+        var during = Stated(statedPeriod, CivilTwilight.Windows());
         if (during is null)
         {
             return Resolution<CivilTwilightOperationFinding>.FromValue(
-                new CivilTwilightOperationFinding(place, period, null, null, waiver));
+                new CivilTwilightOperationFinding(where, statedPeriod, null, null, waiver));
         }
 
         // "No person may operate … during periods of civil twilight unless the small unmanned
         // aircraft has lighted anti-collision lighting …": the unless-clause is the requirement
         // anti-collision-lighting states, and the verdict below is that entry's own.
-        return Lights.AsRequired(lighting, waiver, assertions).Match(
+        return Lights.AsRequired(lit, waiver, assertions).Match(
             required => Resolution<CivilTwilightOperationFinding>.FromValue(
-                new CivilTwilightOperationFinding(place, period, during, required, waiver)),
+                new CivilTwilightOperationFinding(where, statedPeriod, during, required, waiver)),
             open => Resolution<CivilTwilightOperationFinding>.FromUnresolved(
                 Undetermined(
                     MapEntries.AntiCollisionLighting,
                     open.Reason,
-                    $"{place}, {period}",
+                    $"{where}, {statedPeriod}",
                     $"§ 107.29(b) states its requirement of the anti-collision lighting the map entry "
                     + $"'{MapEntries.AntiCollisionLighting.Id}' [{MapEntries.AntiCollisionLighting.Locator.Citation}] "
                     + $"speaks for — {MapEntries.AntiCollisionLighting.Name} — and that entry did not resolve")));

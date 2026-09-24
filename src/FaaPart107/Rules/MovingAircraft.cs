@@ -65,21 +65,31 @@ public static class MovingAircraft
     /// </summary>
     /// <param name="fromAMovingAircraft">
     /// Whether the small unmanned aircraft system is operated from a moving aircraft, as the caller
-    /// states it. Never inferred.
+    /// states it. Never inferred; required once the entry is reachable, and demanded after the gate
+    /// (<c>docs/decisions/0007</c>).
     /// </param>
     /// <param name="waiver">Whether a waiver of § 107.25 is in force, as the caller states it.</param>
     /// <returns>
     /// The finding; <see cref="UnresolvedReason.OutsideCurrentScope"/> citing § 107.205 while a waiver
     /// of § 107.25 is in force.
     /// </returns>
-    public static Resolution<MovingAircraftFinding> Operation(bool fromAMovingAircraft, WaiverStatement waiver)
+    /// <exception cref="ArgumentException">
+    /// The waiver statement is about another regulation; or no waiver is in force and
+    /// <paramref name="fromAMovingAircraft"/> was not stated.
+    /// </exception>
+    public static Resolution<MovingAircraftFinding> Operation(bool? fromAMovingAircraft, WaiverStatement waiver)
     {
         if (Waivers.Suspension(MapEntries.MovingAircraftOperation, Regulation, waiver) is { } suspended)
         {
             return Resolution<MovingAircraftFinding>.FromUnresolved(suspended);
         }
 
+        var stated = Demands.Of(
+            fromAMovingAircraft,
+            MapEntries.MovingAircraftOperation,
+            nameof(Requests.MovingAircraftOperationRequest.FromAMovingAircraft));
+
         return Resolution<MovingAircraftFinding>.FromValue(
-            new MovingAircraftFinding(fromAMovingAircraft, Prohibited: fromAMovingAircraft, waiver));
+            new MovingAircraftFinding(stated, Prohibited: stated, waiver));
     }
 }

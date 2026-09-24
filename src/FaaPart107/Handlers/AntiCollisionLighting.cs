@@ -42,14 +42,18 @@ namespace FaaPart107
         /// about the lighting and what the clause's two assertion entries answered.
         /// </summary>
         /// <remarks>
-        /// The handler decides nothing. It demands the two inputs the rule needs, never defaulting
-        /// either, and hands the caller's assertions through unchanged so that the two entries this
+        /// The handler decides nothing. Neither of the two inputs the rule needs is ever defaulted,
+        /// and the caller's assertions are handed through unchanged so that the two entries this
         /// one depends on answer on their own terms and cite their own locators — which are this
         /// entry's locator too, since all three of § 107.29(a)(2) and (b)'s entries carry it.
+        /// The waiver statement is demanded here, and only it, because
+        /// <see cref="Waivers.Suspension"/> is what reads it and the gate cannot run without it;
+        /// the lighting statement is handed over as the caller left it, so the rule demands it
+        /// after the gate (<c>docs/decisions/0007</c>).
         /// </remarks>
         internal static partial Resolution<object> AntiCollisionLighting(Requests.AntiCollisionLightingRequest request) =>
             Answer(Lights.AsRequired(
-                Demand(request.Lighting, request.EntryId, nameof(request.Lighting)),
+                request.Lighting,
                 Demand(request.Waiver, request.EntryId, nameof(request.Waiver)),
                 request.Assertions));
     }

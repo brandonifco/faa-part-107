@@ -109,32 +109,43 @@ public static class MultipleAircraft
     /// which engagements are at the same time. The engine infers no fleet and no clock.
     /// </para>
     /// </remarks>
-    /// <param name="person">The person the statement is about, as the caller names them.</param>
+    /// <param name="person">
+    /// The person the statement is about, as the caller names them. Required once the entry is
+    /// reachable, and demanded after the gate (<c>docs/decisions/0007</c>).
+    /// </param>
     /// <param name="engagements">
     /// Every unmanned aircraft the person is, at the same time, in one of the three roles for, each
-    /// with the role. Empty says the person is in none of them.
+    /// with the role. Empty says the person is in none of them, which is a statement; not supplying
+    /// the list at all is not, and is demanded after the gate.
     /// </param>
     /// <param name="waiver">Whether a waiver of § 107.35 is in force, as the caller states it.</param>
     /// <returns>
     /// The finding; <see cref="UnresolvedReason.OutsideCurrentScope"/> citing § 107.205 while a waiver
     /// of § 107.35 is in force.
     /// </returns>
+    /// <exception cref="ArgumentException">
+    /// The waiver statement is about another regulation; or no waiver is in force and
+    /// <paramref name="person"/> or <paramref name="engagements"/> was not stated.
+    /// </exception>
     public static Resolution<MultipleAircraftFinding> AtTheSameTime(
-        string person,
-        IReadOnlyList<AircraftEngagement> engagements,
+        string? person,
+        IReadOnlyList<AircraftEngagement>? engagements,
         WaiverStatement waiver)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(person);
-        ArgumentNullException.ThrowIfNull(engagements);
-
         if (Waivers.Suspension(MapEntries.SingleAircraft, Regulation, waiver) is { } suspended)
         {
             return Resolution<MultipleAircraftFinding>.FromUnresolved(suspended);
         }
 
-        var aircraft = DistinctAircraft(engagements);
+        var named = Demands.Of(person, MapEntries.SingleAircraft, nameof(Requests.SingleAircraftRequest.Person));
+        var stated = Demands.Of(
+            engagements, MapEntries.SingleAircraft, nameof(Requests.SingleAircraftRequest.Engagements));
+
+        ArgumentException.ThrowIfNullOrWhiteSpace(named, nameof(person));
+
+        var aircraft = DistinctAircraft(stated);
         return Resolution<MultipleAircraftFinding>.FromValue(
-            new MultipleAircraftFinding(person, [.. engagements], aircraft, aircraft.Length <= 1, waiver));
+            new MultipleAircraftFinding(named, [.. stated], aircraft, aircraft.Length <= 1, waiver));
     }
 
     private static ImmutableArray<string> DistinctAircraft(IReadOnlyList<AircraftEngagement> engagements)

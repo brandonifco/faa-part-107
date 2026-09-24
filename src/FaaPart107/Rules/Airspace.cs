@@ -68,31 +68,42 @@ public static class Airspace
     /// <see cref="MapEntries.AirspaceAuthorized"/>: whether § 107.41 permits operating in
     /// <paramref name="airspace"/> on the authorization <paramref name="authorization"/> states.
     /// </summary>
-    /// <param name="airspace">The airspace the operation is in, as the caller states it. Never inferred.</param>
-    /// <param name="authorization">What the caller states about prior authorization from ATC. Never inferred.</param>
+    /// <param name="airspace">
+    /// The airspace the operation is in, as the caller states it. Never inferred; required once the
+    /// entry is reachable, and demanded after the gate (<c>docs/decisions/0007</c>).
+    /// </param>
+    /// <param name="authorization">
+    /// What the caller states about prior authorization from ATC. Never inferred; required once the
+    /// entry is reachable, and demanded after the gate.
+    /// </param>
     /// <param name="waiver">Whether a waiver of § 107.41 is in force, as the caller states it.</param>
     /// <returns>
     /// The finding; <see cref="UnresolvedReason.OutsideCurrentScope"/> citing § 107.205 while a waiver
     /// is in force.
     /// </returns>
-    /// <exception cref="ArgumentException">The waiver statement is about another regulation.</exception>
+    /// <exception cref="ArgumentException">
+    /// The waiver statement is about another regulation; or no waiver is in force and
+    /// <paramref name="airspace"/> or <paramref name="authorization"/> was not stated.
+    /// </exception>
     public static Resolution<AirspaceFinding> Authorized(
-        AirspaceClass airspace,
-        AtcAuthorization authorization,
+        AirspaceClass? airspace,
+        AtcAuthorization? authorization,
         WaiverStatement waiver)
     {
-        ArgumentNullException.ThrowIfNull(airspace);
-        ArgumentNullException.ThrowIfNull(authorization);
-
         if (Waivers.Suspension(MapEntries.AirspaceAuthorized, Regulation, waiver) is { } suspended)
         {
             return Resolution<AirspaceFinding>.FromUnresolved(suspended);
         }
 
-        var required = Names(airspace);
-        var mayOperate = !required || (authorization.Held && authorization.ObtainedBeforeTheOperation);
+        var stated = Demands.Of(
+            airspace, MapEntries.AirspaceAuthorized, nameof(Requests.AirspaceAuthorizedRequest.Airspace));
+        var held = Demands.Of(
+            authorization, MapEntries.AirspaceAuthorized, nameof(Requests.AirspaceAuthorizedRequest.Authorization));
+
+        var required = Names(stated);
+        var mayOperate = !required || (held.Held && held.ObtainedBeforeTheOperation);
         return Resolution<AirspaceFinding>.FromValue(
-            new AirspaceFinding(airspace, authorization, required, mayOperate, waiver));
+            new AirspaceFinding(stated, held, required, mayOperate, waiver));
     }
 
     /// <summary>
