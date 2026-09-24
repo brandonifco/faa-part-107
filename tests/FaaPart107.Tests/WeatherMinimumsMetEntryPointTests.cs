@@ -37,11 +37,27 @@ namespace FaaPart107.Tests;
 /// The last two reach the entry through <see cref="OperationEvaluator"/> rather than through its
 /// entry point, because what they pin is about the finding and can only be seen there: this
 /// entry's finding records § 107.51(c)'s stated flight visibility and its
-/// <see cref="WeatherMinimumsFinding.ToString"/> does not print it, so it is the one finding in
-/// this engine that tells apart two outcomes the engine says the same words about. That makes it
-/// the worked case for <see cref="EvaluatedRequirement.Equals(EvaluatedRequirement)"/> comparing
-/// the finding rather than the rendering, and each of the two is red on a mutation to this
-/// entry's own rule as well as on one to that comparison.
+/// <see cref="WeatherMinimumsFinding.ToString"/> does not print it, so two operations differing
+/// only in that figure are two findings the engine says the same words about. That makes this
+/// entry <em>a</em> worked case for
+/// <see cref="EvaluatedRequirement.Equals(EvaluatedRequirement)"/> comparing the finding rather
+/// than the rendering, and the simplest one, because the unprinted field is on the finding itself.
+/// </para>
+/// <para>
+/// It is <b>not the only one</b>. Every composite finding lists per-constituent outcomes —
+/// <see cref="LimitationOutcome"/>, <see cref="ExceptedCaseOutcome"/>,
+/// <see cref="RequirementOutcome"/>, <see cref="ObligationOutcome"/> — each recording an
+/// <c>Account</c> of what that constituent said and printing only its id, locator and verdict,
+/// which is the same shape one level down a collection.
+/// <c>OperatingLimitationsEntryPointTests.Two_operations_differing_only_in_a_constituents_recorded_account_are_different_outcomes</c>
+/// pins that case, and it is § 107.51's introductory text reading this very entry's decline.
+/// </para>
+/// <para>
+/// Each of the two below is red on a mutation to this entry's own rule as well as on one to that
+/// comparison, and both mutations were observed rather than assumed: the first loses its finding
+/// when <see cref="Weather.MinimumsMet"/> resolves on the wrong side of § 107.51(d), and the
+/// second loses the stated visibility when the finding stops recording it. The overlay holds
+/// both.
 /// </para>
 /// </remarks>
 public class WeatherMinimumsMetEntryPointTests

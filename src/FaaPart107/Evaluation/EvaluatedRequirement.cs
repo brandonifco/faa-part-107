@@ -191,10 +191,14 @@ public sealed record EvaluatedRequirement
     /// <b>What that catches, and a rendered string did not.</b> A finding field the rule does not
     /// print is inside this comparison now. It was not while <see cref="Explanation"/> stood in
     /// for the finding: two outcomes could be equal while their findings differed in a field the
-    /// rule kept to itself, and <see cref="WeatherMinimumsFinding"/> is the worked case —
+    /// rule kept to itself. <see cref="WeatherMinimumsFinding"/> is one such case —
     /// § 107.51(c)'s stated flight visibility is recorded on the finding and
     /// <see cref="WeatherMinimumsFinding.ToString"/> omits it, so two operations stating different
-    /// visibilities produced the same words. They differ here now, because what is compared is the
+    /// visibilities produced the same words — and it is not the only one: every composite finding
+    /// lists per-constituent outcomes that record what the constituent said and print only its id,
+    /// locator and verdict (<see cref="LimitationOutcome"/>, <see cref="ExceptedCaseOutcome"/>,
+    /// <see cref="RequirementOutcome"/> and <see cref="ObligationOutcome"/> each carry an
+    /// <c>Account</c> of that shape). All of them differ here now, because what is compared is the
     /// finding.
     /// </para>
     /// <para>
@@ -211,17 +215,29 @@ public sealed record EvaluatedRequirement
     /// </para>
     /// <para>
     /// <b>One condition this rests on, which is not this type's to fix.</b> Comparing findings
-    /// reduces, one level down, to record equality on the values a finding carries, and the only
-    /// map-side value among them is <see cref="Assertion.Entry"/>, a <see cref="MapEntry"/>, whose
-    /// <see cref="MapEntry.AssertedBy"/> is an <see cref="ImmutableArray{T}"/> and so is compared
-    /// by the identity of the array behind it — the very defect this method overrides its own
-    /// equality to avoid. It is sound today for two reasons and no others: every
-    /// <see cref="MapEntry"/> this engine hands out is one of <see cref="MapEntries"/>' shared
-    /// statics, and a record's generated equality short-circuits on reference identity; and where
-    /// an entry names nobody, <c>AssertedBy</c> is the <c>ImmutableArray&lt;string&gt;.Empty</c>
-    /// singleton, which is one array. <see cref="MapEntry"/> is generated, so the fix belongs to
-    /// the generator and not here: it is <c>#110</c>, raised upstream as
-    /// <c>rules-factory#462</c>.
+    /// reduces, level by level, to record equality on every value a finding carries, and some of
+    /// those are the map's own: a <see cref="MapEntry"/> travels on an <see cref="Assertion"/>,
+    /// and on the per-constituent outcomes a composite's finding lists — reached through the
+    /// <em>element</em> type of a collection, which is where a census of this that walked field
+    /// types alone would miss it. <see cref="MapEntry"/> is generated and keeps its synthesized
+    /// equality, and its <see cref="MapEntry.AssertedBy"/> is an
+    /// <see cref="ImmutableArray{T}"/>, so it is compared by the identity of the array behind it —
+    /// the very defect this method overrides its own equality to avoid.
+    /// </para>
+    /// <para>
+    /// What makes that sound here is one condition, stated as a condition rather than as a list of
+    /// the places it applies: <b>this engine never constructs a <see cref="MapEntry"/> per
+    /// evaluation.</b> Every one it hands out is one of <see cref="MapEntries"/>' shared statics —
+    /// <see cref="Assertion"/> says so for the one a caller can supply, "on the way out it is
+    /// always the map's own <see cref="MapEntry"/>, whatever the caller passed in" — and a
+    /// record's generated equality short-circuits on reference identity, so two evaluations
+    /// compare one instance with itself and never two arrays. A value that comes to carry a map
+    /// entry later inherits that and needs no amendment here; what would break it is an engine
+    /// that built a <see cref="MapEntry"/> of its own. It is put this way because a list in prose
+    /// goes stale and is then read as checked: <c>docs/decisions/0004</c> records that failure
+    /// twice in its own words, "this census is checked, not proof-read". The generated type is
+    /// <c>#110</c>'s to fix, raised upstream as <c>rules-factory#462</c>, and that fix is what
+    /// retires this paragraph.
     /// </para>
     /// </remarks>
     public bool Equals(EvaluatedRequirement? other) =>
