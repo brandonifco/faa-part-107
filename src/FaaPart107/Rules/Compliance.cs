@@ -78,6 +78,37 @@ public sealed record OperatingLimitationsFinding(
     /// <summary>Where the rule is stated: <c>§ 107.51 introductory text</c>.</summary>
     public SourceLocator Authority => MapEntries.OperatingLimitations.Locator;
 
+    /// <summary>Whether this finding is the same as <paramref name="other"/>, comparing the limitations by element.</summary>
+    /// <param name="other">The other finding.</param>
+    /// <returns>True when both are about the same person under the same waiver statement, and carry the same limitations answered the same way, in the same order.</returns>
+    /// <remarks>
+    /// A record's generated equality would compare <see cref="Limitations"/> with
+    /// <c>EqualityComparer&lt;IReadOnlyList&lt;LimitationOutcome&gt;&gt;.Default</c>, which is the
+    /// identity of the list object, so two resolutions of the same request would be unequal.
+    /// Determinism is about what the engine says, so equality is by element (<c>AGENTS.md</c> §8) —
+    /// the same reason <see cref="MultipleAircraftFinding.Equals(MultipleAircraftFinding)"/> gives
+    /// for overriding its own.
+    /// </remarks>
+    public bool Equals(OperatingLimitationsFinding? other) =>
+        other is not null
+        && Person == other.Person
+        && Waiver == other.Waiver
+        && Limitations.SequenceEqual(other.Limitations);
+
+    /// <inheritdoc/>
+    public override int GetHashCode()
+    {
+        var hash = default(HashCode);
+        hash.Add(Person);
+        hash.Add(Waiver);
+        foreach (var limitation in Limitations)
+        {
+            hash.Add(limitation);
+        }
+
+        return hash.ToHashCode();
+    }
+
     /// <inheritdoc/>
     public override string ToString() =>
         $"{Person} must comply with all of them, and they are {(CompliedWith ? "complied with" : "not complied with")} "

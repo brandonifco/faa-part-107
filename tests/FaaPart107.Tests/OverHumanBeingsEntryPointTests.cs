@@ -504,4 +504,45 @@ public class OverHumanBeingsEntryPointTests
         Assert.Equal(EntryStatus.Implemented, Registry.Entry(Entry.Id).Status);
         Assert.True(Registry.HasImplementation(Entry.Id));
     }
+
+    /// <summary>
+    /// Two resolutions of one request say the same thing, so they are the same finding: compared by
+    /// what they say, and never by the identity of the list of excepted cases carrying it
+    /// (<c>AGENTS.md</c> §8).
+    /// </summary>
+    /// <remarks>
+    /// The two resolutions share no object equality could hold by identity on — each carries its own
+    /// waiver statement, and the entry builds each finding its own list of excepted cases, which the
+    /// <c>NotSame</c> assertions pin so that the comparison cannot pass by accident.
+    /// </remarks>
+    [Fact]
+    public void Two_resolutions_of_one_request_are_equal_and_hash_alike_with_the_excepted_cases_compared_by_element()
+    {
+        var first = Finding(Resolve(
+            HumanBeingLocation.UnderACoveredStructure,
+            Shelter.CoveredStructure,
+            WaiverStatement.NoneHeld("§ 107.39", Caller),
+            protectionHolds: true));
+        var second = Finding(Resolve(
+            HumanBeingLocation.UnderACoveredStructure,
+            Shelter.CoveredStructure,
+            WaiverStatement.NoneHeld("§ 107.39", Caller),
+            protectionHolds: true));
+
+        Assert.NotSame(first, second);
+        Assert.NotSame(first.ExceptedCases, second.ExceptedCases);
+        Assert.NotSame(first.Waiver, second.Waiver);
+
+        Assert.Equal(first, second);
+        Assert.Equal(first.GetHashCode(), second.GetHashCode());
+
+        // Equality still says what it is for: a finding about a human being in the other of
+        // § 107.39(b)'s two places is unequal to the first.
+        Assert.NotEqual(
+            first,
+            Finding(Resolve(
+                HumanBeingLocation.InsideAStationaryVehicle,
+                Shelter.StationaryVehicle,
+                protectionHolds: true)));
+    }
 }

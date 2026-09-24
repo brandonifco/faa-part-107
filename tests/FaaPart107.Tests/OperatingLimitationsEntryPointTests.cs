@@ -424,4 +424,38 @@ public class OperatingLimitationsEntryPointTests
 
         Assert.Equal(nameof(OperatingLimitationsRequest.Person), error.ParamName);
     }
+
+    /// <summary>
+    /// Two resolutions of one request say the same thing, so they are the same finding: compared by
+    /// what they say, and never by the identity of the list of limitations carrying it
+    /// (<c>AGENTS.md</c> §8).
+    /// </summary>
+    /// <remarks>
+    /// The two resolutions share no object equality could hold by identity on — each carries its own
+    /// waiver statement, and the entry builds each finding its own list of limitations, which the
+    /// <c>NotSame</c> assertions pin so that the comparison cannot pass by accident.
+    /// </remarks>
+    [Fact]
+    public void Two_resolutions_of_one_request_are_equal_and_hash_alike_with_the_limitations_compared_by_element()
+    {
+        var first = Finding(Resolve(
+            Groundspeed.InKnots(120m), 1000m, waiver: WaiverStatement.NoneHeld("§ 107.51", Caller)));
+        var second = Finding(Resolve(
+            Groundspeed.InKnots(120m), 1000m, waiver: WaiverStatement.NoneHeld("§ 107.51", Caller)));
+
+        Assert.NotSame(first, second);
+        Assert.NotSame(first.Limitations, second.Limitations);
+        Assert.NotSame(first.Waiver, second.Waiver);
+
+        Assert.Equal(first, second);
+        Assert.Equal(first.GetHashCode(), second.GetHashCode());
+
+        // Equality still says what it is for: a finding about the other person, and one whose
+        // limitations were answered differently, are each unequal to the first.
+        Assert.NotEqual(
+            first,
+            Finding(Resolve(
+                Groundspeed.InKnots(120m), 1000m, person: BoundPerson.PersonManipulatingTheFlightControls)));
+        Assert.NotEqual(first, Finding(Resolve(Groundspeed.InKnots(120m), 200m)));
+    }
 }

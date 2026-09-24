@@ -176,25 +176,32 @@ public sealed record EvaluatedRequirement
     /// </para>
     /// <para>
     /// <b><see cref="Finding"/> is deliberately not compared, and <see cref="Explanation"/> stands
-    /// for it. That is a workaround, and it is meant to be undone.</b>
-    /// <see cref="OperatingLimitationsFinding"/> holds an <c>IReadOnlyList</c> with no
-    /// <c>Equals</c> override, so its generated equality compares that list by identity and two
-    /// resolutions of the same request are unequal — the defect
-    /// <see cref="MultipleAircraftFinding.Equals(MultipleAircraftFinding)"/> overrides its own
-    /// equality to avoid, citing <c>AGENTS.md</c> §8. Comparing findings here would make two
-    /// evaluations of identical facts unequal for a reason that is not about what either of them
-    /// says. What the engine <em>says</em> about the finding is <see cref="Explanation"/>, the
-    /// rule's own <c>ToString()</c>, compared ordinally — so a finding whose reported content
-    /// differs still makes the outcomes differ.
+    /// for it. That is a workaround, and it is meant to be undone.</b> The defect it was working
+    /// around is gone: every finding this engine resolves that carries a collection now compares
+    /// that collection by element rather than by the identity of the list object —
+    /// <see cref="OperatingLimitationsFinding"/>, <see cref="OverHumanBeingsFinding"/>,
+    /// <see cref="PreflightActionsFinding"/> and <see cref="VisualObserverConditionsFinding"/> each
+    /// override their own equality for the reason
+    /// <see cref="MultipleAircraftFinding.Equals(MultipleAircraftFinding)"/> gives and cites,
+    /// <c>AGENTS.md</c> §8. So comparing findings here no longer makes two resolutions of one
+    /// request unequal over which list object happened to carry them.
     /// </para>
     /// <para>
-    /// The fix belongs to that entry and not to this API, so it is filed as <b>#90</b> rather than
-    /// made here: a rules change in a branch that closes #51 is barred by that issue's own
-    /// non-goals and by <c>AGENTS.md</c> §4. <b>When #90 lands, <see cref="Finding"/> goes back
-    /// into this comparison</b> — one line, <c>&amp;&amp; Equals(Finding, other.Finding)</c>, which
-    /// was here before. Until then one consequence is live and worth knowing: a finding field the
-    /// rule does not print is outside this comparison, so two outcomes can be equal while their
-    /// findings differ in a field the rule kept to itself —
+    /// <b>Restoring the comparison is <c>#97</c>, and not <c>#90</c>.</b> #90 is the equality fix in
+    /// those four findings, and it lands without touching this method: putting <c>Finding</c> back
+    /// is a change to this API rather than to a rule, with its own tests and its own review, and a
+    /// branch that closes #90 may not widen into it (<c>AGENTS.md</c> §4). What #97
+    /// does here is one line, <c>&amp;&amp; Equals(Finding, other.Finding)</c>, which was here
+    /// before, with <see cref="GetHashCode"/> and a test to match; whether
+    /// <see cref="Explanation"/> then stays beside it — the rule's own rendering of the same value,
+    /// so not wrong, only redundant — is that issue's question too.
+    /// </para>
+    /// <para>
+    /// Until then one consequence is live and worth knowing. What the engine <em>says</em> about
+    /// the finding is <see cref="Explanation"/>, the rule's own <c>ToString()</c>, compared
+    /// ordinally, so a finding whose reported content differs still makes the outcomes differ — but
+    /// a finding field the rule does not print is outside this comparison, and two outcomes can be
+    /// equal while their findings differ in a field the rule kept to itself.
     /// <see cref="WeatherMinimumsFinding.ToString"/> omits the stated flight visibility, for
     /// instance.
     /// </para>

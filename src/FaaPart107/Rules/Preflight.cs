@@ -193,6 +193,35 @@ public sealed record PreflightActionsFinding(SubpartDOperation Operation, IReadO
     /// <summary>Where the rule is stated: <c>§ 107.49</c>.</summary>
     public SourceLocator Authority => MapEntries.PreflightActions.Locator;
 
+    /// <summary>Whether this finding is the same as <paramref name="other"/>, comparing the obligations by element.</summary>
+    /// <param name="other">The other finding.</param>
+    /// <returns>True when both state the same thing about § 107.49(f)'s condition and carry the same obligations answered the same way, in the same order.</returns>
+    /// <remarks>
+    /// A record's generated equality would compare <see cref="Obligations"/> with
+    /// <c>EqualityComparer&lt;IReadOnlyList&lt;ObligationOutcome&gt;&gt;.Default</c>, which is the
+    /// identity of the list object, so two resolutions of the same request would be unequal.
+    /// Determinism is about what the engine says, so equality is by element (<c>AGENTS.md</c> §8) —
+    /// the same reason <see cref="MultipleAircraftFinding.Equals(MultipleAircraftFinding)"/> gives
+    /// for overriding its own.
+    /// </remarks>
+    public bool Equals(PreflightActionsFinding? other) =>
+        other is not null
+        && Operation == other.Operation
+        && Obligations.SequenceEqual(other.Obligations);
+
+    /// <inheritdoc/>
+    public override int GetHashCode()
+    {
+        var hash = default(HashCode);
+        hash.Add(Operation);
+        foreach (var obligation in Obligations)
+        {
+            hash.Add(obligation);
+        }
+
+        return hash.ToHashCode();
+    }
+
     /// <inheritdoc/>
     public override string ToString() =>
         $"{Operation}, and the remote pilot in command {(AllDone ? "did" : "did not do")} all of what § 107.49 "
