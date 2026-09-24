@@ -230,8 +230,16 @@ public class DeterminismTests
     /// (a) It covers <em>records</em>, so it covers findings only while every finding is a record.
     /// True of this assembly today; prose here rather than a check.
     /// (b) It says a record overrides its equality, never that the override compares its
-    /// collection by element — that is what the five <c>..._compared_by_element</c> tests are for,
-    /// and this census would stay green if one of them were gutted.
+    /// collection by element — that is what the <b>four</b> <c>..._compared_by_element</c> tests
+    /// are for, under <c>operating-limitations</c>, <c>over-human-beings</c>,
+    /// <c>visual-observer-conditions</c> and <c>preflight-actions</c>, and this census would stay
+    /// green if one of them were gutted. The fifth record named in the guard below,
+    /// <see cref="MultipleAircraftFinding"/>, has no such test of its own: what backstops it is
+    /// <c>OperationEvaluatorTests.The_same_facts_evaluate_the_same_way_every_time</c>, which now
+    /// reaches it — <see cref="MultipleAircraft"/> builds the finding's engagements fresh on every
+    /// resolve, so two evaluations of one operation carry two lists, and since <c>#97</c> that
+    /// comparison runs through <see cref="Evaluation.EvaluatedRequirement.Finding"/> rather than
+    /// past it.
     /// (c) It sees only the kinds of field <see cref="ComparesByIdentity"/> recognises, whose own
     /// limits are written there.
     /// (d) It reads instance fields declared on the type (<see cref="Fields"/>), so a static
@@ -253,8 +261,9 @@ public class DeterminismTests
             .Where(type => Fields(type).Any(field => ComparesByIdentity(field.FieldType)))
             .ToArray();
 
-        // The census is only worth anything if it is looking at something: these are the findings
-        // #90 gave their own equality, and they must be among what was examined.
+        // The census is only worth anything if it is looking at something, so these five must be
+        // among what it examined: the four findings #90 gave their own equality, and
+        // MultipleAircraftFinding, which is the precedent those four cite rather than one of them.
         Assert.Contains(typeof(OperatingLimitationsFinding), carryingOne);
         Assert.Contains(typeof(OverHumanBeingsFinding), carryingOne);
         Assert.Contains(typeof(PreflightActionsFinding), carryingOne);
