@@ -554,6 +554,15 @@ public class PreflightActionsEntryPointTests
         Assert.Contains("preflight-actions", mine.Attempted, StringComparison.Ordinal);
         Assert.DoesNotContain("preflight-actions", constituent.Attempted, StringComparison.Ordinal);
 
+        // And what each unanswered obligation recorded is carried, whole and word for word, inside
+        // this entry's own account — not only the blocking one's (docs/decisions/0006, #103). What
+        // control-links-working said is that part 107 does not define "working properly", and
+        // naming the entry and § 107.49(c) without it drops exactly that.
+        Assert.Contains(constituent.Attempted, mine.Attempted, StringComparison.Ordinal);
+        Assert.Contains(ParagraphEOnItsOwn().Attempted, mine.Attempted, StringComparison.Ordinal);
+        Assert.Contains("what 'control-links-working' recorded: ", mine.Attempted, StringComparison.Ordinal);
+        Assert.Contains("what 'attached-object-secure' recorded: ", mine.Attempted, StringComparison.Ordinal);
+
         // And the blind spot that makes Attempted the thing that carries it: the reason and the
         // citation are deliberately the constituent's, because the question that blocks the answer
         // is the constituent's question, so neither can tell the two declines apart
