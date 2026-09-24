@@ -59,15 +59,31 @@ caller did or did not state. `RequirementState.OutsideCurrentScope`, `MissingInp
 
 ### Why, on a ground that is not "the minority reads better"
 
-**`FactRequired` is a claim about what the caller owes, and under a waiver the caller owes
-nothing.** `RequirementState`'s own documentation groups `ActionRequired`, `HumanAssertionRequired`
-and `FactRequired` as *"what the caller still owes"*, and `OperationEvaluation.Outstanding` is
-documented as *"Everything the caller still owes this engine before it could say more."* For a
-suspended entry there is no `Person`, no `Use`, no `Lighting`, no `Place` the caller could supply
-that would make the entry say more, because the entry is not in play. Thirteen entries filed
-themselves under `Outstanding` anyway, each naming a specific fact on `MissingInput` — so a product
-rendering that list would ask somebody for their `Person` for a rule it had just told them does not
-apply.
+**The engine's own type documentation already puts a waiver-suspended entry on the other side of
+this line, in one sentence.** `OperationEvaluation.Unanswered` is *"Everything this engine cannot
+answer **whatever the caller supplies**: the corpus does not settle it, the map puts it out of scope
+**or a waiver suspends it**, this engine has not built it, the structured data is absent, or the
+combination is unresolved. None of these is a finding about the operation."* It names this case
+outright, and "whatever the caller supplies" is the whole of the argument.
+
+**`FactRequired` claims the opposite of that sentence.** `RequirementState` groups `ActionRequired`,
+`HumanAssertionRequired` and `FactRequired` as *"what the caller still owes"*, and
+`OperationEvaluation.Outstanding` is *"Everything the caller still owes this engine before it could
+say more."* Thirteen entries filed a waiver-suspended entry under `Outstanding` anyway, each naming
+a specific fact on `MissingInput` — so a product rendering that list would ask somebody for their
+`Person` for a rule it had just told them does not apply.
+
+**Within this engine's model of the gate**, there is then no `Person`, no `Use`, no `Lighting`, no
+`Place` the caller could supply that would make the entry say more, because the entry is not in
+play. The qualifier is doing real work and is not a hedge. § 107.205(a) and (c) carry provisos —
+"no waiver of this provision will be issued to allow the carriage of property of another person by
+the small unmanned aircraft for compensation or hire" — and § 107.200(d)(1) makes a certificate
+authorise deviation only "to the extent specified". For § 107.25 the fact one of those provisos
+turns on is already an input on the request. **This engine reads none of it**: it records the
+waiver statement the caller makes and does not second-guess its extent, which `docs/decisions/0001`
+and rules-factory decision 0021 settled before this record existed. That is unchanged here, and
+changing it is its own issue: a gate that read the provisos would answer a question about what the
+Administrator may issue, from a corpus that states the condition and not the test.
 
 That is `docs/decisions/0005`'s own argument, met from the other side. 0005 removed a wrong
 `Outstanding` entry by reading a rule's verdict properly: *"The caller owed nothing. The engine had
@@ -84,9 +100,13 @@ exactly the right thing to say about a suspended entry, and is not what the thir
 **The majority's defence does not survive contact with the code.** Three things are wrong with
 "the inputs are the arguments of the call":
 
-- The waiver statement is *also* an argument of the call, and it was already demanded ahead of the
-  others in all fifteen. So the convention was never "all the arguments, together": it was already
-  ordered, and the question was only where the rest sat relative to the gate.
+- The arguments were already ordered, inside the rule. In all fifteen the rule read the waiver
+  statement — as its gate, its first statement — before it read any other argument. So the
+  convention was never "all the arguments at once, and then the rule": the rule already had an
+  order, and the only question was where the *demands* sat relative to it. (The handlers demanded
+  the waiver statement **last** in thirteen of the fifteen, which is why those thirteen named a
+  typed input on a request that stated nothing at all; that is the accident this record removes,
+  not an ordering anyone chose.)
 - Every request property is a nullable `init` property, so no request is ever unformed. There is no
   call that "cannot be made" — `Registry.Resolve(entryId, RuleRequest.Empty)` makes every one of
   them today.
@@ -114,10 +134,18 @@ and before the assertion. Both satisfy this record. What no gated entry may do i
 non-waiver input *before* the gate.
 
 **A malformed value is checked after the gate too**, because it is checked from the value the entry
-demanded and the entry demands nothing until the gate has run. `Altitude.Within`'s negative-altitude
-check and `MultipleAircraft.AtTheSameTime`'s blank-person check moved with their demands. A caller
-who states a waiver in force and a negative altitude is now declined rather than thrown at, which is
-the same answer for the same reason: the entry is not in play.
+demanded and the entry demands nothing until the gate has run. Three checks moved with their
+demands, and this is the complete list:
+
+| rule | check | what a waived request used to get | and gets now |
+|---|---|---|---|
+| `Altitude.Within` | `ArgumentOutOfRangeException.ThrowIfNegative(altitudeAboveGroundLevelFeet)` | the exception, which `OperationEvaluator.Evaluate` rethrows and which abandons the whole evaluation | `OutsideCurrentScope` citing § 107.205 |
+| `Weather.MinimumsMet` | `ArgumentOutOfRangeException.ThrowIfNegative(flightVisibilityStatuteMiles)` | the same | the same |
+| `MultipleAircraft.AtTheSameTime` | `ArgumentException.ThrowIfNullOrWhiteSpace(person)` | `ArgumentException`, reported `FactRequired` naming `person` | the same |
+
+A caller who states a waiver in force and a negative altitude is now declined rather than thrown at,
+which is the same answer for the same reason: the entry is not in play. Each keeps its original
+`paramName`, so where no waiver is in force nothing about any of them moved.
 
 **No verdict changes.** Nothing here touches what any rule requires or what any finding says. The
 only outcomes that move are ones that were `FactRequired` under a waiver in force and are now
@@ -128,11 +156,15 @@ now name the waiver statement.
 
 **Demand first, and change `reasonable-protection` and `over-human-beings` to match.** This was the
 cheaper change by an order of magnitude — two files rather than twenty-six — and the majority's
-argument for it is a real argument, not a rationalisation. It was rejected because the answer it
-gives is one this engine's own API documentation contradicts: it files a suspended entry under
-"everything the caller still owes this engine", and names a fact on `MissingInput` that no caller
-could usefully supply. Choosing it would also have required deleting the general argument already
-recorded in `Rules/Protection.cs` — and that argument is right.
+argument for it is a real argument, not a rationalisation. Stated at its strongest: the request type
+is the entry's contract, every property on it marked *Required* is a fact the entry needs, and
+demanding them all at the door makes "what does this entry want from me?" answerable without the
+caller knowing anything about § 107.205 — one list, one order, independent of any other answer. It
+was rejected because the answer it gives is one this engine's own API documentation contradicts:
+`OperationEvaluation.Unanswered` says a waiver-suspended entry cannot be answered *whatever the
+caller supplies*, and demand-first files that same entry under "everything the caller still owes
+this engine" with a fact named on `MissingInput`. Choosing it would also have required deleting the
+general argument already recorded in `Rules/Protection.cs` — and that argument is right.
 
 **Read the gate in the handler, keeping the demands there too.** This would have left every rule
 signature alone: the handler calls `Waivers.Suspension` first and short-circuits, then demands as
@@ -166,10 +198,29 @@ what produced this.
   `The_table_is_every_entry_whose_request_carries_a_waiver_statement_of_its_own` compares the
   table with the generated request types by reflection, so a gated entry built later cannot be left
   out of it silently.
+- **Two of those tests need a mutation of their own, and have one.** The fifteen per-entry mutations
+  that move a handler's `Demand(...)` back in front of the gate cannot redden
+  `Stated_that_no_waiver_is_in_force_the_same_request_is_refused_for_the_input_the_entry_owes` **by
+  construction** — on the no-waiver path re-wrapping an input throws the same `ArgumentException`
+  with the same `ParamName` — and they cannot touch the reflection test at all, which reads no
+  handler. So that test is reddened instead by a rule that stops demanding (`Speed.Within`
+  defaulting the groundspeed) and by a rule that demands out of order (`Compliance.CompliedWith`
+  swapping `Person` and `Groundspeed`), and the reflection test by deleting a row from its own
+  table. The overlay records all three. This matters more than the usual bookkeeping: those two
+  tests are what stop this record being read as the fully lazy change, and what closes the
+  "built later, left out silently" hole — the two things the rest of the argument leans on.
 - **`CivilTwilightOperationEntryPointTests`' separating assertion is inverted rather than deleted.**
   That test's waived-request-with-`Place`-unset case is the one the issue names as the shape to
   generalise; it now asserts the decline, and asserts beside it that the same request stated with no
   waiver in force still owes `Place` by name.
+- **Fifteen public rule signatures took nullable parameters**, which is a change on the rules'
+  surface and not only inside it. A caller who reaches a rule directly and passes `null` for an
+  input now gets `ArgumentException` — "the caller did not state it" — where it used to get
+  `ArgumentNullException` from a `ThrowIfNull` guard; and `decimal` → `decimal?` on
+  `Altitude.Within`, `Weather.MinimumsMet` and `Compliance.CompliedWith` is a binary-breaking
+  signature change. Through `EntryPoints` and `Registry`, which is how the engine is meant to be
+  reached and how every test reaches it, nothing moves: those callers were passing the request's
+  own nullable property all along.
 - **`docs/decisions/**` is on this engine's semantic surface** (`.github/agent-policy.json`), so the
   change carrying this record needs the semantic verdict.
 - **This record is the general form of what `Rules/Protection.cs` had been saying since § 107.39(b)
