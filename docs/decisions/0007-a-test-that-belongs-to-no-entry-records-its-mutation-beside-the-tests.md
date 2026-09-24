@@ -115,10 +115,22 @@ either record; that the cross-cutting record names no test that has stopped runn
 in both records, so the two cannot disagree; and that no row there is empty of a mutation. **Four
 scope guards stand ahead of those**, so that a census looking at nothing cannot pass: that
 `OperationEvaluatorTests`, `DeterminismTests` and `WeatherMinimumsMetEntryPointTests` are each
-inside what was counted, and that the generated-class harvest returned something. They are real
-failure modes — a renamed class, a harvest that finds none — and **none of the four has been
-watched**; §7's bar is one watched mutation per test, which the four record checks clear several
-times over, and watching these would be work this issue does not need. Its scope is
+inside what was counted, and that the generated-class harvest returned something. **None of the four
+has been watched**; §7's bar is one watched mutation per test, which the four record checks clear
+several times over, and watching these would be work this issue does not need. What fires each is
+worth stating exactly, because the obvious answer is wrong for three of them:
+
+- **Not a rename.** The three classes are named through `nameof`, which the compiler checks, so a
+  rename that updates the `nameof` cannot fire the guard, and one that does not is a compile error
+  rather than an assertion failure. What fires a `Contains` guard is the named class contributing no
+  `[Fact]` or `[Theory]` to what was counted: its tests moved out or were deleted, or — the case the
+  guard is really for — a `Generated/*.g.cs` came to declare a class of that short name, and the
+  exemption above swallowed a hand-written class whole.
+- **A harvest that finds none.** `Assert.NotEmpty` fires when `tests/FaaPart107.Tests/Generated/`
+  yields no class at all: the directory emptied or renamed, or `\bclass\s+(\w+)` stopping to match.
+  Nothing would then be exempt, which fails loudly here rather than quietly widening the census.
+
+Its scope is
 every `[Fact]` and `[Theory]` in the built test assembly **except** those declared by a class in
 `tests/FaaPart107.Tests/Generated/*.g.cs` — a `generated` row in `ownership.py`, rewritten from the
 map by every `factory produce` and not this engine's to name a mutation for. The exemption is read
