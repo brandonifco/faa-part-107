@@ -115,7 +115,51 @@ public sealed record AltitudeFinding(
     public override string ToString() =>
         string.Create(
             CultureInfo.InvariantCulture,
-            $"{AltitudeAboveGroundLevelFeet} feet above ground level is {(WithinLimit ? "within" : "beyond")} {Limit.AboveGroundLevelFeet} feet above ground level [{Authority}]; {Structure}; {Waiver}");
+            $"{AltitudeAboveGroundLevelFeet} feet above ground level is {(WithinLimit ? "within" : "beyond")} {Comparand} [{Authority}]; {Structure}; {Waiver}");
+
+    /// <summary>
+    /// The figure <see cref="WithinLimit"/> turned on, named in § 107.51(b)'s own terms.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Paragraph (b) states its ceiling and then an exception reached by "unless", so which figure
+    /// decides follows the paragraph's own order. While the aircraft is not higher than 400 feet
+    /// above ground level the ceiling is met and the exception is never reached, so the figure is
+    /// <see cref="AltitudeLimit.AboveGroundLevelFeet"/>. Higher than that, the exception is reached,
+    /// and paragraph (b)(1) decides whether it is open: within the printed radius of a structure the
+    /// figure is the one paragraph (b)(2) names, "400 feet above the structure's immediate uppermost
+    /// limit" — the stated limit plus <see cref="AltitudeLimit.AboveStructureUppermostLimitFeet"/>,
+    /// in feet above ground level, which is the reference
+    /// <see cref="StructureStatement.ImmediateUppermostLimitFeet"/> is stated against. Beyond the
+    /// radius, or with no structure stated, paragraph (b)(2) has nothing to measure above and the
+    /// ceiling governs alone.
+    /// </para>
+    /// <para>
+    /// So "<c>{altitude} feet above ground level is within|beyond {this}</c>" is a true sentence on
+    /// every input, which reading <see cref="AltitudeLimit.AboveGroundLevelFeet"/> whichever branch
+    /// produced the verdict was not: an aircraft 1,000 feet up and 200 feet from a 600-foot
+    /// structure is within the limit, and was rendered "within 400 feet above ground level"
+    /// (<c>#122</c>). Nothing here changes <see cref="WithinLimit"/> or any member it is computed
+    /// from; a sentence is not a verdict.
+    /// </para>
+    /// <para>
+    /// The <see cref="StructureStatement.ImmediateUppermostLimitFeet"/> pattern cannot fail while
+    /// <see cref="WithinStructureRadius"/> is true, because that member is read off
+    /// <see cref="StructureStatement.DistanceFeet"/> and the only statement carrying one carries
+    /// both. It is matched rather than assumed, and the ceiling stands where it does not.
+    /// </para>
+    /// </remarks>
+    private string Comparand =>
+        !WithinGroundLevelCeiling
+        && WithinStructureRadius
+        && Structure.ImmediateUppermostLimitFeet is { } uppermost
+            ? string.Create(
+                CultureInfo.InvariantCulture,
+                $"{uppermost + Limit.AboveStructureUppermostLimitFeet} feet above ground level, "
+                + $"{Limit.AboveStructureUppermostLimitFeet} feet above the structure's immediate uppermost limit")
+            : string.Create(
+                CultureInfo.InvariantCulture,
+                $"{Limit.AboveGroundLevelFeet} feet above ground level");
 
     private static StructureStatement CheckStructure(
         StructureStatement structure,
