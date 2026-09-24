@@ -13,7 +13,7 @@ constituent did not settle the question, and say so to a caller who asked about 
 | `operating-limitations` (§ 107.51 intro) | `Rules/Compliance.cs` | each constituent's verdict; a decline where one is undetermined |
 | `visual-observer-conditions` (§ 107.33) | `Rules/Observers.cs` | same, over § 107.33's requirements |
 | `over-human-beings` (§ 107.39) | `Rules/Overflight.cs` | same, over § 107.39's three excepted cases |
-| `civil-twilight-operation` (§ 107.29(a)-(b)) | `Rules/Twilight.cs` | same, over its constituents |
+| `civil-twilight-operation` (§ 107.29(b)-(c)) | `Rules/Twilight.cs` | same, over its constituents |
 | `weather-minimums-met` (§ 107.51(c)-(d)) | `Rules/Weather.cs` | a decline on `prominent-objects`, which declines always |
 | `right-of-way` (§ 107.37(a)) | `Rules/Yielding.cs` | a decline on `well-clear`, which declines always |
 
@@ -159,14 +159,17 @@ only that such a case is *ordinary* — reported, not thrown — and leaves the 
   citation, because a mutation that swapped one of those locators for the other would otherwise
   stay green.
 - **`operating-limitations` does not yet carry its constituent's account forward, and this record
-  says it should.** `LimitationOutcome.Account` holds `weather-minimums-met`'s full `Attempted`, but
-  only on a resolved finding; on a decline the array is local and discarded, so a caller receives
-  "`weather-minimums-met` [§ 107.51(c)-(d)] did not resolve" and the fact that the openness
-  originates in `prominent-objects` is gone — two hops of loss at depth four.
+  says it should.** `LimitationOutcome.Account` holds `weather-minimums-met`'s full `Attempted` on a
+  decline as much as on a resolved finding — `Compliance.Outcome` fills it from `unresolved.Attempted`
+  — but on a decline that account never reaches the caller: `Compliance.Undetermined` builds its own
+  `Attempted` from each undetermined constituent's `Entry.Id` and `Entry.Locator.Citation` and nothing
+  else, and the array of outcomes is local and discarded. So a caller receives "`weather-minimums-met`
+  [§ 107.51(c)-(d)] did not resolve" and the fact that the openness originates in `prominent-objects`
+  is gone — two hops of loss at depth four.
   `The_decline_is_this_entrys_own_and_not_the_constituents_handed_back` pins that loss today
   (`Assert.DoesNotContain("prominent-objects", mine.Attempted)`). Issue #78 was scoped to the two
   composites that disagreed and explicitly not to the four that already had the shape, so closing
-  that gap is a separate issue; what this record settles is that it *is* a gap, and what closing it
+  that gap is **issue #103**; what this record settles is that it *is* a gap, and what closing it
   must not do (become propagation).
 - **Nothing about either entry's regulatory reading moved.** No case that resolved before declines
   now, and no case that declined before resolves. What changed is what a decline says and where its
@@ -175,9 +178,14 @@ only that such a case is *ordinary* — reported, not thrown — and leaves the 
   `Weather.MinimumsMet` and `Speed.Within` both pass `Resolution<T>.FromUnresolved` as the
   `onUnresolved` arm of a `Match` over a value constituent (`visibility-minimum`, `cloud-clearance`,
   `speed-limit`), which hands that constituent's `UnresolvedResult` straight back. Those arms are
-  dead: each entry runs its own waiver gate first, and the gate is the only thing that makes a value
-  constituent decline. They are still the forbidden shape, waiting for a constituent that gains a
-  second way to decline, and they are outside issue #78's acceptance criteria. Recorded here so that
-  the next agent to touch either file does not have to rediscover it.
+  dead, but not because the waiver gate is a constituent's only way to decline: `Clouds.Clearance`
+  and `Speed.Limit` each have a second, behind an optional parameter — `asOneDistance: true` and
+  `asOneFigureIn: not null`, both `RequiresInterpretation` — and only `visibility-minimum` declines
+  on the gate alone. They are dead because each composite runs its own waiver gate first and then
+  calls its constituent at the default (`Clouds.Clearance(waiver)`, `Speed.Limit(waiver)`), never
+  asking the question that second decline answers. They are still the forbidden shape, waiting for a
+  call site that asks it or for a constituent that gains a third way to decline, and they are outside
+  issue #78's acceptance criteria. Closing that is **issue #104**; recorded here so that the next
+  agent to touch either file does not have to rediscover it.
 - **`docs/decisions/**` is on this engine's semantic surface** (`.github/agent-policy.json`), so the
   change carrying this record needs the semantic verdict.
