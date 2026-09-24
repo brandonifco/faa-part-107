@@ -68,10 +68,24 @@ public class DeterminismTests
         "RequirementOutcome.Answering",
     ];
 
-    /// <summary>Every record type in the built engine, in a fixed order.</summary>
+    /// <summary>
+    /// Every record type in the built engine — <c>record</c> and <c>record struct</c> alike — in a
+    /// fixed order.
+    /// </summary>
+    /// <remarks>
+    /// The filter is the synthesized <c>PrintMembers</c>, which every record has.
+    /// <c>&lt;Clone&gt;$</c> looks like the obvious one and is not: the compiler emits it only for
+    /// a record <em>class</em>, because <c>with</c> on a value type is a direct copy. Filtering on
+    /// it left this engine's two record structs — <see cref="Groundspeed"/> and
+    /// <see cref="TwilightBoundary"/> — outside a census whose prose said it ranged over every
+    /// record. Neither carries a collection or a map entry, so nothing the censuses assert was
+    /// wrong; what was wrong was the claim, and a finding declared <c>readonly record struct</c>
+    /// over an <see cref="ImmutableArray{T}"/> would have been invisible to both while being
+    /// exactly the defect they exist to catch.
+    /// </remarks>
     private static IEnumerable<Type> Records() =>
         typeof(EntryPoints).Assembly.GetTypes()
-            .Where(type => type.GetMethod("<Clone>$", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic) is not null)
+            .Where(type => type.GetMethod("PrintMembers", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic) is not null)
             .OrderBy(type => type.FullName, StringComparer.Ordinal);
 
     /// <summary>
@@ -110,6 +124,13 @@ public class DeterminismTests
     /// defect. A general test for "equality that does not reach the elements" would have to build
     /// two equal-content instances and compare them; that is more machinery than this census is
     /// worth, so the exception is written down where it can be read instead.
+    /// </para>
+    /// <para>
+    /// <b>The limit that follows from that</b>, and it is the same shape as the named exception:
+    /// another struct collection that overrides <c>Equals(object)</c> while comparing something
+    /// held by reference would answer "no" here and be missed — <c>ArraySegment&lt;T&gt;</c> is
+    /// the standard example. None is in play in this assembly; if one arrives, it joins
+    /// <see cref="ImmutableArray{T}"/> above rather than being caught by the rule.
     /// </para>
     /// </remarks>
     private static bool ComparesByIdentity(Type type) =>
@@ -195,18 +216,28 @@ public class DeterminismTests
     /// This is what carries most of the weight in
     /// <see cref="Evaluation.EvaluatedRequirement.Equals(Evaluation.EvaluatedRequirement)"/>'s
     /// comparison of a finding, and unlike the three audits that preceded it, it asks nothing
-    /// about which findings are reachable: it ranges over every record the assembly holds, so a
-    /// finding no fact set this repository knows how to build could ever produce is inside it
+    /// about which findings are reachable: it ranges over every record type the assembly holds, so
+    /// a finding no fact set this repository knows how to build could ever produce is inside it
     /// anyway.
     /// </para>
     /// <para>
-    /// <b>What it does not establish</b>, stated because four rounds of this issue were lost to
-    /// claims wider than their method. It checks <em>records</em>, so it covers findings only
-    /// while every finding is a record — true of this assembly today, and prose here rather than
-    /// a check. It says a record overrides its equality, never that the override compares its
-    /// collection by element; that is what the five <c>..._compared_by_element</c> tests are for,
-    /// and this census would stay green if one of them were gutted. And it sees only the kinds of
-    /// field <see cref="ComparesByIdentity"/> recognises, whose limits are written there.
+    /// <b>What it does not establish</b>, stated because five rounds of this issue were lost to
+    /// claims wider than their method — the fifth to the sentence that used to stand here, which
+    /// reassured about records where it should have warned that <see cref="Records"/> then saw
+    /// only record <em>classes</em>. Four limits, each of which would let a real defect through:
+    /// </para>
+    /// <para>
+    /// (a) It covers <em>records</em>, so it covers findings only while every finding is a record.
+    /// True of this assembly today; prose here rather than a check.
+    /// (b) It says a record overrides its equality, never that the override compares its
+    /// collection by element — that is what the five <c>..._compared_by_element</c> tests are for,
+    /// and this census would stay green if one of them were gutted.
+    /// (c) It sees only the kinds of field <see cref="ComparesByIdentity"/> recognises, whose own
+    /// limits are written there.
+    /// (d) It reads instance fields declared on the type (<see cref="Fields"/>), so a static
+    /// holding a collection — <c>MapEntries</c>' entries, <c>Registry</c>'s
+    /// <c>ImmutableArray&lt;RegisteredEntry&gt;</c> — is not in view. Nothing compares two of
+    /// those, so no outcome turns on them; they are simply not what this counts.
     /// </para>
     /// <para>
     /// It fails by <em>name</em>, so a record that joins the list says which record and the reader
@@ -236,8 +267,9 @@ public class DeterminismTests
     }
 
     /// <summary>
-    /// Every field in this engine whose value is one of the map's own entry types, counted through
-    /// element types as well as directly, is one of five this repository has looked at.
+    /// Every <em>record instance field</em> in this engine whose value is one of the map's own
+    /// entry types, counted through element types as well as directly, is one of five this
+    /// repository has looked at.
     /// </summary>
     /// <remarks>
     /// Comparing a finding reduces, level by level, to these — and <c>MapEntry</c> keeps the
@@ -247,9 +279,16 @@ public class DeterminismTests
     /// than anything here. This is the census that condition has to be true of, and it is measured
     /// rather than written down: a field that joins it turns this red by name, where prose about it
     /// went stale twice inside one change.
+    /// <para>
+    /// Record instance fields and no others, which is the right scope and not the whole assembly:
+    /// what the condition is about is a map entry reached while comparing two values, and only a
+    /// field of a record is reached that way. A static holding entries — <c>MapEntries</c>',
+    /// <c>Registry</c>'s <c>ImmutableArray&lt;RegisteredEntry&gt;</c> — is never one side of a
+    /// comparison, and is not counted here.
+    /// </para>
     /// </remarks>
     [Fact]
-    public void Every_field_carrying_a_map_entry_is_one_of_the_five_the_soundness_condition_covers()
+    public void Every_record_field_carrying_a_map_entry_is_one_of_the_five_the_soundness_condition_covers()
     {
         var mapSide = Records()
             .SelectMany(type => Fields(type).Select(field => (Type: type, Field: field)))
