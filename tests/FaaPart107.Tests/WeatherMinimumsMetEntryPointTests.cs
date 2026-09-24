@@ -48,14 +48,26 @@ namespace FaaPart107.Tests;
 /// <see cref="LimitationOutcome"/>, <see cref="ExceptedCaseOutcome"/>,
 /// <see cref="RequirementOutcome"/>, <see cref="ObligationOutcome"/> — each recording an
 /// <c>Account</c> of what that constituent said and printing only its id, locator and verdict,
-/// which is the same shape one level down a collection. Two entries are pinned on it:
+/// which is the same shape one level down a collection. Three entries are pinned on it:
 /// <c>OperatingLimitationsEntryPointTests.Two_operations_differing_only_in_a_constituents_recorded_account_are_different_outcomes</c>,
-/// which is § 107.51's introductory text reading this very entry's decline, and
-/// <c>VisualObserverConditionsEntryPointTests.Two_operations_differing_only_in_who_asserted_the_coordination_are_different_outcomes</c>,
-/// where what is recorded and not printed is <em>who</em> § 107.33(c)'s assertion is attributed
-/// to. Whether a given entry can be put in two such states is that entry's own question rather
-/// than a property of this comparison: <c>over-human-beings</c> and <c>preflight-actions</c> carry
-/// outcomes of the same shape and, on the inputs their evaluator arms accept, cannot be.
+/// which is § 107.51's introductory text reading this very entry's decline;
+/// <c>VisualObserverConditionsEntryPointTests.Two_operations_differing_only_in_who_asserted_the_coordination_are_different_outcomes</c>;
+/// and
+/// <c>OverHumanBeingsEntryPointTests.Two_operations_differing_only_in_who_asserted_the_reasonable_protection_are_different_outcomes</c>.
+/// In the last two what is recorded and not printed is <em>who</em> the assertion is attributed
+/// to, which is the thing an assertion exists to carry.
+/// </para>
+/// <para>
+/// <c>preflight-actions</c> is the one composite with no test of that shape, and the reason is
+/// enumerated rather than assumed: over every state its evaluator arm can be put in — every
+/// <see cref="SubpartDOperation"/>, every <see cref="AircraftPower"/>, all sixteen polarities of
+/// its four § 107.49 assertion entries, and every asserter each of those accepts, all four being
+/// <c>assertedBy: ["remote pilot in command"]</c> and so closed sets — no two of the 58 states in
+/// which it resolves have one rendering and two findings. That is a fact about the inputs that
+/// entry accepts and not about this comparison, and it is the only claim of that form here that a
+/// complete enumeration supports: where <c>assertedBy</c> is the marker <c>["caller"]</c> the
+/// asserter is not narrowed at all (<c>docs/decisions/0003</c>), so a sweep over any entry
+/// reaching one of those three samples that dimension rather than covering it.
 /// </para>
 /// <para>
 /// Each of the two below is red on a mutation to this entry's own rule as well as on one to that
