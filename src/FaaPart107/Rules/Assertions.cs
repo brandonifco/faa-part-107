@@ -3,6 +3,41 @@ using RulesKernel.Resolution;
 namespace FaaPart107;
 
 /// <summary>
+/// What a <c>kind: assertion</c> entry's finding says when the paragraph that states the entry also
+/// states an antecedent: whether that paragraph reaches this operation at all, and so whether there
+/// was an assertion to demand and record.
+/// </summary>
+/// <remarks>
+/// <para>
+/// Correspondence row 8 is "nothing; the engine demands the value", and that is unaltered here:
+/// where the paragraph reaches the operation the value is demanded, checked against the map's
+/// <see cref="MapEntry.AssertedBy"/>, and answered unchanged, exactly as <see cref="Assertions.Stated"/>
+/// answers it. What this interface reports is the case <em>before</em> row 8 has anything to govern
+/// — a paragraph whose own antecedent the caller states is not satisfied states no obligation about
+/// the operation, so there is no fact for anybody to assert and none is demanded. § 107.49(d)'s "If
+/// the small unmanned aircraft is powered" is the one such antecedent in this map
+/// (<see cref="AircraftPower"/>, and <c>#95</c>).
+/// </para>
+/// <para>
+/// It exists so that <c>Evaluation.OperationEvaluator</c> can tell "the caller asserted this" from
+/// "the paragraph does not reach this operation" <b>without naming an entry or a finding type</b>,
+/// which is the property <c>docs/decisions/0004</c> states for the row-8 test and which a per-type
+/// arm there would have given up. An assertion entry a later map version states under an antecedent
+/// of its own is covered the day it is built.
+/// </para>
+/// </remarks>
+public interface IConditionalAssertion
+{
+    /// <summary>
+    /// Whether the paragraph that states the entry reaches this operation, so an assertion was
+    /// demanded and is recorded on the finding. <see langword="false"/> is the paragraph stating no
+    /// requirement about the operation at all — which is neither the assertion holding nor its
+    /// failing to hold, and is never "undetermined".
+    /// </summary>
+    bool ParagraphApplies { get; }
+}
+
+/// <summary>
 /// How a <c>kind: assertion</c> entry is answered: correspondence row 8, "nothing; the engine
 /// demands the value" (the correspondence table beside <c>docs/corpus-map.md</c>, and
 /// <see cref="CorrespondenceRow.Assertion"/>).

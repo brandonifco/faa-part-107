@@ -95,6 +95,13 @@ public enum RequirementState
     /// neither the map nor any rule of this engine records which. Scoring these would be the
     /// orchestrator reading the corpus, which <c>AGENTS.md</c> §5 forbids it. See
     /// <c>docs/decisions/0004-an-assertion-is-recorded-and-not-scored.md</c>.
+    /// <para>
+    /// An assertion entry whose paragraph states an antecedent reports this only where the paragraph
+    /// reaches the operation, because only then is there a fact to record. Where it does not — the
+    /// small unmanned aircraft is not powered, and § 107.49(d) asks nobody anything — the entry
+    /// reports <see cref="Informational"/>, and <see cref="IConditionalAssertion.ParagraphApplies"/>
+    /// on the finding says so.
+    /// </para>
     /// </remarks>
     HumanAssertionRecorded = 5,
 
@@ -120,6 +127,14 @@ public enum RequirementState
     /// <see cref="VisualObserverConditionsFinding.AllRequirementsMet"/> where no visual observer is
     /// used, and <see cref="CivilTwilightOperationFinding.Permitted"/> where the operation is during
     /// neither period of civil twilight. It must not be read as <see cref="Satisfied"/>.
+    /// <para>
+    /// A <c>kind: assertion</c> entry reaches this state by the same third answer and no other:
+    /// <see cref="SufficientAvailablePowerFinding.Holds"/> is null where the small unmanned aircraft
+    /// is not powered, because § 107.49(d) then states no obligation about the operation and no
+    /// assertion was demanded or made. A fact a caller <em>did</em> assert is never reported here —
+    /// that is <see cref="HumanAssertionRecorded"/>, and the two are kept apart because one is what
+    /// the rule says and the other is what a person said.
+    /// </para>
     /// </summary>
     Informational = 7,
 

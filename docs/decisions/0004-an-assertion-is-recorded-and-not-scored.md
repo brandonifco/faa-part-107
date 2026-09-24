@@ -75,11 +75,26 @@ Three consequences of that sentence, and each is deliberate:
   no" distinction the issue exists to protect, at the one place it is easiest to lose.
 - **The test is the map's, not a list of types this engine keeps.** An entry whose first
   correspondence row is row 8 (`RegisteredEntry.Row == CorrespondenceRow.Assertion`) is
-  `kind: assertion`, and a value it resolved to is recorded. Five of the ten answer with a bare
-  `Assertion`; the other five wrap it in a finding of their own so that the § 107.205 waiver
-  statement travels beside it — `UnaidedVisualContactFinding.Contact`,
-  `ObserverCoordinationFinding.Coordination`, `IntensityReductionFinding.Determination`,
-  `FlashRateSufficientFinding.Sufficiency`, `ReasonableProtectionFinding.Protection`. The row test
+  `kind: assertion`, and a value it resolved to is recorded. Four of the ten answer with a bare
+  `Assertion` — `collision-hazard-proximity`, `preflight-risk-assessment`, `participant-briefing`,
+  `attached-object-no-adverse-effect`. The other six wrap it in a finding of their own, so that the
+  caller fact the entry demanded *ahead* of the assertion travels beside it:
+  `UnaidedVisualContactFinding.Contact`, `ObserverCoordinationFinding.Coordination`,
+  `IntensityReductionFinding.Determination`, `FlashRateSufficientFinding.Sufficiency` and
+  `ReasonableProtectionFinding.Protection` carry the § 107.205 waiver statement, and
+  `SufficientAvailablePowerFinding.Availability` carries § 107.49(d)'s own condition (#95).
+  **Wrapping therefore does not mean a waiver gate.** It means a fact was owed before the assertion
+  could be asked for, and § 107.205 is only the commonest such fact: `sufficient-available-power`
+  has no `suspendedBy` in the map at all, and nothing about a waiver is demanded or read for it.
+
+  **This census is checked too, and for the reason the one below states.** It was written without a
+  test and was wrong inside a single change: #95 made the sixth wrapper and left "five" and "so that
+  the § 107.205 waiver statement travels beside it" standing, both false, in the record that is
+  authority for how this engine reads an assertion.
+  `OperationEvaluatorTests.An_assertion_is_wrapped_exactly_where_a_caller_fact_is_demanded_ahead_of_it`
+  now measures the split from the engine — an entry wraps exactly where `OperationFacts.Nothing`
+  makes it report `FactRequired` rather than `HumanAssertionRequired` — and fails naming this record
+  when either half moves. The row test
   covers all ten without naming any of them or any of their types, so an assertion entry a later
   map version adds is covered the day it is built rather than the day somebody remembers this
   record. The gate decides whether the entry is reachable; it does not add a polarity the corpus
@@ -155,6 +170,24 @@ is the engine working, not the engine failing — the same posture §6 records f
   row, with no per-entry decision to make and none to re-make.
   `OperationEvaluatorTests.No_assertion_entry_is_ever_reported_as_satisfied_or_violated` walks the
   registry rather than a list, so it covers them as they land.
+- **An assertion entry whose paragraph states an antecedent has a second answer, and it is not a
+  verdict either.** § 107.49(d) is "**If the small unmanned aircraft is powered**, ensure that there
+  is enough available power …", and that condition is inside `sufficient-available-power`'s own
+  `evidence`. Where the caller states it is not satisfied, the paragraph states no obligation about
+  the operation: nothing is demanded, nobody has asserted anything, and there is no fact to record.
+  That case is reported `Informational` — which is the *rule* speaking, and is what that state is
+  for — and never `HumanAssertionRecorded`, which would name a fact nobody stated, and never
+  `Satisfied`, which is the reading `#95` exists to prevent. Nothing above is weakened: where the
+  paragraph does reach the operation the value is demanded and recorded exactly as this record
+  requires, and no assertion is scored anywhere.
+
+  **The test stays the map's and the rule's, and still names no entry and no finding type.** The row
+  says the entry is an assertion; `IConditionalAssertion.ParagraphApplies` is the rule's own
+  declaration that its paragraph did not reach this operation, and the evaluator reads that and
+  nothing else. So an assertion entry a later map version states under an antecedent of its own is
+  covered the day it is built, the same way one without an antecedent already is.
+  `OperationEvaluatorTests.A_paragraph_that_does_not_reach_the_operation_is_informational_and_not_an_assertion_recorded`
+  pins both halves.
 - **What this costs a caller, measured rather than asserted.** A consuming entry supplies the
   polarity by *using* the fact: where a built entry's own verdict requires an assertion to hold,
   that entry has said which way the assertion points, and a product reads compliance off the

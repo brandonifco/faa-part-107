@@ -139,6 +139,16 @@ public class CollisionHazardProximityEntryPointTests
         Assert.False(assertion.Holds);
     }
 
+    /// <summary>
+    /// A <c>sufficient-available-power</c> request that states § 107.49(d)'s own condition, so the
+    /// attribution check is what the entry refuses on rather than the condition being unstated.
+    /// </summary>
+    private static SufficientAvailablePowerRequest PoweredAndAsserting(Assertion assertion) =>
+        new(RuleRequest.Empty.Assert(MapEntries.SufficientAvailablePower.Id, assertion))
+        {
+            Power = AircraftPower.Powered,
+        };
+
     [Fact]
     public void An_entry_whose_assertedBy_names_people_still_refuses_an_attribution_it_does_not_name()
     {
@@ -151,8 +161,7 @@ public class CollisionHazardProximityEntryPointTests
 
         var error = Assert.Throws<ArgumentException>(
             () => EntryPoints.SufficientAvailablePower.Resolve(
-                SufficientAvailablePowerRequest.Asserting(
-                    new Assertion(MapEntries.SufficientAvailablePower, Holds: true, "visual observer"))));
+                PoweredAndAsserting(new Assertion(MapEntries.SufficientAvailablePower, Holds: true, "visual observer"))));
 
         Assert.Contains("remote pilot in command", error.Message, StringComparison.Ordinal);
         Assert.Contains("visual observer", error.Message, StringComparison.Ordinal);
@@ -161,8 +170,7 @@ public class CollisionHazardProximityEntryPointTests
         // does not carry.
         var marker = Assert.Throws<ArgumentException>(
             () => EntryPoints.SufficientAvailablePower.Resolve(
-                SufficientAvailablePowerRequest.Asserting(
-                    new Assertion(MapEntries.SufficientAvailablePower, Holds: true, "caller"))));
+                PoweredAndAsserting(new Assertion(MapEntries.SufficientAvailablePower, Holds: true, "caller"))));
 
         Assert.Contains("remote pilot in command", marker.Message, StringComparison.Ordinal);
     }
