@@ -262,8 +262,17 @@ what produced this.
   became `stated`, `place` became `where`, `use` became `stated`, `fromAMovingAircraft` became
   `stated`, `person` became `asked`, `flightVisibilityStatuteMiles` became `miles`, `authorization`
   became `held`, `exercise` became `exercised` — and across thirteen handlers **twenty-eight**
-  `Demand(...)` call sites were deleted outright (41 → 13; `operating-limitations` alone loses six,
-  `civil-twilight-operation` and `visual-observer-conditions` three each). Every record below was true when it was observed and none of its *claims*
+  `Demand(...)` call sites were deleted outright: **41 → 13**, counted on code lines only so a doc
+  comment cannot inflate it. Per handler at `684cb7d`: `operating-limitations` 7, `civil-twilight-
+  operation` and `visual-observer-conditions` 4 each, `airspace-authorized`, `altitude-within-limit`,
+  `moving-vehicle-operation`, `right-of-way`, `single-aircraft` and `weather-minimums-met` 3 each,
+  `anti-collision-lighting`, `moving-aircraft-operation`, `speed-within-limit` and
+  `visual-line-of-sight` 2 each; each ends with 1, the waiver statement's. **One of those sites is
+  wrapped**: `moving-vehicle-operation`'s second is written `Demand(` with its argument on the next
+  line, so a count that greps `Demand(request.` line by line sees 40 and not 41 and reports
+  twenty-seven. That is limit 3 below — a fragment spanning a source line break — biting the
+  counting of this figure rather than the sweep, which is why the per-handler figures are written
+  out here: two independent recounts of this number have landed short by exactly that one site. Every record below was true when it was observed and none of its *claims*
   changes; what changes is that re-running one means translating an identifier, or moving the
   substitution from a handler to the rule. The list lives here rather than in the pull request
   because `docs/decisions/0007` rejects the pull request as a place for mutation evidence in terms
