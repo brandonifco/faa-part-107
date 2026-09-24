@@ -34,7 +34,16 @@ namespace FaaPart107.Tests;
 /// <c>scripts/factory/ownership.py</c>: those tests are rewritten from the map by every
 /// <c>factory produce</c> and are not this engine's to name a mutation for. The exemption is read off
 /// that directory rather than written down as a list of class names, so a class cannot be exempted by
-/// being added to a list here — it would have to be generated.
+/// being added to a list here — it would have to be <b>named after</b> a generated class.
+/// </para>
+/// <para>
+/// <b>That "named after" is the exemption's limit, and not a turn of phrase.</b> What is harvested
+/// from those files is the class's <em>short name</em> (<c>\bclass\s+(\w+)</c>) and what it is
+/// compared with is <see cref="System.Reflection.MemberInfo.Name"/>, so a hand-written
+/// <c>namespace FaaPart107.Tests.Elsewhere; public class CorrespondenceTests</c> is exempt with
+/// nothing generated. The narrower check would be on the declaring type's source file, which
+/// reflection does not carry. <c>docs/decisions/0007</c> records this limit and two others of the
+/// same kind; this paragraph is not to drift from it.
 /// </para>
 /// </remarks>
 public class RecordedMutationTests

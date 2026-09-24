@@ -110,9 +110,15 @@ Three properties the location was chosen for:
   `provenance.json`'s `buildInputs` hashes it, so it needs no re-produce of its own.
 
 `RecordedMutationTests.Every_test_on_the_semantic_surface_is_named_by_a_record_that_carries_its_mutation`
-is the converse of `named-tests`, and asserts four things: that no test runs unnamed by either
-record; that the cross-cutting record names no test that has stopped running; that no test is in
-both records, so the two cannot disagree; and that no row there is empty of a mutation. Its scope is
+is the converse of `named-tests`, and makes four **record checks**: that no test runs unnamed by
+either record; that the cross-cutting record names no test that has stopped running; that no test is
+in both records, so the two cannot disagree; and that no row there is empty of a mutation. **Four
+scope guards stand ahead of those**, so that a census looking at nothing cannot pass: that
+`OperationEvaluatorTests`, `DeterminismTests` and `WeatherMinimumsMetEntryPointTests` are each
+inside what was counted, and that the generated-class harvest returned something. They are real
+failure modes — a renamed class, a harvest that finds none — and **none of the four has been
+watched**; §7's bar is one watched mutation per test, which the four record checks clear several
+times over, and watching these would be work this issue does not need. Its scope is
 every `[Fact]` and `[Theory]` in the built test assembly **except** those declared by a class in
 `tests/FaaPart107.Tests/Generated/*.g.cs` — a `generated` row in `ownership.py`, rewritten from the
 map by every `factory produce` and not this engine's to name a mutation for. The exemption is read
@@ -170,9 +176,10 @@ say so if the overlay cannot hold it. It cannot, and this is where it goes inste
 ## Consequences
 
 - **Forty-five tests now carry a mutation that was watched failing**: the forty-four above with one
-  each, and `RecordedMutationTests` with four — one per assertion it makes, because an xUnit test
-  stops at the first assertion that fires and a mutation that trips an earlier one proves nothing
-  about a later one. Its row records all four and the message each printed.
+  each, and `RecordedMutationTests` with four — one per **record check** it makes, because an xUnit
+  test stops at the first assertion that fires and a mutation that trips an earlier one proves
+  nothing about a later one. Its row records all four and the message each printed. Forty-eight
+  mutations over forty-five tests, in all. The four scope guards above are not among them.
 - **A test deleted along with its row is now caught from one side and a test added without a row
   from the other.** `named-tests` fails on an overlay row whose test no longer runs;
   `RecordedMutationTests` fails on a test that runs and is named by nobody, and on a cross-cutting
