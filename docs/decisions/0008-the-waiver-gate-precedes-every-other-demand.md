@@ -251,8 +251,8 @@ what produced this.
   signature change. Through `EntryPoints` and `Registry`, which is how the engine is meant to be
   reached and how every test reaches it, nothing moves: those callers were passing the request's
   own nullable property all along.
-- **Thirty mutation records elsewhere quote code this change renamed or deleted, and this is the
-  list.** Making each rule's demanded value a new local meant renaming the use sites — `lighting`
+- **Twenty-nine mutation records elsewhere quote code this change renamed or deleted, and this is
+  the list.** Making each rule's demanded value a new local meant renaming the use sites — `lighting`
   became `stated`, `place` became `where`, `use` became `stated`, `fromAMovingAircraft` became
   `stated`, `person` became `asked`, `flightVisibilityStatuteMiles` became `miles`, `authorization`
   became `held`, `exercise` became `exercised` — and thirteen handler `Demand(...)` calls were
@@ -265,8 +265,8 @@ what produced this.
 
 | entry | test whose record quotes it | the fragment |
 |---|---|---|
-| `airspace-authorized` | `AirspaceAuthorizedEntryPointTests.An_ATC_authorization_that_was_not_prior_does_not_satisfy_107_41` | `var mayOperate = !required || (authorization.Held && authorization.ObtainedBeforeTheOperation);` |
-| `airspace-authorized` | `AirspaceAuthorizedEntryPointTests.Each_airspace_107_41_names_may_be_operated_in_with_prior_ATC_authorization_citing_107_41` | `var mayOperate = !required || (authorization.Held && authorization.ObtainedBeforeTheOperation);` |
+| `airspace-authorized` | `AirspaceAuthorizedEntryPointTests.An_ATC_authorization_that_was_not_prior_does_not_satisfy_107_41` | `var mayOperate = !required \|\| (authorization.Held && authorization.ObtainedBeforeTheOperation);` |
+| `airspace-authorized` | `AirspaceAuthorizedEntryPointTests.Each_airspace_107_41_names_may_be_operated_in_with_prior_ATC_authorization_citing_107_41` | `var mayOperate = !required \|\| (authorization.Held && authorization.ObtainedBeforeTheOperation);` |
 | `airspace-authorized` | `AirspaceAuthorizedEntryPointTests.Without_an_ATC_authorization_statement_it_refuses_rather_than_infer_one` | `Demand(request.Authorization,` |
 | `airspace-authorized` | `AirspaceAuthorizedEntryPointTests.Without_an_airspace_it_refuses_rather_than_infer_one` | `Demand(request.Airspace,` |
 | `altitude-within-limit` | `AltitudeWithinLimitEntryPointTests.Without_a_structure_statement_it_refuses_rather_than_assume_there_is_no_structure` | `Demand(request.Structure,` |
