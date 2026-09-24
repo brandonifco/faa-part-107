@@ -122,6 +122,39 @@ public sealed record VisualObserverConditionsFinding(
     /// <summary>Where the rule is stated: <c>§ 107.33</c>, the whole section.</summary>
     public SourceLocator Authority => MapEntries.VisualObserverConditions.Locator;
 
+    /// <summary>Whether this finding is the same as <paramref name="other"/>, comparing the requirements by element.</summary>
+    /// <param name="other">The other finding.</param>
+    /// <returns>True when both state the same thing about the chapeau's condition under the same waiver statement, and carry the same requirements answered the same way, in the same order.</returns>
+    /// <remarks>
+    /// A record's generated equality would compare <see cref="Requirements"/> with
+    /// <c>EqualityComparer&lt;IReadOnlyList&lt;RequirementOutcome&gt;&gt;.Default</c>, which is the
+    /// identity of the list object, so two resolutions of the same request would be unequal.
+    /// Determinism is about what the engine says, so equality is by element (<c>AGENTS.md</c> §8) —
+    /// the same reason <see cref="MultipleAircraftFinding.Equals(MultipleAircraftFinding)"/> gives
+    /// for overriding its own.
+    /// </remarks>
+    public bool Equals(VisualObserverConditionsFinding? other) =>
+        other is not null
+        && Use == other.Use
+        && SectionApplies == other.SectionApplies
+        && Waiver == other.Waiver
+        && Requirements.SequenceEqual(other.Requirements);
+
+    /// <inheritdoc/>
+    public override int GetHashCode()
+    {
+        var hash = default(HashCode);
+        hash.Add(Use);
+        hash.Add(SectionApplies);
+        hash.Add(Waiver);
+        foreach (var requirement in Requirements)
+        {
+            hash.Add(requirement);
+        }
+
+        return hash.ToHashCode();
+    }
+
     /// <inheritdoc/>
     public override string ToString() =>
         SectionApplies

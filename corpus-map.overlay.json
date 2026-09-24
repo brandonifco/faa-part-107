@@ -1373,6 +1373,10 @@
       {
         "test": "OperatingLimitationsEntryPointTests.The_dictionary_dispatch_refuses_rather_than_answering_from_defaults",
         "mutation": "Handlers.OperatingLimitations defaulted all seven inputs at once (`request.Person ?? BoundPerson.RemotePilotInCommand`, `request.Groundspeed ?? Groundspeed.InKnots(0m)`, `request.AltitudeAboveGroundLevelFeet ?? 0m`, `request.Structure ?? StructureStatement.NoneWithinRadius(\"the engine\")`, `request.FlightVisibilityStatuteMiles ?? 0m`, `request.Cloud ?? CloudStatement.Measured(0m, 0m, \"the engine\")` and `request.Waiver ?? WaiverStatement.NoneHeld(Compliance.Regulation, \"the engine\")` for their seven `Demand(...)` calls), so `Registry.Resolve(\"operating-limitations\", RuleRequest.Empty)` -- which builds a request with every input at its default -- resolved that the operating limitations are not complied with, from an operation nobody described, instead of refusing; this test went red -- `Failed!  - Failed:     1, Passed:     0, Skipped:     0, Total:     1` on both net8.0 and net10.0 on `Assert.Throws() Failure: No exception was thrown`. The whole set is the mutation: the dictionary dispatch cannot carry typed inputs, and nothing but the handler's Demands stands between it and an invented answer."
+      },
+      {
+        "test": "OperatingLimitationsEntryPointTests.Two_resolutions_of_one_request_are_equal_and_hash_alike_with_the_limitations_compared_by_element",
+        "mutation": "OperatingLimitationsFinding's hand-written `Equals(OperatingLimitationsFinding?)` and `GetHashCode` were deleted, so the record's generated equality compared `Limitations` with `EqualityComparer<IReadOnlyList<LimitationOutcome>>.Default` -- which for an interface-typed collection is the identity of the list object -- and two resolutions of one request were unequal. This test went red on the assertion `Assert.Equal(first, second)`: `Assert.Equal() Failure: Values differ`, with the Expected and Actual strings identical character for character (`a remote pilot in command must comply with all of them, and they are not complied with [cfr-14-107 / § 107.51 introductory text]: 'speed-within-limit' [§ 107.51(a)] not met, 'altitude-within-limit' [§ 107.51(b)] not met, 'weather-minimums-met' [§ 107.51(c)-(d)] undetermined; no certificate of waiver authorizing deviation from § 107.51 is in force, as stated by OperatingLimitationsEntryPointTests`) -- which is the defect exactly: object identity deciding what the engine says (AGENTS.md §8). `Failed!  - Failed:     1, Passed:     0, Skipped:     0, Total:     1` on both net8.0 and net10.0."
       }
     ]
   },
@@ -1576,6 +1580,10 @@
       {
         "test": "VisualObserverConditionsEntryPointTests.The_dictionary_dispatch_refuses_rather_than_answering_from_defaults",
         "mutation": "Handlers.VisualObserverConditions defaulted all four inputs at once (`request.Use ?? VisualObserverUse.NotUsed`, `request.Exercise ?? ExerciseOfTheAbility.Nobody`, `request.Waiver ?? WaiverStatement.NoneHeld(Observers.Regulation, \"the engine\")` and `request.VisualLineOfSightWaiver ?? WaiverStatement.NoneHeld(Observers.CrossReferencedRegulation, \"the engine\")` for their four `Demand(...)` calls), so `Registry.Resolve(\"visual-observer-conditions\", RuleRequest.Empty)` -- which builds a request with every input at its default -- resolved that § 107.33 states no requirement about an operation nobody described, instead of refusing; this test went red -- `Failed!  - Failed:     1, Passed:     0, Skipped:     0, Total:     1` on both net8.0 and net10.0, on `Assert.Throws() Failure: No exception was thrown / Expected: typeof(System.ArgumentException)`. The whole set is the mutation: the dictionary dispatch cannot carry typed inputs, and nothing but the handler's Demands stands between it and an invented answer -- here the invented answer is the worst kind, an operation the section is silently held not to reach."
+      },
+      {
+        "test": "VisualObserverConditionsEntryPointTests.Two_resolutions_of_one_request_are_equal_and_hash_alike_with_the_requirements_compared_by_element",
+        "mutation": "VisualObserverConditionsFinding's hand-written `Equals(VisualObserverConditionsFinding?)` and `GetHashCode` were deleted, so the record's generated equality compared `Requirements` with `EqualityComparer<IReadOnlyList<RequirementOutcome>>.Default` -- the identity of the list object -- and two resolutions of one request were unequal. This test went red on the assertion `Assert.Equal(first, second)`: `Assert.Equal() Failure: Values differ`, between two findings that answer § 107.33's three requirements identically. `Failed!  - Failed:     1, Passed:     0, Skipped:     0, Total:     1` on both net8.0 and net10.0."
       }
     ]
   },
@@ -1649,6 +1657,10 @@
       {
         "test": "OverHumanBeingsEntryPointTests.The_dictionary_dispatch_refuses_rather_than_answering_from_defaults",
         "mutation": "Handlers.OverHumanBeings defaulted all three inputs at once (`request.Location ?? HumanBeingLocation.NeitherOfThem`, `request.Shelter ?? Shelter.CoveredStructure`, `request.Waiver ?? WaiverStatement.NoneHeld(Overflight.Regulation, \"the engine\")`), so `Registry.Resolve(\"over-human-beings\", RuleRequest.Empty)` answered about a human being nobody had located, under a waiver nobody had stated. This test went red with `Failed!  - Failed:     1, Passed:     0, Skipped:     0, Total:     1`, on `Assert.Throws() Failure: No exception was thrown / Expected: typeof(System.ArgumentException)`."
+      },
+      {
+        "test": "OverHumanBeingsEntryPointTests.Two_resolutions_of_one_request_are_equal_and_hash_alike_with_the_excepted_cases_compared_by_element",
+        "mutation": "OverHumanBeingsFinding's hand-written `Equals(OverHumanBeingsFinding?)` and `GetHashCode` were deleted, so the record's generated equality compared `ExceptedCases` with `EqualityComparer<IReadOnlyList<ExceptedCaseOutcome>>.Default` -- the identity of the list object -- and two resolutions of one request were unequal. This test went red on the assertion `Assert.Equal(first, second)`: `Assert.Equal() Failure: Values differ`, between two findings that say the same thing about the same human being under the same covered structure. `Failed!  - Failed:     1, Passed:     0, Skipped:     0, Total:     1` on both net8.0 and net10.0."
       }
     ]
   },
@@ -1759,6 +1771,10 @@
       {
         "test": "PreflightActionsEntryPointTests.Each_obligation_is_read_under_its_own_entry_and_an_assertion_about_another_or_by_another_asserter_is_refused",
         "mutation": "Preflight.Stated built the assertion itself instead of going through the entry's own mechanism (`Resolution<Assertion>.FromValue(new Assertion(entry, ((Assertion)assertions.Asserted(entry.Id)).Holds, entry.AssertedBy[0]))` for `Assertions.Stated(entry, assertions)`), so an assertion attributed to a visual observer answered an entry § 107.49's lead-in gives to the remote pilot in command, and an assertion about sufficient-available-power answered preflight-risk-assessment. This test went red alone, with `Assert.Throws() Failure: No exception was thrown` (`Failed!  - Failed:     1, Passed:   570, Skipped:     0, Total:   571` on both net8.0 and net10.0)."
+      },
+      {
+        "test": "PreflightActionsEntryPointTests.Two_resolutions_of_one_request_are_equal_and_hash_alike_with_the_obligations_compared_by_element",
+        "mutation": "PreflightActionsFinding's hand-written `Equals(PreflightActionsFinding?)` and `GetHashCode` were deleted, so the record's generated equality compared `Obligations` with `EqualityComparer<IReadOnlyList<ObligationOutcome>>.Default` -- the identity of the list object -- and two resolutions of one request were unequal. This test went red on the assertion `Assert.Equal(first, second)`: `Assert.Equal() Failure: Values differ`, between two findings that answer § 107.49's six obligations identically. `Failed!  - Failed:     1, Passed:     0, Skipped:     0, Total:     1` on both net8.0 and net10.0."
       }
     ]
   }

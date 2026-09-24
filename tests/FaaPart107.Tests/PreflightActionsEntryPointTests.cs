@@ -466,4 +466,31 @@ public class PreflightActionsEntryPointTests
                 new PreflightActionsRequest(crossed) { Operation = SubpartDOperation.NotOverHumanBeings })).Message,
             StringComparison.Ordinal);
     }
+
+    /// <summary>
+    /// Two resolutions of one request say the same thing, so they are the same finding: compared by
+    /// what they say, and never by the identity of the list of obligations carrying it
+    /// (<c>AGENTS.md</c> §8).
+    /// </summary>
+    /// <remarks>
+    /// The two resolutions share no object equality could hold by identity on — each is built from
+    /// its own assertions, and the entry builds each finding its own list of obligations, which the
+    /// <c>NotSame</c> assertions pin so that the comparison cannot pass by accident.
+    /// </remarks>
+    [Fact]
+    public void Two_resolutions_of_one_request_are_equal_and_hash_alike_with_the_obligations_compared_by_element()
+    {
+        var first = Finding(Resolve(SubpartDOperation.NotOverHumanBeings, assessed: false));
+        var second = Finding(Resolve(SubpartDOperation.NotOverHumanBeings, assessed: false));
+
+        Assert.NotSame(first, second);
+        Assert.NotSame(first.Obligations, second.Obligations);
+
+        Assert.Equal(first, second);
+        Assert.Equal(first.GetHashCode(), second.GetHashCode());
+
+        // Equality still says what it is for: an operation under subpart D, which reaches
+        // § 107.49(f) and so conjoins one obligation more, is unequal to the first.
+        Assert.NotEqual(first, Finding(Resolve(SubpartDOperation.OverHumanBeings, assessed: false)));
+    }
 }

@@ -106,6 +106,37 @@ public sealed record OverHumanBeingsFinding(
     /// <summary>Where the rule is stated: <c>§ 107.39</c>.</summary>
     public SourceLocator Authority => MapEntries.OverHumanBeings.Locator;
 
+    /// <summary>Whether this finding is the same as <paramref name="other"/>, comparing the excepted cases by element.</summary>
+    /// <param name="other">The other finding.</param>
+    /// <returns>True when both are about a human being in the same place under the same waiver statement, and carry the same excepted cases answered the same way, in the same order.</returns>
+    /// <remarks>
+    /// A record's generated equality would compare <see cref="ExceptedCases"/> with
+    /// <c>EqualityComparer&lt;IReadOnlyList&lt;ExceptedCaseOutcome&gt;&gt;.Default</c>, which is the
+    /// identity of the list object, so two resolutions of the same request would be unequal.
+    /// Determinism is about what the engine says, so equality is by element (<c>AGENTS.md</c> §8) —
+    /// the same reason <see cref="MultipleAircraftFinding.Equals(MultipleAircraftFinding)"/> gives
+    /// for overriding its own.
+    /// </remarks>
+    public bool Equals(OverHumanBeingsFinding? other) =>
+        other is not null
+        && Location == other.Location
+        && Waiver == other.Waiver
+        && ExceptedCases.SequenceEqual(other.ExceptedCases);
+
+    /// <inheritdoc/>
+    public override int GetHashCode()
+    {
+        var hash = default(HashCode);
+        hash.Add(Location);
+        hash.Add(Waiver);
+        foreach (var excepted in ExceptedCases)
+        {
+            hash.Add(excepted);
+        }
+
+        return hash.ToHashCode();
+    }
+
     /// <inheritdoc/>
     public override string ToString() =>
         $"a human being {Location}: § 107.39 {(MayOperate ? "does not prohibit" : "prohibits")} operating a small "
