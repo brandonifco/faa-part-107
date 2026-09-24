@@ -277,8 +277,10 @@ public class OperationEvaluatorTests
     {
         var facts = Complete().Stating(WaiverStatement.Held(Speed.Regulation, Caller, "waiver 2026-0007"));
 
-        // § 107.51 suspended: the two entries under it report the gate's own answer, and that is
-        // "outside current scope", never "satisfied" and never "violated".
+        // § 107.51 suspended: the entries under it report the gate's own answer, and that is
+        // "outside current scope", never "satisfied" and never "violated". Two of them are
+        // checked here, which is a sample and not a count — how many entries § 107.51 carries is
+        // the map's and moves with it, and nothing here measures it.
         var suspended = Outcome("speed-within-limit", facts);
         Assert.Equal(RequirementState.OutsideCurrentScope, suspended.State);
         Assert.Equal(UnresolvedReason.OutsideCurrentScope, suspended.Reason);
@@ -351,9 +353,13 @@ public class OperationEvaluatorTests
     }
 
     /// <summary>
-    /// The assertion entries whose rule wraps the <see cref="Assertion"/> in a finding of its own,
-    /// because the § 107.205 gate has to be recorded beside it. Three shapes, one answer: the state
-    /// is read from the map's correspondence row, not from a list of finding types.
+    /// Assertion entries whose rule wraps the <see cref="Assertion"/> in a finding of its own
+    /// because the § 107.205 gate has to be recorded beside it. A sample of those, and not the
+    /// whole of the wrapper set: wrapping does not mean a waiver gate
+    /// (<c>docs/decisions/0004</c>), and which entries wrap is measured by
+    /// <c>An_assertion_is_wrapped_exactly_where_a_caller_fact_is_demanded_ahead_of_it</c> rather
+    /// than counted here. Different shapes, one answer: the state is read from the map's
+    /// correspondence row, not from a list of finding types.
     /// </summary>
     public static TheoryData<string, bool> GatedAssertions =>
         new()
@@ -431,10 +437,18 @@ public class OperationEvaluatorTests
     [Fact]
     public void The_cost_recorded_in_decision_0004_is_the_cost_the_engine_actually_has()
     {
-        // docs/decisions/0004 names these four, and names the six that have no built consumer. The
-        // number has been wrong twice by being written at one head and left at another, so it is
-        // pinned here rather than proof-read: build a consumer for one of the six and this goes
-        // red, naming the record to update.
+        // The census docs/decisions/0004 records, pinned here rather than proof-read: the
+        // assertion entries a built consumer reads are the list below, and the entries left over
+        // are the ones whose polarity nothing in this engine supplies. Build a consumer for a
+        // left-over entry and this goes red, naming the record to update.
+        //
+        // How many there are of each is deliberately not restated here, and that is this file's
+        // answer to whether it should be. A census that lives in another document moves without
+        // this file being touched, so a number copied out of it into the prose beside the
+        // assertion that measures it can only ever be the one that is wrong — and this comment
+        // proved that on itself, naming a split from two consumers earlier, five lines above the
+        // code that would have told a reader the real one. The prose says what is measured and
+        // why; the assertions say how many.
         string[] recorded =
         [
             "reasonable-protection",
@@ -454,8 +468,8 @@ public class OperationEvaluatorTests
             recorded.Order(StringComparer.Ordinal),
             measured.Order(StringComparer.Ordinal));
 
-        // And the rest of the census the record states: ten assertion entries, six of them with no
-        // built consumer to supply the polarity.
+        // And the rest of the census the record states, measured the same way and for the same
+        // reason: how many entries are row 8, and how many of them no built consumer reads.
         var rowEight = Registry.Entries
             .Where(entry => entry.Row == CorrespondenceRow.Assertion && entry.Status == EntryStatus.Implemented)
             .ToArray();
@@ -856,8 +870,8 @@ public class OperationEvaluatorTests
     [Fact]
     public void A_decline_carries_the_citation_of_the_rule_that_could_not_answer()
     {
-        // Three declines whose own citation is not the entry's, which is why it is carried
-        // separately: the entry says what was asked, the decline says where the real rule lives.
+        // Declines whose own citation is not the entry's, which is why it is carried separately:
+        // the entry says what was asked, the decline says where the real rule lives.
         var suspended = Outcome(
             "speed-within-limit",
             Complete().Stating(WaiverStatement.Held(Speed.Regulation, Caller)));
