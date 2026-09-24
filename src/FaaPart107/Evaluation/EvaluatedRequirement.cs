@@ -225,19 +225,30 @@ public sealed record EvaluatedRequirement
     /// the very defect this method overrides its own equality to avoid.
     /// </para>
     /// <para>
-    /// What makes that sound here is one condition, stated as a condition rather than as a list of
-    /// the places it applies: <b>this engine never constructs a <see cref="MapEntry"/> per
-    /// evaluation.</b> Every one it hands out is one of <see cref="MapEntries"/>' shared statics —
-    /// <see cref="Assertion"/> says so for the one a caller can supply, "on the way out it is
-    /// always the map's own <see cref="MapEntry"/>, whatever the caller passed in" — and a
-    /// record's generated equality short-circuits on reference identity, so two evaluations
-    /// compare one instance with itself and never two arrays. A value that comes to carry a map
-    /// entry later inherits that and needs no amendment here; what would break it is an engine
-    /// that built a <see cref="MapEntry"/> of its own. It is put this way because a list in prose
-    /// goes stale and is then read as checked: <c>docs/decisions/0004</c> records that failure
-    /// twice in its own words, "this census is checked, not proof-read". The generated type is
-    /// <c>#110</c>'s to fix, raised upstream as <c>rules-factory#462</c>, and that fix is what
-    /// retires this paragraph.
+    /// What makes that sound is one condition, stated as a condition rather than as a list of the
+    /// places it applies, because a list in prose goes stale and is then read as checked —
+    /// <c>docs/decisions/0004</c> records that failure twice in its own words, "this census is
+    /// checked, not proof-read". The condition is: <b>no <see cref="MapEntry"/> a caller made ever
+    /// reaches an outcome.</b> A caller <em>can</em> build one — <see cref="MapEntry"/> is
+    /// publicly constructible and travels in on an <see cref="Assertion"/> — so "this engine
+    /// builds none of its own" would not be enough on its own. What closes it is that
+    /// <c>Assertions.Stated</c> answers on the map's entry and not the caller's, rebuilding the
+    /// assertion rather than passing it through, for a reason it states there: a caller who could
+    /// supply the entry could choose the citation its answer is made under. Every other map entry
+    /// on an outcome is handed in by rule code from <see cref="MapEntries"/> directly. So each is
+    /// one shared static, a record's generated equality short-circuits on reference identity, and
+    /// two evaluations compare one instance with itself and never two arrays.
+    /// </para>
+    /// <para>
+    /// There is one path that would defeat it, and it is generated:
+    /// <c>Registry.Default</c>'s <c>CorrespondenceRow.Assertion</c> arm answers with
+    /// <c>request.Asserted(entry.Id)</c> — the caller's own object, unrebuilt, straight onto
+    /// <see cref="Finding"/>. It is vacuous today, because every <c>kind: assertion</c> entry this
+    /// engine has built is <c>Implemented</c> with a handler that goes through
+    /// <c>Assertions.Stated</c>, so the arm is never taken; an entry left to that default would
+    /// take it. That, and <see cref="MapEntry"/>'s generated equality itself, are <c>#110</c>'s,
+    /// raised upstream as <c>rules-factory#462</c>; the fix there is what retires these two
+    /// paragraphs.
     /// </para>
     /// </remarks>
     public bool Equals(EvaluatedRequirement? other) =>

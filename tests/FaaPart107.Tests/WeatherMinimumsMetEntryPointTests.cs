@@ -48,9 +48,14 @@ namespace FaaPart107.Tests;
 /// <see cref="LimitationOutcome"/>, <see cref="ExceptedCaseOutcome"/>,
 /// <see cref="RequirementOutcome"/>, <see cref="ObligationOutcome"/> — each recording an
 /// <c>Account</c> of what that constituent said and printing only its id, locator and verdict,
-/// which is the same shape one level down a collection.
-/// <c>OperatingLimitationsEntryPointTests.Two_operations_differing_only_in_a_constituents_recorded_account_are_different_outcomes</c>
-/// pins that case, and it is § 107.51's introductory text reading this very entry's decline.
+/// which is the same shape one level down a collection. Two entries are pinned on it:
+/// <c>OperatingLimitationsEntryPointTests.Two_operations_differing_only_in_a_constituents_recorded_account_are_different_outcomes</c>,
+/// which is § 107.51's introductory text reading this very entry's decline, and
+/// <c>VisualObserverConditionsEntryPointTests.Two_operations_differing_only_in_who_asserted_the_coordination_are_different_outcomes</c>,
+/// where what is recorded and not printed is <em>who</em> § 107.33(c)'s assertion is attributed
+/// to. Whether a given entry can be put in two such states is that entry's own question rather
+/// than a property of this comparison: <c>over-human-beings</c> and <c>preflight-actions</c> carry
+/// outcomes of the same shape and, on the inputs their evaluator arms accept, cannot be.
 /// </para>
 /// <para>
 /// Each of the two below is red on a mutation to this entry's own rule as well as on one to that

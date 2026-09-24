@@ -1,3 +1,4 @@
+using FaaPart107.Evaluation;
 using FaaPart107.Requests;
 using RulesKernel.Resolution;
 using Xunit;
@@ -502,5 +503,79 @@ public class VisualObserverConditionsEntryPointTests
         // Equality still says what it is for: an operation with no visual observer used, which the
         // section states no requirement about, is unequal to the first.
         Assert.NotEqual(first, Finding(Resolve(VisualObserverUse.NotUsed, seen: null, coordinate: null)));
+    }
+
+    /// <summary>
+    /// An operation the evaluator can reach this entry on: a visual observer used, § 107.31(a)'s
+    /// ability asserted, and § 107.33(c)'s coordination asserted <em>not</em> to hold — which is
+    /// what makes the conjunction resolve rather than decline, the same shape as an unmet
+    /// limitation settling § 107.51. <paramref name="coordinationAssertedBy"/> is who made that
+    /// assertion, one of the people § 107.33(c) names.
+    /// </summary>
+    private static OperationFacts Operation(string coordinationAssertedBy) => new OperationFacts
+    {
+        VisualObserverUse = VisualObserverUse.Used,
+        Exercise = RowTwo,
+    }
+        .Stating(WaiverStatement.NoneHeld(Observers.Regulation, Caller))
+        .Stating(WaiverStatement.NoneHeld(LineOfSight.Regulation, Caller))
+        .Asserting(new Assertion(MapEntries.UnaidedVisualContact, true, RemotePilotInCommand))
+        .Asserting(new Assertion(MapEntries.ObserverCoordination, false, coordinationAssertedBy));
+
+    /// <summary>This entry's outcome, as a product layer receives it.</summary>
+    private static EvaluatedRequirement Outcome(string coordinationAssertedBy) =>
+        OperationEvaluator.Evaluate(Operation(coordinationAssertedBy))
+            .Requirement(MapEntries.VisualObserverConditions.Id);
+
+    /// <summary>
+    /// Who is answerable for § 107.33(c)'s assertion is recorded and is not printed, so two
+    /// operations differing only in which of the people the paragraph names made it are one set of
+    /// words and two findings — and they are two outcomes.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <see cref="RequirementOutcome.Account"/> holds the answering entry's own <c>ToString()</c>,
+    /// which for an assertion entry carries "as asserted by …";
+    /// <see cref="RequirementOutcome.ToString"/> prints only the paragraph, the verdict and the
+    /// entry, and this finding's own <c>ToString</c> prints those. Attribution is the thing this
+    /// engine refuses to lose — <see cref="Assertion"/>'s own remarks say a fact the engine did
+    /// not determine is "worth nothing without whose fact it is" — so two outcomes differing in it
+    /// are not one outcome, and until
+    /// <see cref="EvaluatedRequirement.Equals(EvaluatedRequirement)"/> compared the finding they
+    /// were.
+    /// </para>
+    /// <para>
+    /// The names are read from the map's <c>assertedBy</c> through
+    /// <see cref="MapEntry.AssertedBy"/> rather than written here, so this test states no view
+    /// about who § 107.33(c) permits: it asks the map for two of them.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Two_operations_differing_only_in_who_asserted_the_coordination_are_different_outcomes()
+    {
+        var permitted = MapEntries.ObserverCoordination.AssertedBy;
+        Assert.True(permitted.Length >= 2, "§ 107.33(c) names at least two people who may assert it");
+
+        var byFirst = Outcome(permitted[0]);
+        var bySecond = Outcome(permitted[1]);
+
+        var findingByFirst = Assert.IsType<VisualObserverConditionsFinding>(byFirst.Finding);
+        var findingBySecond = Assert.IsType<VisualObserverConditionsFinding>(bySecond.Finding);
+
+        var coordinationByFirst = Requirement(findingByFirst, "(c)");
+        var coordinationBySecond = Requirement(findingBySecond, "(c)");
+
+        // The attribution is the one thing that differs, and the finding records it.
+        Assert.Contains(permitted[0], coordinationByFirst.Account, StringComparison.Ordinal);
+        Assert.Contains(permitted[1], coordinationBySecond.Account, StringComparison.Ordinal);
+        Assert.Equal(coordinationByFirst with { Account = coordinationBySecond.Account }, coordinationBySecond);
+
+        // And nothing the engine prints about either operation differs.
+        Assert.Equal(coordinationByFirst.ToString(), coordinationBySecond.ToString());
+        Assert.Equal(findingByFirst.ToString(), findingBySecond.ToString());
+        Assert.Equal(byFirst.Explanation, bySecond.Explanation);
+
+        Assert.NotEqual(findingByFirst, findingBySecond);
+        Assert.NotEqual(byFirst, bySecond);
     }
 }
