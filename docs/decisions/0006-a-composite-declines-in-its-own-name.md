@@ -158,19 +158,46 @@ only that such a case is *ordinary* — reported, not thrown — and leaves the 
   same blind spot for speed. Every test here asserts the naming on `Attempted`, not on the
   citation, because a mutation that swapped one of those locators for the other would otherwise
   stay green.
-- **`operating-limitations` does not yet carry its constituent's account forward, and this record
-  says it should.** `LimitationOutcome.Account` holds `weather-minimums-met`'s full `Attempted` on a
-  decline as much as on a resolved finding — `Compliance.Outcome` fills it from `unresolved.Attempted`
-  — but on a decline that account never reaches the caller: `Compliance.Undetermined` builds its own
-  `Attempted` from each undetermined constituent's `Entry.Id` and `Entry.Locator.Citation` and nothing
-  else, and the array of outcomes is local and discarded. So a caller receives "`weather-minimums-met`
-  [§ 107.51(c)-(d)] did not resolve" and the fact that the openness originates in `prominent-objects`
-  is gone — two hops of loss at depth four.
-  `The_decline_is_this_entrys_own_and_not_the_constituents_handed_back` pins that loss today
-  (`Assert.DoesNotContain("prominent-objects", mine.Attempted)`). Issue #78 was scoped to the two
-  composites that disagreed and explicitly not to the four that already had the shape, so closing
-  that gap is **issue #103**; what this record settles is that it *is* a gap, and what closing it
-  must not do (become propagation).
+- **`operating-limitations` carries its constituent's account forward, and so does
+  `preflight-actions`.** `LimitationOutcome.Account` holds `weather-minimums-met`'s full `Attempted`
+  on a decline as much as on a resolved finding — `Compliance.Outcome` fills it from
+  `unresolved.Attempted` — but until **issue #103** (PR #114) that account never reached the caller:
+  `Compliance.Undetermined` built its own `Attempted` from each undetermined constituent's
+  `Entry.Id` and `Entry.Locator.Citation` and nothing else, and the array of outcomes was local and
+  discarded. So a caller received "`weather-minimums-met` [§ 107.51(c)-(d)] did not resolve" and the
+  fact that the openness originates in `prominent-objects` was gone — two hops of loss at depth
+  four. It now quotes `limitation.Account` for every undetermined constituent, after this entry has
+  named itself and named that constituent, and `Preflight.Undetermined` does the same for every
+  unanswered obligation: the gap there was identical and pinned in neither direction, and the owner
+  widened #103 to it. Issue #78 was scoped to the two composites that disagreed and explicitly not
+  to the four that already had the shape, which is why this record named the gap rather than closing
+  it; what it settled is that it *is* a gap, and what closing it must not do (become propagation).
+  `The_decline_is_this_entrys_own_and_not_the_constituents_handed_back` now pins the carrying rather
+  than the loss — `Assert.DoesNotContain("prominent-objects", mine.Attempted)` has become
+  `Assert.Contains("prominent-objects", mine.Attempted)` beside
+  `Assert.Contains(constituent.Attempted, mine.Attempted)`, with
+  `Assert.NotEqual(constituent.Attempted, mine.Attempted)` unchanged next to them, because containing
+  the constituent's account is not being its result.
+- **The quotation is one hop, taken by each composite, and transitive only by composition.** This is
+  #103's criterion 5, decided there and recorded here because it governs every composite and not
+  only the two that carry it today. A composite quotes the account of the entries its own
+  `dependsOn` names and reads nothing below them. Depth arrives anyway, because the constituent
+  built its account the same way: `operating-limitations` quoting `weather-minimums-met` once
+  carries `prominent-objects`' own words to a caller at depth four without ever reading that entry.
+  Walking the graph and quoting transitively is refused for the same reason this record refuses the
+  deeper *citation* — the edge is not in the map, and "originating" is not well defined past depth
+  two — so one hop is both the least and the most a composite may quote: it is the only hop the map
+  authorises. Nothing is truncated, deliberately. What bounds the length is the map — one quotation
+  per constituent that did not resolve, each bounded in turn by its own `dependsOn` — and a cutoff
+  chosen in a rule would drop the depth the quotation exists to carry, silently.
+- **Three composites still do not quote, and each is its own issue.** `over-human-beings`,
+  `visual-observer-conditions` and `civil-twilight-operation` build their declines from ids,
+  citations and reasons and discard the constituent's account — the first two hold one on their
+  outcome records, and `civil-twilight-operation` has no field for it at all. #103's sweep put each
+  of the three to its own entry point on a declining request and confirmed at runtime that the
+  constituent's `Attempted` does not appear in the composite's. None was changed on that branch,
+  because fixing three entries the issue did not name would have made a one-issue change
+  unreviewable; the bullet above is the shape each of them is owed.
 - **Nothing about either entry's regulatory reading moved.** No case that resolved before declines
   now, and no case that declined before resolves. What changed is what a decline says and where its
   facts come from.
