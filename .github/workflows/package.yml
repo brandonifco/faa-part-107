@@ -1,0 +1,71 @@
+name: package
+
+# Engine-owned, not emitted by rules-factory (docs/decisions/0009).
+#
+# Packs the engine exactly as publish.yml does, and runs tools/check-package.py on what came out,
+# on every pull request and every push to main. It publishes nothing and holds no credential. It
+# exists so that a change to the packaging -- a property in FaaPart107.csproj, a new pin in the
+# generated RulesFactory.Packages.g.props, a dependency that starts to flow -- is seen on the pull
+# request that makes it, and not first on the tag that tries to publish it.
+#
+# It is not the gate. ./scripts/validate.sh full is, and validate.yml runs it; this adds one
+# question the gate does not ask, which is whether the package is the one 0009 describes.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: package-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Read the pinned SDK version
+        id: sdk
+        run: echo "version=$(python3 -c 'import json;print(json.load(open("global.json"))["sdk"]["version"])')" >> "$GITHUB_OUTPUT"
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          dotnet-version: ${{ steps.sdk.outputs.version }}
+
+      - name: Restore (locked)
+        env:
+          CI: "true"
+        run: dotnet restore src/FaaPart107/FaaPart107.csproj --locked-mode
+
+      - name: Build Release
+        env:
+          CI: "true"
+        run: dotnet build src/FaaPart107/FaaPart107.csproj -c Release --no-restore -warnaserror
+
+      - name: Pack
+        env:
+          CI: "true"
+        run: dotnet pack src/FaaPart107/FaaPart107.csproj -c Release --no-build -o artifacts
+
+      # On a pull request the checkout is GitHub's merge commit, so that is the commit the nuspec
+      # names; on a push it is the pushed commit. Either way it is GITHUB_SHA.
+      - name: Check the package is the one 0009 describes
+        run: |
+          shopt -s nullglob
+          packages=(artifacts/FaaPart107.*.nupkg)
+          if [[ ${#packages[@]} -ne 1 ]]; then
+            echo "::error::expected exactly one FaaPart107 .nupkg, found ${#packages[@]}"
+            exit 1
+          fi
+          python3 tools/check-package.py "${packages[0]}" --commit "$GITHUB_SHA"
