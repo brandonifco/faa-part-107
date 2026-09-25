@@ -19,8 +19,9 @@
 
        main is never a release version. VersionPrefix names the next release and the suffix says
        this tree is not it, so an ordinary `dotnet pack` here produces <VersionPrefix>-dev, which
-       nuget.org never serves. The release pull request clears VersionSuffix; its merge commit is
-       what the owner tags vX.Y.Z, and publish.yml refuses a tag that is not the resolved version.
+       nuget.org never serves. The release pull request clears VersionSuffix and re-produces; its
+       merge commit is what the owner tags vX.Y.Z, and publish.yml refuses a tag that is not the
+       resolved version.
        This is rules-kernel's cycle (its decision 0012), for the reason it gives. -->
   <PropertyGroup>
     <PackageId>FaaPart107</PackageId>
@@ -28,7 +29,7 @@
     <VersionSuffix>dev</VersionSuffix>
     <Authors>Brandon</Authors>
     <Product>FAA Part 107 rules engine</Product>
-    <Description>A deterministic rules engine for 14 CFR Part 107 subpart B, produced by rules-factory from a corpus map. OperationEvaluator.Evaluate(OperationFacts) returns one EvaluatedRequirement per map entry, in map order, and OperationEvaluation.ProvenanceJson() returns the provenance.json this build embeds: the factory, map package, corpus and kernel it was produced from.</Description>
+    <Description>A deterministic rules engine for 14 CFR Part 107, mapped from subpart B, produced by rules-factory from a corpus map. OperationEvaluator.Evaluate(OperationFacts) returns one EvaluatedRequirement per map entry, in map order, and OperationEvaluation.ProvenanceJson() returns the provenance.json this build embeds: the factory, map package, corpus and kernel it was produced from.</Description>
     <PackageTags>rules-engine;faa;part-107;uas;determinism;provenance</PackageTags>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/brandonifco/faa-part-107</PackageProjectUrl>

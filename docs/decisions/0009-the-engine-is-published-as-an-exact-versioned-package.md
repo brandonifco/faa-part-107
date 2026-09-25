@@ -1,7 +1,8 @@
 # 0009 — The engine is published to nuget.org as one exact, versioned package, and a consumer pins it by hash
 
 **Status:** accepted when the owner merges the pull request that closes #132. That merge is the
-ruling. The first publication is a separate act, also the owner's (see "What the owner does").
+ruling, on distribution only: this record rules on no map entry, and changes no rule or outcome. The
+first publication is a separate act, also the owner's (see "What the owner does").
 
 ## Context
 
@@ -62,7 +63,7 @@ byte for byte. `.github/workflows/package.yml` runs it on every pull request and
 **SemVer, independent of the ruleset version.** `main` always resolves to the next version with a
 `-dev` suffix (`VersionPrefix`/`VersionSuffix` in `FaaPart107.csproj`). A default `dotnet pack` on
 `main` therefore produces a version nuget.org never serves. A release is a pull request that clears
-`VersionSuffix`, and nothing else. Its merge commit is tagged. The next pull request moves
+`VersionSuffix` and then re-produces (see "Provenance"), and nothing else. Its merge commit is tagged. The next pull request moves
 `VersionPrefix` on and restores the suffix. This is rules-kernel decision 0012's cycle, adopted for
 its reason: a development tree must not be packable under a version that is also a release.
 
