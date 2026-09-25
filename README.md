@@ -112,11 +112,30 @@ checkout at that commit:
 python3 tools/factory provenance --engine <this repository>
 ```
 
+That recompute compares every build input. Until the next re-produce it reports
+`src/FaaPart107/FaaPart107.csproj`, which gained its package properties after the last `produce`
+(decision 0009). A release re-produces before it is tagged, so the record a published package embeds
+hashes the tree it was built from.
+
 ## Verify it
 
 ```bash
 ./scripts/validate.sh full
 ```
+
+## Using it from another repository
+
+The engine is distributed through nuget.org as the package `FaaPart107` (decision 0009), from the
+first release the owner tags. Pin an exact version, and restore with a lock file in locked mode:
+
+```xml
+<PackageVersion Include="FaaPart107" Version="[0.1.0]" />
+```
+
+`OperationEvaluation.ProvenanceJson()` returns the `provenance.json` the package embeds, and the
+nuspec names the commit the package was built from. `main` always builds `<next version>-dev`. A
+release is a `vX.Y.Z` tag the owner pushes, and `publish.yml` publishes it only after
+`./scripts/validate.sh full` and `tools/check-package.py` pass.
 
 ## Licence
 

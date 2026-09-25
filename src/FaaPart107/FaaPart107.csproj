@@ -12,4 +12,34 @@
     <EmbeddedResource Include="../../provenance.json" LogicalName="FaaPart107.provenance.json" Link="provenance.json" />
   </ItemGroup>
 
+  <!-- The engine is published to nuget.org as one package, so another repository can pin an exact,
+       hashed build of it (docs/decisions/0009). The map and the analyzers are PrivateAssets="all"
+       in RulesFactory.Packages.g.props and do not flow to a consumer; RulesKernel does, at the
+       version that file pins, which tools/check-package.py holds equal to provenance.json.
+
+       main is never a release version. VersionPrefix names the next release and the suffix says
+       this tree is not it, so an ordinary `dotnet pack` here produces <VersionPrefix>-dev, which
+       nuget.org never serves. The release pull request clears VersionSuffix and re-produces; its
+       merge commit is what the owner tags vX.Y.Z, and publish.yml refuses a tag that is not the
+       resolved version.
+       This is rules-kernel's cycle (its decision 0012), for the reason it gives. -->
+  <PropertyGroup>
+    <PackageId>FaaPart107</PackageId>
+    <VersionPrefix>0.1.0</VersionPrefix>
+    <VersionSuffix>dev</VersionSuffix>
+    <Authors>Brandon</Authors>
+    <Product>FAA Part 107 rules engine</Product>
+    <Description>A deterministic rules engine for 14 CFR Part 107, mapped from subpart B, produced by rules-factory from a corpus map. OperationEvaluator.Evaluate(OperationFacts) returns one EvaluatedRequirement per map entry, in map order, and OperationEvaluation.ProvenanceJson() returns the provenance.json this build embeds: the factory, map package, corpus and kernel it was produced from.</Description>
+    <PackageTags>rules-engine;faa;part-107;uas;determinism;provenance</PackageTags>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/brandonifco/faa-part-107</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/brandonifco/faa-part-107</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <!-- Writes <repository url=… commit=…> into the nuspec: the package names the commit it was
+         built from, which is how its bytes are traced back to a reviewed tree. -->
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
+
 </Project>

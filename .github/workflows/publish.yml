@@ -1,0 +1,171 @@
+name: publish
+
+# Engine-owned, not emitted by rules-factory. Publishes the FaaPart107 package to nuget.org
+# (docs/decisions/0009).
+#
+# Modelled on rules-kernel's publish.yml and rules-factory's publish-map.yml, and the same in the
+# parts that matter: triggered by a tag the owner pushes; the tag must equal the version the tree
+# resolves to; nuget.org, because a consumer restores it without a credential; and Trusted
+# Publishing, a short-lived OIDC token exchanged for an API key valid for minutes, so there is no
+# stored secret to leak or rotate.
+#
+# A published version can be unlisted and never deleted, so nothing is pushed unless the gate
+# passed. The `gate` job runs ./scripts/validate.sh full -- this engine's one definition of
+# acceptable -- then packs, and runs tools/check-package.py on the package with the tag's version
+# and this commit. It holds no credential. The `publish` job alone holds `id-token: write`; it does
+# not build anything, and pushes the very files `gate` checked, handed over as a workflow artifact,
+# so the bytes on nuget.org are the bytes that were examined.
+#
+# Before the first run the owner adds a Trusted Publishing policy on nuget.org for this repository
+# and this workflow file (0009, "What the owner does").
+
+on:
+  push:
+    tags: ["v*"]
+  # For retrying a publish that failed after the gate passed (a transient OIDC or nuget.org
+  # failure). Launch it with the tag selected as the ref; a branch is refused below. It cannot
+  # finish a push that stopped halfway: once the .nupkg is accepted, a retry fails on the duplicate
+  # by design, and a missing .snupkg is pushed by hand (0009, "Release").
+  workflow_dispatch: {}
+
+concurrency:
+  group: publish-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  gate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    outputs:
+      version: ${{ steps.version.outputs.value }}
+    steps:
+      - name: Require a tag of the form vX.Y.Z
+        id: version
+        env:
+          REF_TYPE: ${{ github.ref_type }}
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          if [[ "$REF_TYPE" != "tag" ]]; then
+            echo "::error::publish must run from a tag vX.Y.Z, not a $REF_TYPE ('$REF_NAME'). For a manual retry, select the tag as the ref."
+            exit 1
+          fi
+          version="${REF_NAME#v}"
+          if [[ "$REF_NAME" != v* || ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
+            echo "::error::'$REF_NAME' is not of the form vX.Y.Z"
+            exit 1
+          fi
+          echo "value=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          # The whole history, so the next step can see main.
+          fetch-depth: 0
+
+      # A release is cut from main (0009). A tag on a side branch that cleared the suffix would
+      # otherwise pass every check below and publish a tree nobody merged.
+      - name: Require the tagged commit to be on main
+        run: |
+          if ! git merge-base --is-ancestor "$GITHUB_SHA" origin/main; then
+            echo "::error::$GITHUB_SHA is not on main; a release is a tag on a merged main commit"
+            exit 1
+          fi
+
+      - name: Read the pinned SDK version
+        id: sdk
+        run: echo "version=$(python3 -c 'import json;print(json.load(open("global.json"))["sdk"]["version"])')" >> "$GITHUB_OUTPUT"
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          dotnet-version: ${{ steps.sdk.outputs.version }}
+
+      - name: Validate before publishing
+        env:
+          CI: "true"
+        run: ./scripts/validate.sh full
+
+      # main carries <VersionPrefix>-dev, so a development tree cannot be tagged as a release: the
+      # release pull request clears VersionSuffix, and this compares the tag to the RESOLVED
+      # version, not to a file a reviewer has to read.
+      - name: Require the resolved package version to equal the tag
+        env:
+          TAG_VERSION: ${{ steps.version.outputs.value }}
+        run: |
+          resolved="$(dotnet msbuild src/FaaPart107/FaaPart107.csproj -getProperty:PackageVersion -nologo)"
+          echo "src/FaaPart107/FaaPart107.csproj resolves to $resolved"
+          if [[ "$resolved" != "$TAG_VERSION" ]]; then
+            echo "::error::the tree resolves to $resolved, but the tag says $TAG_VERSION. The release pull request clears <VersionSuffix> and sets <VersionPrefix> to the version being released; main carries the next version with a suffix."
+            exit 1
+          fi
+
+      - name: Pack
+        env:
+          CI: "true"
+        run: dotnet pack src/FaaPart107/FaaPart107.csproj -c Release -o artifacts
+
+      - name: Check the package is the one 0009 describes
+        env:
+          TAG_VERSION: ${{ steps.version.outputs.value }}
+        run: |
+          python3 tools/check-package.py "artifacts/FaaPart107.$TAG_VERSION.nupkg" --version "$TAG_VERSION" --commit "$GITHUB_SHA"
+          test -f "artifacts/FaaPart107.$TAG_VERSION.snupkg"
+          sha256sum artifacts/*
+
+      - name: Hand the checked files to the publish job
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: package
+          path: artifacts/
+          if-no-files-found: error
+          retention-days: 7
+
+  publish:
+    needs: gate
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      # Required to mint the OIDC token Trusted Publishing exchanges for a short-lived API key.
+      # This job only; `gate`, where the repository's gate and the build run, never has it.
+      id-token: write
+    steps:
+      - name: Take the files the gate checked
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: package
+          path: artifacts
+
+      - name: Show what is about to be pushed
+        run: sha256sum artifacts/*
+
+      # Only `dotnet nuget push` needs the SDK here. Pinned to the release the other publish
+      # workflows in this project use.
+      - name: Set up .NET
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          dotnet-version: '10.0.112'
+
+      - name: Exchange the OIDC token for a short-lived API key
+        id: login
+        uses: NuGet/login@8d196754b4036150537f80ac539e15c2f1028841 # v1
+        with:
+          user: brandonifco
+
+      # No --skip-duplicate: a version is immutable, and a tag re-pushed over a version that
+      # already exists is a mistake to be told about, not a success. The .snupkg beside the
+      # .nupkg is pushed to the symbol server by the same command.
+      - name: Push to nuget.org
+        env:
+          NUGET_API_KEY: ${{ steps.login.outputs.NUGET_API_KEY }}
+          VERSION: ${{ needs.gate.outputs.version }}
+        run: |
+          dotnet nuget push "artifacts/FaaPart107.$VERSION.nupkg" \
+            --source https://api.nuget.org/v3/index.json \
+            --api-key "$NUGET_API_KEY"
