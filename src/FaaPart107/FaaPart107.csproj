@@ -26,7 +26,7 @@
   <PropertyGroup>
     <PackageId>FaaPart107</PackageId>
     <VersionPrefix>0.1.0</VersionPrefix>
-    <VersionSuffix>dev</VersionSuffix>
+    <VersionSuffix></VersionSuffix>
     <Authors>Brandon</Authors>
     <Product>FAA Part 107 rules engine</Product>
     <Description>A deterministic rules engine for 14 CFR Part 107, mapped from subpart B, produced by rules-factory from a corpus map. OperationEvaluator.Evaluate(OperationFacts) returns one EvaluatedRequirement per map entry, in map order, and OperationEvaluation.ProvenanceJson() returns the provenance.json this build embeds: the factory, map package, corpus and kernel it was produced from.</Description>
