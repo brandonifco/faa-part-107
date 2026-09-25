@@ -473,7 +473,10 @@ and not from the API author:
 | the same, asserted by `"the remote pilot in command"` instead | `Assertions.Stated`; decision 0003 | `200`; that entry reports `factRequired`, and the attribution is not rewritten |
 | `night-operation`, whatever the facts | `definedElsewhere` | `missingRulesData` |
 | `waiver-policy`, whatever the facts | `scope: out` | `outsideCurrentScope` |
-| a negative altitude, with `noneHeld` stated for § 107.51 (under no statement the entry reports `factRequired` for the waiver; under a held waiver it reports `outsideCurrentScope`) | decision 0008; `OperationEvaluatorTests` | `422`, with no partial result |
+| a negative `altitudeAboveGroundLevelFeet`, with `noneHeld` stated for § 107.51 **and** a `structure` statement | `Altitude.Within`; `OperationEvaluatorTests.A_value_a_rule_refuses_is_a_fault_and_is_not_dressed_as_a_fact_the_caller_owes` | the rule throws `ArgumentOutOfRangeException` for `altitudeAboveGroundLevelFeet`, so `422` naming that input, with no partial result |
+| the same negative altitude and `noneHeld`, with no `structure` statement | `Altitude.Within` demands the structure before it validates the altitude; `AltitudeWithinLimitEntryPointTests.Without_a_structure_statement_it_refuses_rather_than_assume_there_is_no_structure` | `200`; `altitude-within-limit` reports `factRequired`, `missingInput` `Structure`. Not a `422` |
+| the same negative altitude and a `structure` statement, with no waiver statement for § 107.51 | decision 0008; `AltitudeWithinLimitEntryPointTests.Without_a_waiver_statement_it_refuses_rather_than_infer_one` | `200`; `altitude-within-limit` reports `factRequired`, `missingInput` `Waiver`. Not a `422` |
+| the same negative altitude, with the waiver for § 107.51 stated as `held` | decision 0008; `AltitudeWithinLimitEntryPointTests.While_a_waiver_of_107_51_is_stated_in_force_it_declines_OutsideCurrentScope_citing_107_205_whatever_the_altitude` | `200`; `altitude-within-limit` reports `outsideCurrentScope`, citing § 107.205: the waiver suspends the rule before the altitude is read. Not a `422` |
 | an unknown `entryId` in `assertions` | §4.2 | `422` |
 | `asOf` omitted | §4.2 | `night-waiver-termination` reports `factRequired`, and the server date appears nowhere in `result` |
 | the same request sent twice | `DeterminismTests` | byte-identical `result` and `engine` |
