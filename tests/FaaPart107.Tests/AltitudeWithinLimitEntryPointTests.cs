@@ -300,7 +300,9 @@ public class AltitudeWithinLimitEntryPointTests
                 // Paragraph (b)'s own ceiling settled it, and the sentence is the one it always was.
                 Assert.Equal(finding.Limit.AboveGroundLevelFeet, named);
                 Assert.Contains(
-                    $"is within {finding.Limit.AboveGroundLevelFeet} feet above ground level [",
+                    string.Create(
+                        CultureInfo.InvariantCulture,
+                        $"is within {finding.Limit.AboveGroundLevelFeet} feet above ground level ["),
                     sentence,
                     StringComparison.Ordinal);
             }
