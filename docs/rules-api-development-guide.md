@@ -140,15 +140,15 @@ Adapters stay out of each other too: no `RulesApi.<Engine>` assembly references 
 
 ### 4.1 What the adapter calls
 
-The adapter uses only the public API this engine already has. It calls nothing generated or
-internal:
+The adapter uses only the public API this engine already has, and nothing internal. Two of the
+members below are generated, `MapEntries` and `Registry`, and both are public:
 
 | Adapter needs | Engine member |
 |---|---|
 | evaluate | `OperationEvaluator.Evaluate(OperationFacts)` |
 | facts | the `init` properties of `OperationFacts`, plus `.Stating(WaiverStatement)` and `.Asserting(Assertion)` |
 | waiver statements | `WaiverStatement.Held(regulation, statedBy, certificate?)` and `WaiverStatement.NoneHeld(regulation, statedBy)` |
-| assertions | `new Assertion(MapEntry entry, bool holds, string assertedBy)`, with the entry looked up by id |
+| assertions | `new Assertion(MapEntry entry, bool holds, string assertedBy)`. The engine has no public lookup from an id to a `MapEntry`: `Registry.Entry(id)` returns a `RegisteredEntry`, and the `MapEntry` values are the generated `MapEntries` statics. The adapter keeps its own id → `MapEntry` table over those statics, and a test checks that table against `Registry.Entries`. A proper by-id lookup would be an engine change, filed as §15 describes |
 | results | `OperationEvaluation.Requirements`, `.Outstanding`, `.Unanswered` and `.Count(state)` |
 | identity | `OperationEvaluation.EvaluatedBy`, a `ReplayCompatibilityIdentity`: ruleset `faa-part-107` v1, replay schema v1, and the source baselines |
 | provenance | `OperationEvaluation.ProvenanceJson()`, which is `provenance.json` byte for byte |
