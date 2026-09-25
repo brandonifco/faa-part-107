@@ -21,22 +21,27 @@ Every one of the map's forty-seven entries is answered, and the accounting is ex
 | | | counted from |
 |---|---|---|
 | implemented by this engine | 39 | `status: implemented` in `corpus-map.overlay.json` |
-| defined outside this corpus, `definedElsewhere` | 4 | `night-operation`, `night-waiver-bar`, `civil-twilight-alaska`, `hazardous-material` |
-| deliberately not implemented, `scope: out` | 4 | `knowledge-recency`, `subpart-d-categories`, `waiver-policy`, `waivable-regulations` |
+| defined outside this corpus, `definedElsewhere` | 4 | `definedElsewhere` in `backlog/README.md` |
+| deliberately not implemented, `scope: out` | 4 | `scope: out` in `backlog/README.md` |
 
 Thirty-nine and four and four is forty-seven, and there is nothing in the backlog to build:
 `backlog/README.md`, which `factory produce` writes from the merged map, reports **0 item(s)**.
-Neither of the other two classes is work outstanding. A `definedElsewhere` entry is one the map
-says is defined outside this corpus — § 1.1's "night", the Air Almanac's Alaskan civil twilight,
-49 CFR 171.8's "hazardous material" — so the fact is not in this corpus to implement. A
-`scope: out` entry is one this map deliberately does not read, and those four are exactly the four
-entries citing outside the twelve sections of subpart B. Each of the eight declines through its
-generated entry point with the reason the map's correspondence table gives and its own citation.
+Neither of the other two classes is work outstanding.
+
+`night-operation`, `night-waiver-bar`, `civil-twilight-alaska` and `hazardous-material` are
+`definedElsewhere`: the map says the term each turns on is defined outside this corpus — § 1.1's
+"night" for the first two, the Air Almanac's Alaskan civil twilight, 49 CFR 171.8's "hazardous
+material" — so the fact is not in this corpus to implement. `knowledge-recency`,
+`subpart-d-categories`, `waiver-policy` and `waivable-regulations` are `scope: out`: this map
+deliberately does not read them, and they are exactly the four entries citing outside the twelve
+sections of subpart B. Each of the eight declines through its generated entry point with the
+reason the map's correspondence table gives and its own citation.
 
 Nothing checks these counts: `README.md` appears in none of `provenance.json`'s `generated`,
-`managed` or `engineOwned` lists, so no gate step reads it. Each row therefore names the artefact
-it was counted from, and `backlog/README.md` — generated, and hashed in `provenance.json` —
-classifies all forty-seven the same way, so it is the one to believe if they ever disagree.
+`managed` or `engineOwned` lists, so no gate step reads it. Each row of the table therefore names
+the artefact its count was read from, and `backlog/README.md` — generated, and hashed in
+`provenance.json` — classifies all forty-seven the same way, so it is the one to believe if they
+ever disagree.
 
 ## What is here
 
