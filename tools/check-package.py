@@ -3,6 +3,7 @@
 
     tools/check-package.py artifacts/FaaPart107.0.1.0-dev.nupkg
     tools/check-package.py artifacts/FaaPart107.0.1.0.nupkg --version 0.1.0 --commit "$GITHUB_SHA"
+    tools/check-package.py FaaPart107.0.1.0.nupkg --published --version 0.1.0 --commit <sha>
 
 Engine-owned, not emitted by rules-factory. `dotnet pack` decides what goes into the package from
 MSBuild properties spread over four files, one of them generated; this reads the package that
@@ -24,6 +25,12 @@ What it holds:
   * every packed DLL embeds this tree's provenance.json byte for byte, as the managed resource
     FaaPart107.provenance.json: a 4-byte little-endian length followed by exactly those bytes.
 
+--published is for a package downloaded back from nuget.org, which adds its repository signature,
+.signature.p7s, after the push. In that mode the package must carry that one extra part, and every
+other check is unchanged; without it, as in package.yml and publish.yml before the push, the part
+is unexpected like any other. Only its presence is checked, never its certificate or its digest:
+that is `dotnet nuget verify --all`'s job, and this script does not claim it.
+
 Standard library only. Exit 0 when every check held, 1 when one failed, 2 on bad usage. A check
 that examined nothing fails: a package with no DLL in it proves nothing about provenance.
 """
@@ -41,6 +48,7 @@ PACKAGE_ID = "FaaPart107"
 REPOSITORY = "https://github.com/brandonifco/faa-part-107"
 KERNEL_ID = "RulesKernel"
 BUILD_ONLY = ("RulesFactory.Maps.", "RulesKernel.Analyzers")
+REPOSITORY_SIGNATURE = ".signature.p7s"
 OPC_PARTS = re.compile(r"^(_rels/\.rels|\[Content_Types\]\.xml|package/services/metadata/core-properties/[0-9a-f]+\.psmdcp)$")
 
 
@@ -56,7 +64,7 @@ def local(tag: str) -> str:
     return tag.rsplit("}", 1)[-1]
 
 
-def check(package: Path, version: str | None, commit: str | None) -> list[str]:
+def check(package: Path, version: str | None, commit: str | None, published: bool = False) -> list[str]:
     problems: list[str] = []
     provenance_bytes = (ROOT / "provenance.json").read_bytes()
     kernel_version = (json.loads(provenance_bytes).get("kernel") or {}).get("version")
@@ -88,13 +96,20 @@ def check(package: Path, version: str | None, commit: str | None) -> list[str]:
     if package.name != expected_name:
         problems.append(f"file is named {package.name!r}, expected {expected_name!r}")
 
-    # Contents: exactly the assembly and its documentation per framework, and the OPC parts.
+    # Contents: exactly the assembly and its documentation per framework, and the OPC parts, plus
+    # nuget.org's repository signature when the package is checked as published.
     expected = {f"lib/{tfm}/{PACKAGE_ID}.{ext}" for tfm in frameworks for ext in ("dll", "xml")}
+    if published:
+        expected.add(REPOSITORY_SIGNATURE)
     actual = {name for name in names if not OPC_PARTS.match(name) and name != f"{PACKAGE_ID}.nuspec"}
     for name in sorted(expected - actual):
-        problems.append(f"missing {name}")
+        if name == REPOSITORY_SIGNATURE:
+            problems.append(f"missing {name}: --published expects nuget.org's repository signature")
+        else:
+            problems.append(f"missing {name}")
     for name in sorted(actual - expected):
-        problems.append(f"unexpected {name}: 0009 packs the assembly and its documentation, nothing else")
+        hint = " (a package downloaded from nuget.org is checked with --published)" if name == REPOSITORY_SIGNATURE else ""
+        problems.append(f"unexpected {name}: 0009 packs the assembly and its documentation, nothing else{hint}")
 
     # Dependencies: RulesKernel at the recorded kernel version, per framework, and nothing else.
     dependencies = fields.get("dependencies")
@@ -147,17 +162,22 @@ def main() -> int:
     parser.add_argument("package", type=Path)
     parser.add_argument("--version", help="the version the package must carry (publish.yml: the tag's)")
     parser.add_argument("--commit", help="the commit the nuspec must name (publish.yml: GITHUB_SHA)")
+    parser.add_argument("--published", action="store_true",
+                        help="the package was downloaded from nuget.org: require its repository signature "
+                             f"({REPOSITORY_SIGNATURE}), without verifying it cryptographically")
     args = parser.parse_args()
     if not args.package.is_file():
         print(f"error: {args.package} is not a file", file=sys.stderr)
         return 2
-    problems = check(args.package, args.version, args.commit)
+    problems = check(args.package, args.version, args.commit, args.published)
     for problem in problems:
         print(f"FAIL {problem}")
     if problems:
         print(f"check-package: FAIL ({len(problems)} problem(s)) in {args.package.name}")
         return 1
     print(f"check-package: ok   {args.package.name}")
+    if args.published:
+        print(f"note: {REPOSITORY_SIGNATURE} is present but was not verified; use `dotnet nuget verify --all`")
     return 0
 
 
