@@ -1,7 +1,7 @@
 # 0009 — The engine is published to nuget.org as one exact, versioned package, and a consumer pins it by hash
 
-**Status:** proposed on #132. The owner's merge of the pull request that adds this record is the
-ruling. The first publication is a separate act, the owner's (see "What the owner does").
+**Status:** accepted when the owner merges the pull request that closes #132. That merge is the
+ruling. The first publication is a separate act, also the owner's (see "What the owner does").
 
 ## Context
 
@@ -101,8 +101,15 @@ this `.csproj` among them, as of the last `factory produce`. `scripts/engine-gat
 deliberately does not hold those hashes between produces: engine-owned edits are the engine's own
 acts. So the packaging properties this record adds leave `buildInputs[src/FaaPart107/FaaPart107.csproj]`
 recording the pre-packaging bytes until the next produce refreshes it. None of those properties
-changes what the engine computes. The source commit in (2) identifies the exact tree. A consumer
-that needs the build inputs' exact bytes reads them at that commit, not from the record.
+changes what the engine computes. The one identity they do change is `AssemblyVersion`, which moves
+from the SDK default `1.0.0.0` to `<VersionPrefix>.0`. Nothing in the engine reads it. The source
+commit in (2) identifies the exact tree.
+
+A release must not carry that lag, because `factory provenance --engine` compares every build input
+and would report the mismatch at the tagged commit. **So the release pull request finishes with
+`tools/re-produce.sh`.** It clears `VersionSuffix`, then re-produces, so the record it embeds hashes
+the very `.csproj` being tagged. That is the same rule that already finishes an overlay change
+(`AGENTS.md` §7). Between releases, `main`'s record may lag an engine-owned edit, as it always could.
 
 `dotnet pack` is not byte-reproducible: the `.nupkg` container carries timestamps and a random part
 name, as rules-factory 0015 measured. The compiled assemblies are deterministic
@@ -126,19 +133,23 @@ name, so a consumer checks that the resolved kernel equals `ProvenanceJson()`'s 
 A release is a `vX.Y.Z` tag on a `main` commit whose resolved version has no suffix. **The owner
 pushes it.** `publish.yml` then does the following:
 
-1. runs `./scripts/validate.sh full`;
-2. requires the resolved `PackageVersion` to equal the tag;
-3. packs, and runs `tools/check-package.py` with the tag's version and the commit;
-4. hands exactly those files to a job that alone holds `id-token: write`, which exchanges an OIDC
-   token for a short-lived nuget.org key and pushes them, with no `--skip-duplicate`.
+1. requires the tagged commit to be on `main`;
+2. runs `./scripts/validate.sh full`;
+3. requires the resolved `PackageVersion` to equal the tag;
+4. packs, and runs `tools/check-package.py` on the `.nupkg` with the tag's version and the commit.
+   The `.snupkg` holds only the symbols built by the same `pack`, and is checked for presence alone;
+5. hands exactly those files to a job that alone holds `id-token: write`, which exchanges an OIDC
+   token for a short-lived nuget.org key and pushes them, with no `--skip-duplicate`. If the
+   `.nupkg` is accepted and the symbols push then fails, a retry fails on the duplicate by design.
+   The version exists, and its symbols are pushed by hand.
 
 ### What the owner does
 
 - Before the first release, add a nuget.org Trusted Publishing policy: owner `brandonifco`,
   repository `faa-part-107`, workflow `publish.yml`. The kernel and the maps already have the same
   kind of policy.
-- For each release, merge the release pull request and push the tag. A published version can be
-  unlisted and never deleted, so no agent pushes a release tag.
+- For each release, merge the release pull request (suffix cleared, then re-produced) and push the
+  tag. A published version can be unlisted and never deleted, so no agent pushes a release tag.
 
 ## What was rejected
 

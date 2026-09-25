@@ -23,7 +23,9 @@ on:
   push:
     tags: ["v*"]
   # For retrying a publish that failed after the gate passed (a transient OIDC or nuget.org
-  # failure). Launch it with the tag selected as the ref; a branch is refused below.
+  # failure). Launch it with the tag selected as the ref; a branch is refused below. It cannot
+  # finish a push that stopped halfway: once the .nupkg is accepted, a retry fails on the duplicate
+  # by design, and a missing .snupkg is pushed by hand (0009, "Release").
   workflow_dispatch: {}
 
 concurrency:
@@ -63,6 +65,17 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+          # The whole history, so the next step can see main.
+          fetch-depth: 0
+
+      # A release is cut from main (0009). A tag on a side branch that cleared the suffix would
+      # otherwise pass every check below and publish a tree nobody merged.
+      - name: Require the tagged commit to be on main
+        run: |
+          if ! git merge-base --is-ancestor "$GITHUB_SHA" origin/main; then
+            echo "::error::$GITHUB_SHA is not on main; a release is a tag on a merged main commit"
+            exit 1
+          fi
 
       - name: Read the pinned SDK version
         id: sdk

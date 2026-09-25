@@ -112,6 +112,11 @@ checkout at that commit:
 python3 tools/factory provenance --engine <this repository>
 ```
 
+That recompute compares every build input. Until the next re-produce it reports
+`src/FaaPart107/FaaPart107.csproj`, which gained its package properties after the last `produce`
+(decision 0009). A release re-produces before it is tagged, so the record a published package embeds
+hashes the tree it was built from.
+
 ## Verify it
 
 ```bash

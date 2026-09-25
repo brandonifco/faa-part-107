@@ -8,7 +8,8 @@ Engine-owned, not emitted by rules-factory. `dotnet pack` decides what goes into
 MSBuild properties spread over four files, one of them generated; this reads the package that
 came out and fails, naming the part, on anything 0009 does not allow. It runs on every pull request
 (package.yml) so packaging cannot break unseen, and in publish.yml between the pack and the push,
-so nothing reaches nuget.org that it has not examined.
+so no .nupkg reaches nuget.org that it has not examined. The .snupkg beside it holds only the
+symbols the same `pack` built, and publish.yml checks it for presence alone.
 
 What it holds:
 

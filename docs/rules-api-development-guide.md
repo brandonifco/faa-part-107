@@ -182,16 +182,17 @@ members below are generated, `MapEntries` and `Registry`, and both are public:
 
 ### 4.3 How the host consumes the engine
 
-`src/FaaPart107/FaaPart107.csproj` is not packaged or published today. The host must pin an exact,
-hashed build of the engine, so that the provenance it reports belongs to the code it actually ran.
+The host must pin an exact, hashed build of the engine, so that the provenance it reports belongs
+to the code it actually ran.
 
-The recommendation is to publish `FaaPart107` as a versioned NuGet package (GitHub Packages or a
-private feed), built by CI from a tagged commit. `rules-api` then consumes it with a lock file in
-locked mode, the same discipline this repository already applies to `RulesKernel` and the map.
+[Decision 0009](decisions/0009-the-engine-is-published-as-an-exact-versioned-package.md) settles
+this. The engine is published to nuget.org as the package `FaaPart107`, built by CI from a
+`vX.Y.Z` tag the owner pushes. `rules-api` pins it at an exact version and restores it with a lock
+file in locked mode, the same discipline this repository already applies to `RulesKernel` and the
+map. It also checks that the kernel it resolved is the one `ProvenanceJson()` names.
 
-Packaging is a change to this repository, so it is an issue under `AGENTS.md` §4, not something
-done from the API repository. A git submodule or project reference is acceptable for the Phase A
-spike only. It must be replaced before anything is persisted as an audit record.
+Until the first version is published, a git submodule or project reference is acceptable for the
+Phase A spike only. It must be replaced before anything is persisted as an audit record.
 
 The host targets `net10.0`. The engine multi-targets `net8.0;net10.0`.
 
@@ -559,9 +560,11 @@ a Phase A requirement.
 
 Record each of these before the phase that needs it. Don't let an implementer settle them in code.
 
-1. **How the engine is distributed** (Phase A): a NuGet package from this repository (recommended,
-   §4.3) or a submodule; which feed; and how the host checks the package's embedded provenance
-   against its lock-file hash.
+1. **How the engine is distributed** (Phase A). **Decided by
+   [0009](decisions/0009-the-engine-is-published-as-an-exact-versioned-package.md):** a NuGet
+   package, `FaaPart107`, on nuget.org, pinned exactly and locked by content hash. The host reads the
+   provenance through `ProvenanceJson()` and checks that its resolved kernel is the one that record
+   names.
 2. **The evaluation id format** (Phase A): ULID or UUIDv7.
 3. **How fine-grained finding DTOs are** (Phase A): one DTO per engine finding type (recommended),
    or a smaller set of shared shapes.
