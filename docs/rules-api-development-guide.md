@@ -82,27 +82,46 @@ brandonifco/rules-api
 
 ### 3.2 Dependency direction
 
+Arrows read "depends on".
+
 ```text
-                 RulesApi (host)
-                      │
-                      ▼
-              RulesApi.Runtime  ◄──── RulesApi.Contracts
-                 ▲         ▲
-                 │         └──── future adapters (RulesApi.<Engine>)
-                 │
-        RulesApi.FaaPart107
-                 │
-                 ▼
-             FaaPart107 (this engine, consumed as a package)
-                 │
-                 ▼
-             RulesKernel
+  RulesApi  (executable; Program.cs is the composition root)
+     │                              │
+     │                              │  registration only
+     ▼                              ▼
+  RulesApi.Runtime  ◄───────  RulesApi.FaaPart107      (future: RulesApi.<Engine>)
+     │                              │
+     ▼                              ▼
+  RulesApi.Contracts          FaaPart107  (this engine, consumed as a package)
+                                    │
+                                    ▼
+                              RulesKernel
 ```
 
-This must be enforced by a test, not just drawn. An architecture test in `RulesApi.Tests` fails if
-`RulesApi`, `RulesApi.Runtime` or `RulesApi.Contracts` references `FaaPart107`, `RulesKernel` or
-any adapter assembly. The host references adapters only at the composition root, and only to
-register them.
+The boundary has three parts:
+
+- **`RulesApi.Runtime` and `RulesApi.Contracts` never reference FAA Part 107, RulesKernel, or any
+  engine adapter.** They are the engine-neutral platform, and a later engine reuses them unchanged.
+- **The executable `RulesApi` project is the composition root.** It may reference adapter
+  assemblies, and it does so solely to register them: `services.AddRuleEngine<FaaPart107Module>()`
+  in `Program.cs`, and one more line of the same kind per engine (§10). It does not reference
+  `FaaPart107` or `RulesKernel` itself; those reach it only through an adapter.
+- **Everything in `RulesApi` outside the composition root stays engine-neutral.** Middleware,
+  infrastructure, OpenAPI setup, the error envelope and every other platform type use no adapter
+  type, no engine type and no kernel type.
+
+This must be enforced by tests, not just drawn. The architecture tests in `RulesApi.Tests` check
+the boundary as it actually is:
+
+1. the `RulesApi.Runtime` and `RulesApi.Contracts` assemblies reference no `FaaPart107`,
+   `RulesKernel` or `RulesApi.<Engine>` adapter assembly;
+2. the `RulesApi` assembly references no `FaaPart107` or `RulesKernel` assembly directly;
+3. within the `RulesApi` assembly, only the composition root (`Program`, the type the top-level
+   statements in `Program.cs` compile to) depends on an adapter type. Any other type in that
+   assembly that depends on an adapter, engine or kernel type fails the test, and the failure
+   names it.
+
+Adapters stay out of each other too: no `RulesApi.<Engine>` assembly references another.
 
 ### 3.3 What is generic and what is FAA-specific
 
