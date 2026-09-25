@@ -1,3 +1,5 @@
+using System.Globalization;
+using System.Text.RegularExpressions;
 using FaaPart107.Requests;
 using RulesKernel.Resolution;
 using Xunit;
@@ -162,6 +164,149 @@ public class AltitudeWithinLimitEntryPointTests
         Assert.True(finding.WithinStructureAllowance);
         Assert.Equal(withinLimit, finding.WithinLimit);
         Assert.Equal(withinLimit, finding.WithinGroundLevelCeiling);
+    }
+
+    public static TheoryData<decimal, decimal, decimal, string> ExceptionPathRenderings => new()
+    {
+        // distance from the structure, its immediate uppermost limit, the altitude, the whole rendering.
+
+        // The separating input #122 reports: within the limit on the exception, and rendered against the
+        // 400-foot above ground level ceiling it is six hundred feet above.
+        {
+            200m, 600m, 1000m,
+            "1000 feet above ground level is within 1000 feet above ground level, 400 feet above the "
+            + "structure's immediate uppermost limit [cfr-14-107 / § 107.51(b)]; the small unmanned "
+            + "aircraft is flown 200 feet from a structure whose immediate uppermost limit is 600 feet "
+            + "above ground level, as stated by AltitudeWithinLimitEntryPointTests; no certificate of "
+            + "waiver authorizing deviation from § 107.51 is in force, as stated by "
+            + "AltitudeWithinLimitEntryPointTests"
+        },
+
+        // At paragraph (b)(2)'s figure exactly: 500 + 400, which "does not fly higher than" is met at.
+        {
+            0m, 500m, 900m,
+            "900 feet above ground level is within 900 feet above ground level, 400 feet above the "
+            + "structure's immediate uppermost limit [cfr-14-107 / § 107.51(b)]; the small unmanned "
+            + "aircraft is flown 0 feet from a structure whose immediate uppermost limit is 500 feet "
+            + "above ground level, as stated by AltitudeWithinLimitEntryPointTests; no certificate of "
+            + "waiver authorizing deviation from § 107.51 is in force, as stated by "
+            + "AltitudeWithinLimitEntryPointTests"
+        },
+
+        // A hundredth of a foot above it: beyond, and named against the same figure, not the ceiling.
+        {
+            0m, 500m, 900.01m,
+            "900.01 feet above ground level is beyond 900 feet above ground level, 400 feet above the "
+            + "structure's immediate uppermost limit [cfr-14-107 / § 107.51(b)]; the small unmanned "
+            + "aircraft is flown 0 feet from a structure whose immediate uppermost limit is 500 feet "
+            + "above ground level, as stated by AltitudeWithinLimitEntryPointTests; no certificate of "
+            + "waiver authorizing deviation from § 107.51 is in force, as stated by "
+            + "AltitudeWithinLimitEntryPointTests"
+        },
+
+        // Beyond the 400-foot radius, paragraph (b)(2) has nothing to measure above, so the ceiling
+        // governs alone and is what the sentence names -- the wording unchanged from before #122.
+        {
+            400.01m, 500m, 900m,
+            "900 feet above ground level is beyond 400 feet above ground level [cfr-14-107 / "
+            + "§ 107.51(b)]; the small unmanned aircraft is flown 400.01 feet from a structure whose "
+            + "immediate uppermost limit is 500 feet above ground level, as stated by "
+            + "AltitudeWithinLimitEntryPointTests; no certificate of waiver authorizing deviation from "
+            + "§ 107.51 is in force, as stated by AltitudeWithinLimitEntryPointTests"
+        },
+
+        // Within the radius but not higher than 400 feet above ground level: the ceiling is met and
+        // paragraph (b)'s "unless" is never reached, so the ceiling is what the sentence names.
+        {
+            200m, 600m, 400m,
+            "400 feet above ground level is within 400 feet above ground level [cfr-14-107 / "
+            + "§ 107.51(b)]; the small unmanned aircraft is flown 200 feet from a structure whose "
+            + "immediate uppermost limit is 600 feet above ground level, as stated by "
+            + "AltitudeWithinLimitEntryPointTests; no certificate of waiver authorizing deviation from "
+            + "§ 107.51 is in force, as stated by AltitudeWithinLimitEntryPointTests"
+        },
+    };
+
+    /// <summary>
+    /// § 107.51(b) states a ceiling and then an exception reached by "unless", and the figure the
+    /// explanation names follows that order: the ceiling while it is met, and above it the figure
+    /// paragraph (b)(2) names — "400 feet above the structure's immediate uppermost limit" — wherever
+    /// paragraph (b)(1) opens the exception. Before <c>#122</c> the sentence named
+    /// <see cref="AltitudeLimit.AboveGroundLevelFeet"/> whichever branch produced the verdict, so an
+    /// aircraft correctly found within the limit a thousand feet up beside a six-hundred-foot
+    /// structure was rendered "within 400 feet above ground level".
+    /// </summary>
+    [Theory]
+    [MemberData(nameof(ExceptionPathRenderings))]
+    public void The_explanation_names_the_figure_the_verdict_turned_on_and_not_the_400_foot_ceiling_whichever_branch_answered(
+        decimal distanceFeet,
+        decimal uppermostLimitFeet,
+        decimal altitudeFeet,
+        string expected)
+    {
+        var structure = StructureStatement.Near(distanceFeet, uppermostLimitFeet, Caller);
+
+        var finding = Finding(Resolve(altitudeFeet, structure, NoWaiver));
+
+        Assert.Equal(expected, finding.ToString());
+    }
+
+    public static TheoryData<decimal> SweptAltitudes =>
+        [0m, 100m, 399.99m, 400m, 400.01m, 401m, 500m, 899.99m, 900m, 900.01m, 1000m, 1000.01m, 5000m];
+
+    /// <summary>
+    /// The property the rendering is for, swept rather than sampled: over every altitude above, and
+    /// over the statement naming no structure and thirty-five naming one, the figure the sentence
+    /// names is the one the verdict turned on — the altitude is within the named figure exactly while
+    /// <see cref="AltitudeFinding.WithinLimit"/> is true, so the sentence is arithmetically true on
+    /// every one of them rather than on the rows somebody thought to write down. Every row where
+    /// § 107.51(b)'s own ceiling is met is checked to still name that ceiling, in the words it named
+    /// it in before <c>#122</c>.
+    /// </summary>
+    [Theory]
+    [MemberData(nameof(SweptAltitudes))]
+    public void Whatever_figure_the_explanation_names_the_altitude_is_within_it_exactly_while_it_is_within_the_limit(
+        decimal altitudeFeet)
+    {
+        var structures = new List<StructureStatement> { NoStructure };
+        foreach (var distanceFeet in new[] { 0m, 200m, 399.99m, 400m, 400.01m, 401m, 1000m })
+        {
+            foreach (var uppermostLimitFeet in new[] { 0m, 100m, 500m, 600m, 1000m })
+            {
+                structures.Add(StructureStatement.Near(distanceFeet, uppermostLimitFeet, Caller));
+            }
+        }
+
+        Assert.Equal(36, structures.Count);
+
+        foreach (var structure in structures)
+        {
+            var finding = Finding(Resolve(altitudeFeet, structure, NoWaiver));
+            var sentence = finding.ToString();
+
+            var match = Regex.Match(
+                sentence,
+                @"^(?<altitude>[\d.]+) feet above ground level is (?<verdict>within|beyond) (?<figure>[\d.]+) feet above ground level[,\ ]");
+            Assert.True(match.Success, sentence);
+
+            var named = decimal.Parse(match.Groups["figure"].Value, CultureInfo.InvariantCulture);
+
+            Assert.Equal(altitudeFeet, decimal.Parse(match.Groups["altitude"].Value, CultureInfo.InvariantCulture));
+            Assert.Equal(finding.WithinLimit ? "within" : "beyond", match.Groups["verdict"].Value);
+            Assert.Equal(finding.WithinLimit, altitudeFeet <= named);
+
+            if (finding.WithinGroundLevelCeiling)
+            {
+                // Paragraph (b)'s own ceiling settled it, and the sentence is the one it always was.
+                Assert.Equal(finding.Limit.AboveGroundLevelFeet, named);
+                Assert.Contains(
+                    string.Create(
+                        CultureInfo.InvariantCulture,
+                        $"is within {finding.Limit.AboveGroundLevelFeet} feet above ground level ["),
+                    sentence,
+                    StringComparison.Ordinal);
+            }
+        }
     }
 
     [Theory]
