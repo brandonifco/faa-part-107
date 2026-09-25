@@ -161,12 +161,22 @@ internal:
   caller omits `asOf`, it stays null and that entry reports `FactRequired`. The request time
   belongs in the envelope (§7).
 - **Waivers are stated per regulation.** A regulation with no statement is not "none held";
-  decision 0008 and rules-factory decision 0021 explain why. Each waiver DTO maps to one
-  `WaiverStatement` and is added through `Stating`, filed under the regulation the statement
-  itself names.
-- **`statedBy` and `assertedBy` are required text.** The engine rejects empty ones. The API
-  returns `422` rather than filling in a placeholder such as `"api"` or the caller's account name.
-  Who is answerable is a regulatory fact, not a product one.
+  decision 0001 ("What was rejected") and rules-factory decision 0021 explain why. Each waiver DTO
+  maps to one `WaiverStatement` and is added through `Stating`, filed under the regulation the
+  statement itself names.
+- **`statedBy` and `assertedBy` are required text.** The engine rejects an empty one when the
+  `WaiverStatement` or `Assertion` is built, so the mapper returns `422` rather than filling in a
+  placeholder such as `"api"` or the caller's account name. Who is answerable is a regulatory fact,
+  not a product one.
+- **An assertion's `assertedBy` must be one of the entry's own `assertedBy` names.** Where the map
+  names people, the engine checks the attribution against that list by exact, case-sensitive match
+  and does not normalise it: `sufficient-available-power` accepts `"remote pilot in command"` and
+  refuses `"the remote pilot in command"` (`Assertions.Stated`). The exception is an entry whose list
+  is the single marker `caller`. There the corpus names nobody, and the attribution is recorded, not
+  checked (decision 0003). The API does not rewrite an attribution to make it match. It passes the
+  caller's text through, and a refused one comes back as the engine answers it (§5.3). Each
+  requirement's `assertedBy` in the response (§6.2) tells the caller which names that entry
+  accepts.
 - **Assertions name map entries.** If an `entryId` is not a map entry, or not a
   `kind: assertion` entry, the API returns `422`. It never drops the assertion silently.
 
@@ -220,7 +230,7 @@ separated at the top level:
     { "regulation": "§ 107.51", "status": "noneHeld", "statedBy": "the remote pilot in command" }
   ],
   "assertions": [
-    { "entryId": "sufficient-available-power", "holds": true, "assertedBy": "the remote pilot in command" }
+    { "entryId": "sufficient-available-power", "holds": true, "assertedBy": "remote pilot in command" }
   ]
 }
 ```
@@ -249,7 +259,8 @@ Rules for the DTO layer:
 |---|---|
 | the body is not JSON, or a property has the wrong JSON type | `400` |
 | an unknown enum string or unit, an unknown or non-assertion `entryId`, an empty `statedBy`/`assertedBy`, or two waivers for one regulation | `422`, naming the JSON pointer |
-| the engine throws `ArgumentException` for a malformed value, such as a negative altitude | `422`, naming the input the exception names |
+| an assertion attributed to someone the entry's `assertedBy` does not name | **not an error**: `200`, and the engine reports that entry `factRequired`, with its explanation naming who may assert it. The API passes this through unchanged and does not pre-empt it with a `422` |
+| the engine throws a derived `ArgumentException` (such as `ArgumentOutOfRangeException`) for a malformed value, such as a negative altitude | `422`, naming the input the exception names |
 | a fact is omitted | **not an error**: `200`, and that entry reports `factRequired` |
 
 By design, `OperationEvaluator.Evaluate` abandons the whole evaluation when it meets a malformed
@@ -288,13 +299,15 @@ prose documentation.
 
 ### 6.2 One requirement
 
-Every field of `EvaluatedRequirement` is carried. None is dropped for brevity.
+Every field of `EvaluatedRequirement` is carried. None is dropped for brevity. The one exception is
+`Locator`, which is only `citations[0]` again.
 
 ```json
 {
   "entryId": "speed-within-limit",
   "state": "satisfied",
   "status": "implemented",
+  "row": "none",
   "citations": [ { "source": "cfr-14-107", "locator": "§ 107.51(a)" } ],
   "explanation": "…the engine's own words…",
   "finding": { "type": "groundspeedFinding", "withinLimit": true, "authority": { "source": "cfr-14-107", "locator": "§ 107.51(a)" } },
@@ -455,10 +468,11 @@ and not from the API author:
 | a groundspeed given, with no waiver statement for § 107.51 | decision 0008 | `factRequired`, with `missingInput` naming the waiver |
 | the waiver for § 107.51 stated as `held` | README, § 107.205 | `outsideCurrentScope`, with `declineCites` § 107.205 |
 | `sufficient-available-power` with `aircraftPower: powered` and no assertion | `OperationEvaluatorTests` | `humanAssertionRequired`, with `assertionOwed`, `assertionCites` and `assertedBy` present |
-| the same, asserted | decision 0004 | `humanAssertionRecorded`, with the finding carrying the assertion |
+| the same, asserted by `"remote pilot in command"` | decision 0004 | `humanAssertionRecorded`, with the finding carrying the assertion |
+| the same, asserted by `"the remote pilot in command"` instead | `Assertions.Stated`; decision 0003 | `200`; that entry reports `factRequired`, and the attribution is not rewritten |
 | `night-operation`, whatever the facts | `definedElsewhere` | `missingRulesData` |
 | `waiver-policy`, whatever the facts | `scope: out` | `outsideCurrentScope` |
-| a negative altitude | the `Evaluate` contract | `422`, with no partial result |
+| a negative altitude, with `noneHeld` stated for § 107.51 (under no statement the entry reports `factRequired` for the waiver; under a held waiver it reports `outsideCurrentScope`) | decision 0008; `OperationEvaluatorTests` | `422`, with no partial result |
 | an unknown `entryId` in `assertions` | §4.2 | `422` |
 | `asOf` omitted | §4.2 | `night-waiver-termination` reports `factRequired`, and the server date appears nowhere in `result` |
 | the same request sent twice | `DeterminismTests` | byte-identical `result` and `engine` |
