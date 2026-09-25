@@ -108,7 +108,8 @@ def check(package: Path, version: str | None, commit: str | None, published: boo
         else:
             problems.append(f"missing {name}")
     for name in sorted(actual - expected):
-        problems.append(f"unexpected {name}: 0009 packs the assembly and its documentation, nothing else")
+        hint = " (a package downloaded from nuget.org is checked with --published)" if name == REPOSITORY_SIGNATURE else ""
+        problems.append(f"unexpected {name}: 0009 packs the assembly and its documentation, nothing else{hint}")
 
     # Dependencies: RulesKernel at the recorded kernel version, per framework, and nothing else.
     dependencies = fields.get("dependencies")
