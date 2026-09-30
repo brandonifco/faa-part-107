@@ -10,7 +10,7 @@ public static class Ruleset
     /// random algorithm, because the corpus declares <c>randomness: none</c> (rules-factory decision 0019)
     /// and the engine draws no random value.
     /// </summary>
-    public static ReplayCompatibilityIdentity Identity { get; } = new(
+    public static EngineIdentity Identity { get; } = new(
         ruleset: new RulesetVersion("faa-part-107", 1),
         replaySchema: new ReplaySchemaVersion(1),
         sourceBaselines: [MapEntries.Baseline]);
