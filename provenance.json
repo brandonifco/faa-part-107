@@ -19,8 +19,8 @@
   },
   "distribution": "public",
   "factory": {
-    "version": "0.0.0-dev+5cce501cb552",
-    "commit": "5cce501cb5522b75b08bf40c00c5d191ffbc7240",
+    "version": "0.0.0-dev+0f894dd47c31",
+    "commit": "0f894dd47c31b81fe4e58d5db232152aaee57bf2",
     "dirty": false
   },
   "maps": [
@@ -125,7 +125,7 @@
       },
       {
         "path": "tools/factory/ownership.py",
-        "sha256": "f32892a8ae844c4f1fac3cf51f1b1413bcf32f1fb245fc4b383b7b723427cc60"
+        "sha256": "6084605e5efa9c8fb70a95c559022e2177dc56b548bc8d2adefcc29062a7eb87"
       },
       {
         "path": "tools/factory/pins.py",
@@ -225,7 +225,7 @@
       },
       {
         "path": "tools/factory/recipe/rails/tools/pr-policy.py",
-        "sha256": "a68e3e9603684143232a8badf4e36642ce2762a20a38fbed5e33f7255d2629ac"
+        "sha256": "49e4845fb7d07855fe719c353b9493da9802f4bf80be3465a2ae8c991d957938"
       },
       {
         "path": "tools/factory/recipe/rails/tools/re-produce.sh",
@@ -285,7 +285,7 @@
       },
       {
         "path": "tools/factory/rulescorpus.py",
-        "sha256": "b4e402985061df59df946eb2276c1cdda47cc7e99ec137fc10f8ff923fa4afd9"
+        "sha256": "7f37f62b59672cdd197efe3c07a07dd0b097f25c833447a201269c112dfa4c41"
       },
       {
         "path": "tools/factory/rulings.py",
@@ -309,7 +309,7 @@
       }
     ],
     "digestRule": "sha256 over UTF-8 lines '<sha256>  <path>\\n', one per recipe file, in ascending byte order of path",
-    "digest": "a8dad34375d17ec09d012d9efb86d5edcd317e37afec1742e81d002f8b3a51ad"
+    "digest": "ffa871d83a88789b07d0b1651caa1ef86d9aa7d9a9ba6e248bb05b1d808290cd"
   },
   "generated": [
     {
@@ -322,7 +322,7 @@
     },
     {
       "path": "corpus/part107.corpus.build.json",
-      "sha256": "ea49f31ec4558816b7263d6de46f4de9357c94ca31bd5f8c3b1c8d92ad3aa134"
+      "sha256": "42ff094126d2c9d9de62f7d2953447a22c0ad19ea7f578575656e118d925e94d"
     },
     {
       "path": "corpus/part107.corpus.expect.json",
@@ -374,7 +374,7 @@
     },
     {
       "path": "scripts/factory/ownership.py",
-      "sha256": "f32892a8ae844c4f1fac3cf51f1b1413bcf32f1fb245fc4b383b7b723427cc60"
+      "sha256": "6084605e5efa9c8fb70a95c559022e2177dc56b548bc8d2adefcc29062a7eb87"
     },
     {
       "path": "scripts/factory/pins.py",
@@ -394,7 +394,7 @@
     },
     {
       "path": "scripts/factory/rulescorpus.py",
-      "sha256": "b4e402985061df59df946eb2276c1cdda47cc7e99ec137fc10f8ff923fa4afd9"
+      "sha256": "7f37f62b59672cdd197efe3c07a07dd0b097f25c833447a201269c112dfa4c41"
     },
     {
       "path": "scripts/factory/rulings.py",
@@ -573,8 +573,8 @@
     },
     {
       "path": "tools/pr-policy.py",
-      "recipeVersion": 14,
-      "sha256": "a68e3e9603684143232a8badf4e36642ce2762a20a38fbed5e33f7255d2629ac"
+      "recipeVersion": 15,
+      "sha256": "49e4845fb7d07855fe719c353b9493da9802f4bf80be3465a2ae8c991d957938"
     },
     {
       "path": "tools/re-produce.sh",
