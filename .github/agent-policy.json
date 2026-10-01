@@ -12,7 +12,7 @@
     "semanticPaths": [
       "src/**",
       "tests/**",
-      "corpus-map.overlay.json",
+      "overlay/**",
       "RulesFactory.Packages.g.props",
       "corpus/**",
       "docs/decisions/**"

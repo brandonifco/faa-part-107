@@ -83,7 +83,7 @@ public class RecordedMutationTests
     private static Dictionary<string, string> NamedByAnEntry()
     {
         var named = new Dictionary<string, string>(StringComparer.Ordinal);
-        foreach (var file in Directory.EnumerateFiles(Path.Combine(EngineRoot, "overlay"), "*.json"))
+        foreach (var file in Directory.EnumerateFiles(Path.Combine(EngineRoot, "overlay"), "*.json").Order(StringComparer.Ordinal))
         {
             using var entry = JsonDocument.Parse(File.ReadAllBytes(file));
             if (!entry.RootElement.TryGetProperty("tests", out var tests))
