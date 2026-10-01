@@ -73,6 +73,17 @@ public class FlashRateSufficientEntryPointTests
     }
 
     [Fact]
+    public void A_finding_cannot_be_constructed_without_its_assertion_or_its_waiver_statement()
+    {
+        var asserted = new Assertion(Entry, Holds: true, "the operator");
+
+        Assert.Equal("Sufficiency",
+            Assert.Throws<ArgumentNullException>(() => new FlashRateSufficientFinding(null!, NoWaiver)).ParamName);
+        Assert.Equal("Waiver",
+            Assert.Throws<ArgumentNullException>(() => new FlashRateSufficientFinding(asserted, null!)).ParamName);
+    }
+
+    [Fact]
     public void An_assertion_that_the_flash_rate_is_not_sufficient_resolves_to_that_and_is_not_turned_into_a_decline()
     {
         // "Silence" and "no" are different answers. The corpus gives the fact to whoever the caller
