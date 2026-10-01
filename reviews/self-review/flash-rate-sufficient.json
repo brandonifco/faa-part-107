@@ -1,5 +1,5 @@
 {
-  "claimSha256": "358300414862527aec6d91459484e12dad98f9848180e0319506643deb29d43d",
+  "claimSha256": "28d85c58a8d4f43e2df7c9b958388bbe61177496725756ef13f4672bd5f58b63",
   "classes": {
     "action-dependency-interactions": {
       "outcome": "tested",
@@ -33,11 +33,14 @@
     },
     "exception-leakage": {
       "outcome": "tested",
-      "reason": "AssertionRequiredException (no waiver in force and nothing asserted) and ArgumentException (a value of the wrong kind, or about another entry or regulation) are this rule's documented refusals, and the shared Assertions/Waivers mechanism's. The typed entry point is tested for each. The dictionary dispatch is tested to refuse the same wrong-entry and wrong-kind values; it cannot carry a waiver statement, so it refuses with ArgumentException before the assertion is read.",
+      "reason": "AssertionRequiredException (no waiver in force and nothing asserted) and ArgumentException (a value of the wrong kind, an assertion about another entry, a statement about another regulation, or no waiver statement) are this rule's documented refusals, and the shared Assertions/Waivers mechanism's; the typed entry point is tested for each. The dictionary dispatch by id carries no waiver statement, so it refuses every request with ArgumentException naming Waiver before any assertion is read, and that is tested; it never reaches the wrong-entry or wrong-kind refusals.",
       "tests": [
         "Asserting_nothing_demands_the_value_rather_than_declining_the_entry",
-        "The_dictionary_dispatch_answers_and_refuses_the_same_way",
-        "An_assertion_about_another_entry_is_refused"
+        "A_value_that_is_not_an_assertion_is_refused",
+        "An_assertion_about_another_entry_is_refused",
+        "A_waiver_statement_about_another_regulation_is_refused",
+        "Without_a_waiver_statement_it_refuses_rather_than_infer_one",
+        "The_dictionary_dispatch_answers_and_refuses_the_same_way"
       ]
     },
     "exclusive-or": {
