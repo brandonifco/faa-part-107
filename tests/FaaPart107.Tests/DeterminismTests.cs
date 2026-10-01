@@ -45,10 +45,7 @@ public class DeterminismTests
     /// </remarks>
     private static readonly string[] KnownToCompareACollectionByIdentity =
     [
-        "DerivedMapEntry",
-        "MapEntry",
         "OperationFacts",
-        "RegisteredEntry",
     ];
 
     /// <summary>
@@ -208,8 +205,10 @@ public class DeterminismTests
 
     /// <summary>
     /// No record in this engine both carries a collection compared by the identity of the object
-    /// behind it and keeps the equality the compiler wrote — save four this repository has already
-    /// taken up, none of which is a finding.
+    /// behind it and keeps the equality the compiler wrote — save one this repository has already
+    /// taken up, <c>OperationFacts</c> (#109), which is not a finding. The generated
+    /// <c>MapEntry</c>, <c>DerivedMapEntry</c> and <c>RegisteredEntry</c> were three more until the
+    /// factory gave them equality by element (#110).
     /// </summary>
     /// <remarks>
     /// <para>
@@ -255,7 +254,7 @@ public class DeterminismTests
     /// </para>
     /// </remarks>
     [Fact]
-    public void No_record_compares_a_collection_by_its_identity_but_the_four_already_taken_up()
+    public void No_record_compares_a_collection_by_its_identity_but_the_one_already_taken_up()
     {
         var carryingOne = Records()
             .Where(type => Fields(type).Any(field => ComparesByIdentity(field.FieldType)))
