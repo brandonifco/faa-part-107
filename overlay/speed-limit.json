@@ -1,0 +1,29 @@
+{
+  "status": "implemented",
+  "implementedIn": {
+    "ruleset": "faa-part-107",
+    "version": 1
+  },
+  "tests": [
+    {
+      "test": "SpeedLimitEntryPointTests.The_limit_resolves_as_printed_87_knots_and_100_miles_per_hour_citing_107_51_a",
+      "mutation": "GroundspeedLimit.Knots printed 88 knots (`Groundspeed.InKnots(88m)` for `InKnots(87m)`); this test went red. It went red too with GroundspeedLimit.Authority citing operating-limitations' `§ 107.51 introductory text` instead of speed-limit's locator."
+    },
+    {
+      "test": "SpeedLimitEntryPointTests.Asked_for_the_limit_as_one_figure_it_declines_RequiresInterpretation_citing_107_51_a",
+      "mutation": "Speed.Limit never took the one-figure branch (`asOneFigureIn is { } unit && unit == (SpeedUnit)99`), so a request for one figure resolved to the limit as printed instead of declining; this test went red for both units."
+    },
+    {
+      "test": "SpeedLimitEntryPointTests.While_a_waiver_of_107_51_is_stated_in_force_it_declines_OutsideCurrentScope_citing_107_205_and_records_the_statement",
+      "mutation": "Waivers.Suspension ignored the statement (`return false ? ... : null` for `return statement.InForce ? ...`), so a stated waiver was not honoured and the limit resolved; this test went red. It went red too with the decline citing waiver-policy's `§ 107.200` instead of waivable-regulations' `§ 107.205`."
+    },
+    {
+      "test": "SpeedLimitEntryPointTests.Without_a_waiver_statement_it_refuses_rather_than_infer_one",
+      "mutation": "Handlers.SpeedLimit defaulted a missing statement to none held (`request.Waiver ?? WaiverStatement.NoneHeld(Speed.Regulation, \"the engine\")` for `Demand(request.Waiver, ...)`); this test went red."
+    },
+    {
+      "test": "SpeedLimitEntryPointTests.A_waiver_statement_about_another_regulation_is_refused",
+      "mutation": "Waivers.Suspension compared the statement's regulation with itself (`statement.Regulation, statement.Regulation` for `statement.Regulation, regulation`), so a waiver of § 107.41 suspended § 107.51(a); this test went red."
+    }
+  ]
+}

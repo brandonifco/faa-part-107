@@ -4,41 +4,41 @@
     "net10.0": {
       "RulesFactory.Maps.FaaPart107": {
         "type": "Direct",
-        "requested": "[4.0.0, 4.0.0]",
-        "resolved": "4.0.0",
-        "contentHash": "YoOge0rgMHPZVSB8KC97L9YKsT9/mO79P8InEMAoeXsQY7UhuT+PdAD6kZu6dzGULOk8dVNubTuPCgBkVhmdLA=="
+        "requested": "[5.0.0, 5.0.0]",
+        "resolved": "5.0.0",
+        "contentHash": "TxKf2NiZZFpaJNlhp8o2B9irUKhv0LmIa66afwKdTRIk/YyPrHdnbR7i/IvVjv+2BN2Z3G9wCD+2mYao/70aLg=="
       },
       "RulesKernel": {
         "type": "Direct",
-        "requested": "[0.3.0, )",
-        "resolved": "0.3.0",
-        "contentHash": "x52TbzXTrKKrq6dgQTqWayvO/NLsAEMMfPChdbaBeE4fP9hNVB4ILbIIwaBKQOKnA4FRODNJ2UIKSFFT8ByFGA=="
+        "requested": "[1.0.0, )",
+        "resolved": "1.0.0",
+        "contentHash": "KApaRg9KEEiwg+cnZDPU0MPNRtHyuWYqCFpYYo1tS+l7tIXNBM+fu5Br4h9UdpFVry7Wis3xoA5b7se/4sn8KA=="
       },
       "RulesKernel.Analyzers": {
         "type": "Direct",
-        "requested": "[0.3.0, )",
-        "resolved": "0.3.0",
-        "contentHash": "vReVuCsY5OXRQplsRoiVkj+Q90iINC+oIkQnMoTtsc2xDZsSot6liaPQ8iqZ7orLksytB7eIv9yVfEq5PYTBgw=="
+        "requested": "[1.0.0, )",
+        "resolved": "1.0.0",
+        "contentHash": "zR0tUW0miz4pR5bg7NvZtN/Cs9D2IXfOXuQkhZyUEY0Zt8YXXQKelvvvnPLvzsuSsX4mLGJGkXG8EWRh3JCztA=="
       }
     },
     "net8.0": {
       "RulesFactory.Maps.FaaPart107": {
         "type": "Direct",
-        "requested": "[4.0.0, 4.0.0]",
-        "resolved": "4.0.0",
-        "contentHash": "YoOge0rgMHPZVSB8KC97L9YKsT9/mO79P8InEMAoeXsQY7UhuT+PdAD6kZu6dzGULOk8dVNubTuPCgBkVhmdLA=="
+        "requested": "[5.0.0, 5.0.0]",
+        "resolved": "5.0.0",
+        "contentHash": "TxKf2NiZZFpaJNlhp8o2B9irUKhv0LmIa66afwKdTRIk/YyPrHdnbR7i/IvVjv+2BN2Z3G9wCD+2mYao/70aLg=="
       },
       "RulesKernel": {
         "type": "Direct",
-        "requested": "[0.3.0, )",
-        "resolved": "0.3.0",
-        "contentHash": "x52TbzXTrKKrq6dgQTqWayvO/NLsAEMMfPChdbaBeE4fP9hNVB4ILbIIwaBKQOKnA4FRODNJ2UIKSFFT8ByFGA=="
+        "requested": "[1.0.0, )",
+        "resolved": "1.0.0",
+        "contentHash": "KApaRg9KEEiwg+cnZDPU0MPNRtHyuWYqCFpYYo1tS+l7tIXNBM+fu5Br4h9UdpFVry7Wis3xoA5b7se/4sn8KA=="
       },
       "RulesKernel.Analyzers": {
         "type": "Direct",
-        "requested": "[0.3.0, )",
-        "resolved": "0.3.0",
-        "contentHash": "vReVuCsY5OXRQplsRoiVkj+Q90iINC+oIkQnMoTtsc2xDZsSot6liaPQ8iqZ7orLksytB7eIv9yVfEq5PYTBgw=="
+        "requested": "[1.0.0, )",
+        "resolved": "1.0.0",
+        "contentHash": "zR0tUW0miz4pR5bg7NvZtN/Cs9D2IXfOXuQkhZyUEY0Zt8YXXQKelvvvnPLvzsuSsX4mLGJGkXG8EWRh3JCztA=="
       }
     }
   }

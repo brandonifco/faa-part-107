@@ -1,0 +1,140 @@
+{
+  "claimSha256": "28d85c58a8d4f43e2df7c9b958388bbe61177496725756ef13f4672bd5f58b63",
+  "classes": {
+    "action-dependency-interactions": {
+      "outcome": "tested",
+      "reason": "anti-collision-lighting depends on this entry and on intensity-reduction-in-interest-of-safety, which shares this entry's locator. The composite resolves its constituents together and each answer stays its own entry's, and the remote pilot in command's determination belongs to the other entry, not this one.",
+      "tests": [
+        "The_constituents_answers_are_their_own_entries_and_the_verdict_follows_what_they_returned",
+        "The_determination_the_remote_pilot_in_command_makes_on_this_clause_belongs_to_the_other_entry"
+      ]
+    },
+    "caller-controlled-sizes": {
+      "outcome": "not-applicable",
+      "reason": "No size or count the caller controls drives work or allocation: the attribution string is recorded, not iterated or parsed.",
+      "tests": []
+    },
+    "count-semantics": {
+      "outcome": "not-applicable",
+      "reason": "No count appears in the clause or the entry.",
+      "tests": []
+    },
+    "empty-collections": {
+      "outcome": "tested",
+      "reason": "The one collection the request carries is the assertions dictionary; empty, the value is demanded rather than the entry declined.",
+      "tests": [
+        "Asserting_nothing_demands_the_value_rather_than_declining_the_entry"
+      ]
+    },
+    "exact-min-max": {
+      "outcome": "not-applicable",
+      "reason": "The entry states no bound. The one figure in § 107.29(a)(2) and (b), visible for at least 3 statute miles, is anti-collision-lighting's and not this entry's (No_flash_rate_is_modelled_because_the_corpus_states_none).",
+      "tests": []
+    },
+    "exception-leakage": {
+      "outcome": "tested",
+      "reason": "AssertionRequiredException (no waiver in force and nothing asserted) and ArgumentException (a value of the wrong kind, an assertion about another entry, a statement about another regulation, or no waiver statement) are this rule's documented refusals, and the shared Assertions/Waivers mechanism's; the typed entry point is tested for each. The dictionary dispatch by id carries no waiver statement, so it refuses every request with ArgumentException naming Waiver before any assertion is read, and that is tested; it never reaches the wrong-entry or wrong-kind refusals.",
+      "tests": [
+        "Asserting_nothing_demands_the_value_rather_than_declining_the_entry",
+        "A_value_that_is_not_an_assertion_is_refused",
+        "An_assertion_about_another_entry_is_refused",
+        "A_waiver_statement_about_another_regulation_is_refused",
+        "Without_a_waiver_statement_it_refuses_rather_than_infer_one",
+        "The_dictionary_dispatch_answers_and_refuses_the_same_way"
+      ]
+    },
+    "exclusive-or": {
+      "outcome": "not-applicable",
+      "reason": "The clause this entry implements has no disjunction. The only 'or' in its evidence is the pronoun pair 'he or she' in § 107.29(a)(2)'s second sentence, which is intensity-reduction-in-interest-of-safety's. § 107.205(b)'s 'Section 107.29(a)(2) and (b)' joins the two paragraphs with 'and', and a statement about any other regulation is refused (A_waiver_statement_about_another_regulation_is_refused).",
+      "tests": []
+    },
+    "idempotence": {
+      "outcome": "not-applicable",
+      "reason": "FlashRate.SufficientToAvoidACollision is a static function of its two arguments that reads and writes no state, and the finding it returns is an immutable record, so a repeated request cannot be answered differently. The entry point and the dictionary dispatch answer one request alike (The_dictionary_dispatch_answers_and_refuses_the_same_way).",
+      "tests": []
+    },
+    "immutability": {
+      "outcome": "tested",
+      "reason": "The finding is a sealed record with get-only members; the answered assertion carries the map's own entry and citation, never the caller-supplied one.",
+      "tests": [
+        "The_citation_is_the_maps_and_a_caller_supplied_entry_does_not_become_it"
+      ]
+    },
+    "integer-extremes": {
+      "outcome": "not-applicable",
+      "reason": "The entry reads no integer: its inputs are a WaiverStatement and an Assertion (a bool and an attribution). The corpus states no flash rate, so no figure is modelled (No_flash_rate_is_modelled_because_the_corpus_states_none).",
+      "tests": []
+    },
+    "invalid-construction": {
+      "outcome": "tested",
+      "reason": "FlashRateSufficientFinding checks both members for null in its constructor and exposes them get-only, and constructing one without either throws naming the member. The request's waiver is demanded, never defaulted. No enum or struct is constructed from caller input here.",
+      "tests": [
+        "A_finding_cannot_be_constructed_without_its_assertion_or_its_waiver_statement",
+        "Without_a_waiver_statement_it_refuses_rather_than_infer_one"
+      ]
+    },
+    "invalid-intermediate-state": {
+      "outcome": "not-applicable",
+      "reason": "FlashRateSufficientFinding's members are get-only with null checks in the constructor, so neither a public API nor a `with` copy can produce a finding without its assertion or its waiver statement.",
+      "tests": []
+    },
+    "invalid-public-input": {
+      "outcome": "tested",
+      "reason": "A missing waiver statement, a value that is not an Assertion, an assertion about another entry and a statement about another regulation are each refused with a reason.",
+      "tests": [
+        "Without_a_waiver_statement_it_refuses_rather_than_infer_one",
+        "A_value_that_is_not_an_assertion_is_refused",
+        "An_assertion_about_another_entry_is_refused",
+        "A_waiver_statement_about_another_regulation_is_refused"
+      ]
+    },
+    "missing-content-masking": {
+      "outcome": "tested",
+      "reason": "A missing assertion does not mask the decline a waiver in force already settles: the gate is read first and the assertion is never demanded.",
+      "tests": [
+        "While_a_waiver_of_107_29_a_2_and_b_is_stated_in_force_it_declines_OutsideCurrentScope_citing_107_205_without_demanding_the_assertion"
+      ]
+    },
+    "order-dependence": {
+      "outcome": "tested",
+      "reason": "The only order is the gate before the assertion: a waiver in force declines without demanding the assertion, whichever is supplied. The assertions dictionary is keyed by entry id, so no ordering of it can reach the answer. That is argument from the type, not a test.",
+      "tests": [
+        "While_a_waiver_of_107_29_a_2_and_b_is_stated_in_force_it_declines_OutsideCurrentScope_citing_107_205_without_demanding_the_assertion"
+      ]
+    },
+    "overflow-underflow": {
+      "outcome": "not-applicable",
+      "reason": "FlashRate.SufficientToAvoidACollision does no arithmetic: it consults the waiver gate and answers the caller's assertion unchanged.",
+      "tests": []
+    },
+    "partial-mutation-before-refusal": {
+      "outcome": "not-applicable",
+      "reason": "The rule is a pure function of an immutable request: it holds no state and writes nothing, so there is nothing a refusal could leave changed.",
+      "tests": []
+    },
+    "phase-state-boundaries": {
+      "outcome": "tested",
+      "reason": "The one state the entry names is whether a waiver of § 107.29(a)(2) and (b) is in force: in force it declines OutsideCurrentScope citing § 107.205; stated not in force the assertion is demanded and answered.",
+      "tests": [
+        "While_a_waiver_of_107_29_a_2_and_b_is_stated_in_force_it_declines_OutsideCurrentScope_citing_107_205_without_demanding_the_assertion",
+        "Stated_that_no_waiver_is_in_force_the_assertion_is_demanded_and_answered_and_the_statement_recorded"
+      ]
+    },
+    "refusal-classification": {
+      "outcome": "tested",
+      "reason": "A waiver in force is OutsideCurrentScope citing § 107.205; a 'no' is an answer, not a decline; nothing asserted is a demand for the value, not a decline.",
+      "tests": [
+        "While_a_waiver_of_107_29_a_2_and_b_is_stated_in_force_it_declines_OutsideCurrentScope_citing_107_205_without_demanding_the_assertion",
+        "An_assertion_that_the_flash_rate_is_not_sufficient_resolves_to_that_and_is_not_turned_into_a_decline",
+        "Asserting_nothing_demands_the_value_rather_than_declining_the_entry"
+      ]
+    },
+    "sentinel-wraparound": {
+      "outcome": "not-applicable",
+      "reason": "No counter, index or modular value exists in this entry's request, rule or finding.",
+      "tests": []
+    }
+  },
+  "entry": "flash-rate-sufficient",
+  "selfReviewFormat": 1
+}

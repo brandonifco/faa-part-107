@@ -20,8 +20,8 @@ namespace FaaPart107.Tests;
 /// </para>
 /// <para>
 /// <b>Two records, and which one a test belongs in is a question about the test, not a preference.</b>
-/// A test that proves one map entry's own rule is named by that entry's row in
-/// <c>corpus-map.overlay.json</c>. A test that proves something no single entry owns — the
+/// A test that proves one map entry's own rule is named by that entry's overlay file,
+/// <c>overlay/&lt;entry id&gt;.json</c>. A test that proves something no single entry owns — the
 /// evaluator's own contract, a census over every entry, determinism across two evaluations — has no
 /// overlay row available to it, because rules-factory decision 0015's merge rule 1 refuses an overlay
 /// key that is not an entry id; it is named instead by <c>cross-cutting-mutations.json</c> beside this
@@ -79,14 +79,14 @@ public class RecordedMutationTests
         ];
     }
 
-    /// <summary>Every test an entry's overlay row names, with the mutation that row records.</summary>
+    /// <summary>Every test an entry's overlay file names, with the mutation that file records.</summary>
     private static Dictionary<string, string> NamedByAnEntry()
     {
-        using var overlay = JsonDocument.Parse(File.ReadAllBytes(Path.Combine(EngineRoot, "corpus-map.overlay.json")));
         var named = new Dictionary<string, string>(StringComparer.Ordinal);
-        foreach (var entry in overlay.RootElement.EnumerateObject())
+        foreach (var file in Directory.EnumerateFiles(Path.Combine(EngineRoot, "overlay"), "*.json").Order(StringComparer.Ordinal))
         {
-            if (!entry.Value.TryGetProperty("tests", out var tests))
+            using var entry = JsonDocument.Parse(File.ReadAllBytes(file));
+            if (!entry.RootElement.TryGetProperty("tests", out var tests))
             {
                 continue;
             }
@@ -141,7 +141,7 @@ public class RecordedMutationTests
             unnamed.Length == 0,
             "these tests run and no record names the mutation that reddens them, so nobody has watched them "
             + "fail (AGENTS.md §7). A test that proves one map entry's rule belongs in that entry's `tests` in "
-            + "corpus-map.overlay.json; one that proves something no single entry owns belongs in "
+            + "overlay/<entry id>.json; one that proves something no single entry owns belongs in "
             + $"tests/FaaPart107.Tests/cross-cutting-mutations.json (docs/decisions/0007): {string.Join(", ", unnamed)}");
 
         // 2. And nothing is named that does not run: a test deleted or renamed out from under its row
@@ -181,7 +181,7 @@ public class RecordedMutationTests
         }
 
         throw new InvalidOperationException(
-            $"no engine root above {AppContext.BaseDirectory}: this test reads corpus-map.overlay.json and "
+            $"no engine root above {AppContext.BaseDirectory}: this test reads overlay/ and "
             + "cross-cutting-mutations.json from the engine's own working tree, as the generated "
             + "ProvenanceTests reads provenance.json");
     }

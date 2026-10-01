@@ -49,6 +49,11 @@ Closes #
 
 <!-- For anything touching the rules surface. "N/A" only where nothing here does.
 
+     The entry ids are a comma-separated set. For an implementation, tools/pr-policy.py compares
+     that set with the overlay entries this diff moves to `implemented`, and compares the linked
+     issue's `rules-factory-entry` marker with the same identity. For a defect fix or document
+     change with no status transition, an issue marker still has to match the entry named here.
+
      A factory update (above) names the map package and version and nothing else here: a map
      version bump regenerates every entry, so there is no single entry id and no single locator,
      and "all of them" names nothing a reviewer can check. -->
@@ -76,6 +81,32 @@ $ ./scripts/validate.sh full
 Mutations observed:
 
 <!-- one line per test: the test name, the mutation, and that it failed with it in place -->
+
+## Documentation
+
+<!-- One line per document **this engine owns** — its README, its own `docs/`, and any rail it has
+     adopted — plus every `*.md` this diff touches, whoever owns it:
+
+     - [x] `README.md` — updated: the entry table names the altitude limit
+     - [x] `docs/how-we-read-the-corpus.md` — checked, no change: it describes the map, not handlers
+
+     ```
+     tools/pr-policy.py --docs-skeleton
+     ```
+
+     prints the section for your tree, unticked, to complete.
+
+     The rails the factory writes — `AGENTS.md`, `CLAUDE.md`, `docs/agent-team.md`, the charters,
+     this template — are not this engine's documents and are not listed, because `produce` refuses
+     a hand edit to them; a `factory produce` update, which does move them, lists each as
+     `updated` like any other changed file. A numbered decision record under `docs/decisions/` is
+     frozen: superseded by a new record, never rewritten, so it is listed only when this change
+     edits it.
+
+     "Checked" means read against this change, and the note says what you looked for. Nothing can
+     tell whether you read a file; that part rests on your word, and the note is where you give it.
+
+     An engine that owns no documents yet answers in a sentence saying so, not a bullet. -->
 
 ## Determinism
 
@@ -105,5 +136,10 @@ Mutations observed:
 - independently reviewed by:
 
 ## Unrelated changes
+
+<!-- Changes in this pull request that the issue did not ask for, and why each could not be its
+     own issue (AGENTS.md §4). A document this change makes untrue is **not** unrelated: updating
+     it is part of the change, and belongs in the sections above. If this list is not "None", a
+     reviewer is entitled to ask for the change to be split. -->
 
 None

@@ -214,7 +214,11 @@ public sealed record EvaluatedRequirement
     /// where the finding speaks, load-bearing where nothing else does: it is kept.
     /// </para>
     /// <para>
-    /// <b>One condition this rests on, which is not this type's to fix.</b> Comparing findings
+    /// <b>One condition this rested on, until <c>#110</c>.</b> The factory now generates
+    /// <see cref="MapEntry"/>'s equality by element (<c>rules-factory#462</c>), so what this
+    /// paragraph and the two after it describe is no longer what equality rests on. They are kept
+    /// because the generated <c>Registry</c> arm they describe still answers with the caller's own
+    /// object. As it stood before that fix: comparing findings
     /// reduces, level by level, to record equality on every value a finding carries, and some of
     /// those are the map's own: a <see cref="MapEntry"/> travels on an <see cref="Assertion"/>,
     /// and on the per-constituent outcomes a composite's finding lists — reached through the
@@ -246,9 +250,8 @@ public sealed record EvaluatedRequirement
     /// <see cref="Finding"/>. It is vacuous today, because every <c>kind: assertion</c> entry this
     /// engine has built is <c>Implemented</c> with a handler that goes through
     /// <c>Assertions.Stated</c>, so the arm is never taken; an entry left to that default would
-    /// take it. That, and <see cref="MapEntry"/>'s generated equality itself, are <c>#110</c>'s,
-    /// raised upstream as <c>rules-factory#462</c>; the fix there is what retires these two
-    /// paragraphs.
+    /// take it. That, and <see cref="MapEntry"/>'s generated equality itself, were <c>#110</c>'s,
+    /// raised upstream as <c>rules-factory#462</c>; the equality half of that has landed.
     /// </para>
     /// </remarks>
     public bool Equals(EvaluatedRequirement? other) =>

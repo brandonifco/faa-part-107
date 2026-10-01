@@ -150,7 +150,7 @@ members below are generated, `MapEntries` and `Registry`, and both are public:
 | waiver statements | `WaiverStatement.Held(regulation, statedBy, certificate?)` and `WaiverStatement.NoneHeld(regulation, statedBy)` |
 | assertions | `new Assertion(MapEntry entry, bool holds, string assertedBy)`. The engine has no public lookup from an id to a `MapEntry`: `Registry.Entry(id)` returns a `RegisteredEntry`, and the `MapEntry` values are the generated `MapEntries` statics. The adapter keeps its own id → `MapEntry` table over those statics, and a test checks that table against `Registry.Entries`. A proper by-id lookup would be an engine change, filed as §15 describes |
 | results | `OperationEvaluation.Requirements`, `.Outstanding`, `.Unanswered` and `.Count(state)` |
-| identity | `OperationEvaluation.EvaluatedBy`, a `ReplayCompatibilityIdentity`: ruleset `faa-part-107` v1, replay schema v1, and the source baselines |
+| identity | `OperationEvaluation.EvaluatedBy`, an `EngineIdentity`: ruleset `faa-part-107` v1, replay schema v1, and the source baselines |
 | provenance | `OperationEvaluation.ProvenanceJson()`, which is `provenance.json` byte for byte |
 | state of a decline from a direct entry-point call | `RequirementStates.For(UnresolvedReason)` |
 
@@ -346,8 +346,8 @@ Counts and hashes below are illustrative.
     "ruleset": { "id": "faa-part-107", "version": 1 },
     "replaySchemaVersion": 1,
     "corpus": { "sourceId": "cfr-14-107", "asOf": "2026-01-01", "contentHash": "80f6…" },
-    "map": { "packageId": "RulesFactory.Maps.FaaPart107", "version": "4.0.0" },
-    "kernel": { "packageId": "RulesKernel", "version": "0.3.0" },
+    "map": { "packageId": "RulesFactory.Maps.FaaPart107", "version": "5.0.0" },
+    "kernel": { "packageId": "RulesKernel", "version": "1.0.0" },
     "provenanceSha256": "…"
   },
   "result": {
