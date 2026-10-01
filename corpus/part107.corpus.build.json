@@ -8,14 +8,28 @@
     }
   ],
   "corpusId": "cfr-14-107",
-  "derivations": [],
+  "derivations": [
+    {
+      "adapter": "xml",
+      "id": "cfr-14-107-sections",
+      "input": "cfr-14-107-xml",
+      "output": {
+        "id": "cfr-14-107-sections-xml",
+        "path": "canonical/part107.xml"
+      },
+      "parameters": {
+        "idAttribute": "N",
+        "segmentElement": "DIV8"
+      }
+    }
+  ],
   "external": [],
   "schema": "rules-corpus/build/1",
   "sources": [
     {
       "id": "cfr-14-107-xml",
       "mediaType": "application/xml",
-      "notes": "The eCFR versioner XML, byte for byte as retrieved. The baseline names this source directly: the corpus is the retrieved file, with no derivation. A work of the United States Government, in the public domain.",
+      "notes": "The eCFR versioner XML, byte for byte as retrieved. The baseline names this source directly. The xml adapter segments it by its DIV8 elements, one per section with its id from the N attribute, into a canonical artifact that is these same bytes. A work of the United States Government, in the public domain.",
       "origin": "https://www.ecfr.gov/api/versioner/v1/full/2026-01-01/title-14.xml?part=107",
       "path": "part107.xml"
     }

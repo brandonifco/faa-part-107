@@ -6,7 +6,8 @@ by [rules-factory](https://github.com/brandonifco/rules-factory) from a corpus m
 
 The corpus is 14 CFR Part 107 as of 2026-01-01, fetched from the eCFR versioner API and pinned in
 `corpus/part107.xml`, built and verified by [rules-corpus](https://github.com/brandonifco/rules-corpus)
-on every validation run from the build definition beside it (`corpus/part107.corpus.build.json`). Part 107 is a work of the United States
+on every validation run from the build definition beside it (`corpus/part107.corpus.build.json`),
+which also segments it with rules-corpus's `xml` adapter, one segment per section (61 `DIV8` elements). Part 107 is a work of the United States
 Government and is in the public domain in the United States. The specification is the map in the
 package [`RulesFactory.Maps.FaaPart107`](https://www.nuget.org/packages/RulesFactory.Maps.FaaPart107)
 5.0.0: forty-seven entries — forty-three over twelve sections of subpart B, and four that cite
@@ -99,7 +100,7 @@ python3 tools/factory produce --package RulesFactory.Maps.FaaPart107@5.0.0 \
   --corpus <this repository>/corpus/part107.xml --name FaaPart107 --out <this repository>
 ```
 
-`provenance.json` records the run: rules-factory `0.0.0-dev+5cce501cb552`, commit `5cce501cb552`,
+`provenance.json` records the run: rules-factory `0.0.0-dev+0f894dd47c31`, commit `0f894dd47c31`,
 `dirty: false`. The version reads `0.0.0-dev+<commit>` rather than a release number because no
 `factory/vX.Y.Z` tag was visible on that commit when the record was written; `tools/re-produce.sh`
 explains why a tagless clone records it that way, and is what re-runs `produce` here, pinned to
