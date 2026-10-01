@@ -33,7 +33,7 @@
     },
     "exception-leakage": {
       "outcome": "tested",
-      "reason": "AssertionRequiredException (nothing asserted, no waiver in force) and ArgumentException (a value of the wrong kind or about another entry or regulation) are the documented refusals of this rule and of the shared Assertions/Waivers mechanism; both public paths, the entry point and the dictionary dispatch, behave the same.",
+      "reason": "AssertionRequiredException (no waiver in force and nothing asserted) and ArgumentException (a value of the wrong kind, or about another entry or regulation) are this rule's documented refusals, and the shared Assertions/Waivers mechanism's. The typed entry point is tested for each. The dictionary dispatch is tested to refuse the same wrong-entry and wrong-kind values; it cannot carry a waiver statement, so it refuses with ArgumentException before the assertion is read.",
       "tests": [
         "Asserting_nothing_demands_the_value_rather_than_declining_the_entry",
         "The_dictionary_dispatch_answers_and_refuses_the_same_way",
@@ -94,10 +94,9 @@
     },
     "order-dependence": {
       "outcome": "tested",
-      "reason": "The only order is the gate before the assertion: a waiver in force declines without demanding the assertion, whichever is supplied. The assertions dictionary is keyed by entry, so its order cannot reach the answer.",
+      "reason": "The only order is the gate before the assertion: a waiver in force declines without demanding the assertion, whichever is supplied. The assertions dictionary is keyed by entry id, so no ordering of it can reach the answer. That is argument from the type, not a test.",
       "tests": [
-        "While_a_waiver_of_107_29_a_2_and_b_is_stated_in_force_it_declines_OutsideCurrentScope_citing_107_205_without_demanding_the_assertion",
-        "The_dictionary_dispatch_answers_and_refuses_the_same_way"
+        "While_a_waiver_of_107_29_a_2_and_b_is_stated_in_force_it_declines_OutsideCurrentScope_citing_107_205_without_demanding_the_assertion"
       ]
     },
     "overflow-underflow": {

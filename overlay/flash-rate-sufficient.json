@@ -67,7 +67,7 @@
     },
     {
       "test": "FlashRateSufficientEntryPointTests.A_finding_cannot_be_constructed_without_its_assertion_or_its_waiver_statement",
-      "mutation": "FlashRateSufficientFinding.Sufficiency lost its null guard (`public Assertion Sufficiency { get; } = Sufficiency;` for `= Sufficiency ?? throw new ArgumentNullException(nameof(Sufficiency));`), so a finding could be constructed with no assertion; this test went red with `Assert.Throws() Failure: No exception was thrown` -- `Failed!  - Failed:     1, Passed:   769, Skipped:     0, Total:   770` on both net8.0 and net10.0, and nothing else in the suite went red (#128, the self-review's invalid-construction class)"
+      "mutation": "FlashRateSufficientFinding.Sufficiency lost its null guard (`public Assertion Sufficiency { get; } = Sufficiency;` for `= Sufficiency ?? throw new ArgumentNullException(nameof(Sufficiency));`), so a finding could be constructed with no assertion; this test went red with `Assert.Throws() Failure: No exception was thrown` -- `Failed!  - Failed:     1, Passed:   769, Skipped:     0, Total:   770` on both net8.0 and net10.0, and nothing else in the suite went red (#128, the self-review's invalid-construction class). It went red too, alone and with the same message and counts, with the `Waiver` guard removed instead (`public WaiverStatement Waiver { get; } = Waiver;`)"
     }
   ]
 }
