@@ -1,12 +1,12 @@
 {
-  "claimSha256": "594ba941d36eb27e8169586f20ee2ebb6fb07a438f64664bb1c5ceabac35144a",
+  "claimSha256": "358300414862527aec6d91459484e12dad98f9848180e0319506643deb29d43d",
   "classes": {
     "action-dependency-interactions": {
       "outcome": "tested",
-      "reason": "anti-collision-lighting depends on this entry and intensity-reduction-in-interest-of-safety shares its locator; the remote pilot in command's determination belongs to that other entry, and a fact reaches only the rule that reads it.",
+      "reason": "anti-collision-lighting depends on this entry and on intensity-reduction-in-interest-of-safety, which shares this entry's locator. The composite resolves its constituents together and each answer stays its own entry's, and the remote pilot in command's determination belongs to the other entry, not this one.",
       "tests": [
-        "The_determination_the_remote_pilot_in_command_makes_on_this_clause_belongs_to_the_other_entry",
-        "A_fact_supplied_reaches_the_rule_that_reads_it_and_no_other"
+        "The_constituents_answers_are_their_own_entries_and_the_verdict_follows_what_they_returned",
+        "The_determination_the_remote_pilot_in_command_makes_on_this_clause_belongs_to_the_other_entry"
       ]
     },
     "caller-controlled-sizes": {
@@ -42,16 +42,13 @@
     },
     "exclusive-or": {
       "outcome": "not-applicable",
-      "reason": "The clause this entry implements contains no 'or'. § 107.205(b)'s 'Section 107.29(a)(2) and (b)' joins the two paragraphs with 'and', and a statement about any other regulation is refused (A_waiver_statement_about_another_regulation_is_refused).",
+      "reason": "The clause this entry implements has no disjunction. The only 'or' in its evidence is the pronoun pair 'he or she' in § 107.29(a)(2)'s second sentence, which is intensity-reduction-in-interest-of-safety's. § 107.205(b)'s 'Section 107.29(a)(2) and (b)' joins the two paragraphs with 'and', and a statement about any other regulation is refused (A_waiver_statement_about_another_regulation_is_refused).",
       "tests": []
     },
     "idempotence": {
-      "outcome": "tested",
-      "reason": "The answer is a function of the request alone: the entry point and the dictionary dispatch answer one request the same way, and the evaluator's same-facts check covers this entry among the rest.",
-      "tests": [
-        "The_dictionary_dispatch_answers_and_refuses_the_same_way",
-        "The_same_facts_evaluate_the_same_way_every_time"
-      ]
+      "outcome": "not-applicable",
+      "reason": "FlashRate.SufficientToAvoidACollision is a static function of its two arguments that reads and writes no state, and the finding it returns is an immutable record, so a repeated request cannot be answered differently. The entry point and the dictionary dispatch answer one request alike (The_dictionary_dispatch_answers_and_refuses_the_same_way).",
+      "tests": []
     },
     "immutability": {
       "outcome": "tested",
@@ -67,10 +64,10 @@
     },
     "invalid-construction": {
       "outcome": "tested",
-      "reason": "FlashRateSufficientFinding checks both members for null in its constructor and exposes them get-only; the request's waiver is demanded, never defaulted. No enum or struct is constructed from caller input here.",
+      "reason": "FlashRateSufficientFinding checks both members for null in its constructor and exposes them get-only, and constructing one without either throws naming the member. The request's waiver is demanded, never defaulted. No enum or struct is constructed from caller input here.",
       "tests": [
-        "Without_a_waiver_statement_it_refuses_rather_than_infer_one",
-        "A_value_that_is_not_an_assertion_is_refused"
+        "A_finding_cannot_be_constructed_without_its_assertion_or_its_waiver_statement",
+        "Without_a_waiver_statement_it_refuses_rather_than_infer_one"
       ]
     },
     "invalid-intermediate-state": {
