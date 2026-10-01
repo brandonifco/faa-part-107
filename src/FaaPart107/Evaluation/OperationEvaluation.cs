@@ -45,7 +45,7 @@ public sealed record OperationEvaluation
     /// corpus baseline the map is true of — <see cref="Ruleset.Identity"/>, reused rather than
     /// restated.
     /// </summary>
-    public ReplayCompatibilityIdentity EvaluatedBy => Ruleset.Identity;
+    public EngineIdentity EvaluatedBy => Ruleset.Identity;
 
     /// <summary>
     /// Everything the caller still owes this engine before it could say more: an authorization or
