@@ -96,14 +96,14 @@
       "faapart107": {
         "type": "Project",
         "dependencies": {
-          "RulesKernel": "[0.3.0, )"
+          "RulesKernel": "[1.0.0, )"
         }
       },
       "RulesKernel": {
         "type": "CentralTransitive",
-        "requested": "[0.3.0, )",
-        "resolved": "0.3.0",
-        "contentHash": "x52TbzXTrKKrq6dgQTqWayvO/NLsAEMMfPChdbaBeE4fP9hNVB4ILbIIwaBKQOKnA4FRODNJ2UIKSFFT8ByFGA=="
+        "requested": "[1.0.0, )",
+        "resolved": "1.0.0",
+        "contentHash": "KApaRg9KEEiwg+cnZDPU0MPNRtHyuWYqCFpYYo1tS+l7tIXNBM+fu5Br4h9UdpFVry7Wis3xoA5b7se/4sn8KA=="
       }
     },
     "net8.0": {
@@ -201,14 +201,14 @@
       "faapart107": {
         "type": "Project",
         "dependencies": {
-          "RulesKernel": "[0.3.0, )"
+          "RulesKernel": "[1.0.0, )"
         }
       },
       "RulesKernel": {
         "type": "CentralTransitive",
-        "requested": "[0.3.0, )",
-        "resolved": "0.3.0",
-        "contentHash": "x52TbzXTrKKrq6dgQTqWayvO/NLsAEMMfPChdbaBeE4fP9hNVB4ILbIIwaBKQOKnA4FRODNJ2UIKSFFT8ByFGA=="
+        "requested": "[1.0.0, )",
+        "resolved": "1.0.0",
+        "contentHash": "KApaRg9KEEiwg+cnZDPU0MPNRtHyuWYqCFpYYo1tS+l7tIXNBM+fu5Br4h9UdpFVry7Wis3xoA5b7se/4sn8KA=="
       }
     }
   }

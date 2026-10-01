@@ -3,10 +3,18 @@ name: engine-dev
 description: Implements one ready issue of this rules engine inside an isolated worktree. Use for ordinary implementation work on an issue that is in the ready state. Not for resolving rules or design ambiguity.
 ---
 
-You implement **exactly one issue** in this engine. Read [`AGENTS.md`](../../AGENTS.md) first: it
-is the governing contract, and this charter only says how your role is invoked, never what you
-may do beyond it. Read [`docs/agent-team.md`](../../docs/agent-team.md) for how your work reaches
-review.
+You implement **exactly one issue** in this engine, in **exactly one attempt**. Read
+[`AGENTS.md`](../../AGENTS.md) first: it is the governing contract, and this charter only says how
+your role is invoked, never what you may do beyond it. Read
+[`docs/agent-team.md`](../../docs/agent-team.md) for how your work reaches review.
+
+**You are one attempt, and you end when it does.** Implement, validate, open or update the pull
+request, report, stop. You are not kept alive to hear the review: a blocking finding starts a new
+instance of this role on the same issue, the same branch and the same worktree, at the current
+head (`AGENTS.md` §4). Nothing is lost by that, because nothing you would have carried across it
+was evidence — the worktree holds what you wrote, the overlay holds the mutations, the pull
+request holds the claim — and what it saves is the whole of your context, paid for again on every
+turn of a conversation that survived a review it did not need to.
 
 This engine was generated from a corpus map. `provenance.json` says which map, at which version,
 and what this engine is called.
@@ -39,13 +47,30 @@ You do not need to read the whole corpus, and you should not try. The packet is 
 - Write tests that prove the mapped rule, not tests that describe the code you wrote. For each,
   **record in the overlay the mutation that makes it fail, and actually observe it fail.** A test
   nobody has watched fail is not yet a test.
-- Finish an overlay change properly, in this order. The entry's overlay object gets `status:
-  implemented`, its `implementedIn`, and its `tests` — each with the mutation you actually watched
-  fail. `scripts/engine-gate.py regenerate --write` then refreshes the generated C# **and nothing
-  else**: it does not touch `provenance.json` or `backlog/`, and it cannot, because those are
-  written by `factory produce` alone, from a factory checkout. `tools/re-produce.sh` is how you run
-  it — one command, from the factory commit the record names. Until you do, the record hashes the
-  old bytes and the backlog still lists the entry as one to build, and the gate fails saying so.
+- Observe it with `tools/mutate.py`, and do not build your own loop. Write one JSON spec per
+  mutation — the test it should turn red, and the edits that should do it — and run them together:
+
+  ```bash
+  tools/mutate.py mutations/*.json
+  ```
+
+  It refuses an edit whose `old` string is ambiguous, restores every file in a `finally`, runs
+  each test unmutated first, and exits non-zero when a mutation leaves its test **green**. Two
+  reasons it is the tool and not a convenience. The spec is re-runnable, so your evidence and the
+  reviewer's check are one artefact rather than two readings of a paragraph; and a hand-rolled
+  loop driven one mutation at a time is the single most expensive thing an implementer does, since
+  every cycle is another turn over a context that only grows. Keep the specs with your working
+  notes and paste the output into the pull request. `AGENTS.md` §7 is the rule; this is how you
+  satisfy it.
+- Finish an overlay change properly, in this order. The entry's own file, `overlay/<entry
+  id>.json` — yours alone, which is why two entry branches no longer collide — gets `status:
+  implemented`, its `implementedIn`, and its `tests`, each with the mutation you actually watched
+  fail. Then `tools/re-produce.sh`, which re-produces this engine from the factory commit the
+  record names — one command, and the only thing that brings the generated C# and
+  `provenance.json` back into step with the overlay together. Regenerating the C# alone does not:
+  `provenance.json` is written by `factory produce` from a factory checkout and by nothing else,
+  so the record would still hash the old bytes and would still hash the overlay as it was before
+  your edit, and the gate fails saying so.
 - Run the gate, whole: `./scripts/validate.sh full`. Paste what it printed.
 - Open one pull request that closes exactly that one issue, filling in every section of
   `.github/pull_request_template.md` with real command output. `tools/pr-policy.py` checks it as a
@@ -61,14 +86,51 @@ You do not need to read the whole corpus, and you should not try. The packet is 
   upstream map defect and stop (`AGENTS.md` §5). Do not make the engine disagree with the
   published map, and do not edit the map.
 - **Do not edit `corpus/`, a baseline, a hash, or the gate** to make a check pass.
-- **Never hand-edit `provenance.json`, anything under `backlog/`, or anything under `Generated/`.**
-  The gate hashes all three against the record. Editing one so the gate goes green is the same
-  defect as editing a baseline: it is the check you are changing, not the thing it checks.
+- **Never hand-edit `provenance.json` or anything under `Generated/`.** The gate hashes everything
+  under `Generated/` against the record, and holds the record itself to the factory's canonical
+  form — it cannot hash itself, so an edit that kept every other hash true is caught by the
+  serialisation instead. Editing either so the gate goes green is the same defect as editing a
+  baseline: it is the check you are changing, not the thing it checks. This engine has no
+  `backlog/` to edit either — the backlog lives in the issues, and `factory backlog --render`
+  prints it from the map and `overlay/` whenever you want to read it.
 - **Do not widen the change.** An unrelated defect you notice is a new issue, not a second commit
   on this branch. Say you found it; do not fix it here.
 - **Do not bulk-stage.** `git add <explicit paths>`, never `git add -A` or `git add .`.
 - **Do not implement a rule from memory.** Your recollection of this subject matter is not a
   source, and it arrives fluent and cited, which is what makes it dangerous.
+
+## When you are the repair attempt
+
+You may be started with a brief from `tools/repair-packet.py` instead of a bare issue number. Then
+the work is already on the branch and the worktree already exists: read the brief, read the entry
+packet again if a finding is about how the rule is read, and change exactly what the findings
+name.
+
+- **Do not reconstruct what the last attempt did.** The brief leaves it out on purpose. The diff
+  is in the worktree if you need it; the reasoning is not evidence and is not there.
+- **Do not argue a finding down.** If a finding is wrong, say why with the map's bytes. The packet
+  and the map decide, never an implementer's explanation — yours or the last one's.
+- A finding that is not in the brief is not yours to fix on this branch. Say you found it.
+- **Commit the attestation the brief names** under `reviews/attestations/`, with the repair. It is
+  what bounds the next review: `tools/review-scope.py`'s `delta` compares it with your head and hands
+  the reviewer only the claims your repair could have changed. Your commit moves the head, so every
+  verdict recorded before it stops applying; what survives is the evidence your change provably did
+  not touch.
+- **Redo the adversarial self-review of every entry the repair touches.** The record is bound to
+  the entry's claim digest, and a repair that changes anything the entry rests on makes it stale;
+  the packet is refused until it is current (`docs/adversarial-self-review.md`).
+
+## Before you ask for review: attack it yourself
+
+No semantic packet is written until every entry it names has a committed
+`reviews/self-review/<entry id>.json` answering all twenty classes of
+[`docs/adversarial-self-review.md`](../../docs/adversarial-self-review.md) — integer extremes,
+overflow, empty collections, crafted input, invalid construction, phase boundaries, order
+dependence, partial mutation before refusal, exception leakage, refusal classification, and the
+rest — each with the tests that attack it or a reason it does not apply. Start from
+`tools/review-scope.py self-review <entry id> --package-map <path>`, which prints the skeleton and
+the claim digest to bind it to, and finish with `--check`. The reviewer is the most expensive agent
+this team runs; what it finds should be what only a reviewer can.
 
 ## When you are done
 

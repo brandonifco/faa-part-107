@@ -1,0 +1,57 @@
+{
+  "status": "implemented",
+  "implementedIn": {
+    "ruleset": "faa-part-107",
+    "version": 1
+  },
+  "tests": [
+    {
+      "test": "MovingAircraftOperationEntryPointTests.Operated_from_a_moving_aircraft_it_resolves_prohibited_citing_107_25",
+      "mutation": "MovingAircraft.Operation never prohibited anything (`Prohibited: false` for `Prohibited: stated` in the MovingAircraftFinding it constructs), so operation from a moving aircraft resolved as not prohibited; this test went red. It went red too with MovingAircraftFinding.Authority citing speed-limit's `§ 107.51(a)` (`MapEntries.SpeedLimit.Locator` for `MapEntries.MovingAircraftOperation.Locator`). Re-observed and reworded for #93, which renames the local the rule reads from `fromAMovingAircraft` to `stated` (`docs/decisions/0008-the-waiver-gate-precedes-every-other-demand.md`): over the whole suite the substitution reddens four -- `Failed!  - Failed:     4, Passed:   739, Skipped:     0, Total:   743` on both net8.0 and net10.0 -- this test, MovingAircraftOperationEntryPointTests.Stated_that_no_waiver_is_in_force_the_rule_is_evaluated_and_the_statement_recorded, OperationEvaluatorTests.A_fact_not_stated_is_not_read_as_false_and_not_read_as_true, and ONE row of OperationEvaluatorTests.Each_verdict_is_read_from_its_own_rule_in_its_own_direction, the `expected: Violated` one. A constant `Prohibited` can only redden the theory row whose expectation it contradicts; the `expected: Satisfied` row is `Prohibited: true`'s, recorded under Operated_from_an_aircraft_that_is_not_moving_107_25_a_does_not_prohibit_it. The two substitutions happen to give the same totals and do not give the same red set."
+    },
+    {
+      "test": "MovingAircraftOperationEntryPointTests.Operated_from_an_aircraft_that_is_not_moving_107_25_a_does_not_prohibit_it",
+      "mutation": "MovingAircraft.Operation prohibited every operation (`Prohibited: true` for `Prohibited: stated`), so an aircraft the caller states is not moving was still prohibited — § 107.25(a) reaching further than \"a moving aircraft\"; this test went red. Re-observed and reworded for #93, which renames the local the rule reads from `fromAMovingAircraft` to `stated` (`docs/decisions/0008-the-waiver-gate-precedes-every-other-demand.md`): over the whole suite the substitution reddens four -- `Failed!  - Failed:     4, Passed:   739, Skipped:     0, Total:   743` on both net8.0 and net10.0 -- this test, MovingAircraftOperationEntryPointTests.Stated_that_no_waiver_is_in_force_the_rule_is_evaluated_and_the_statement_recorded, OperationEvaluatorTests.A_fact_not_stated_is_not_read_as_false_and_not_read_as_true, and ONE row of OperationEvaluatorTests.Each_verdict_is_read_from_its_own_rule_in_its_own_direction, the `expected: Satisfied` one — the opposite row from `Prohibited: false`'s, recorded under Operated_from_a_moving_aircraft_it_resolves_prohibited_citing_107_25. The two substitutions happen to give the same totals and do not give the same red set."
+    },
+    {
+      "test": "MovingAircraftOperationEntryPointTests.The_entry_reads_only_whether_the_aircraft_is_moving_and_no_condition_that_qualifies_only_the_vehicle_limb",
+      "mutation": "MovingAircraftOperationRequest gained a third settable input, § 107.25(b)'s condition (`public bool? OverASparselyPopulatedArea { get; init; }` added beside FromAMovingAircraft and Waiver), so the aircraft limb offered a condition that qualifies only the vehicle limb; this test went red (Failed: 1, Passed: 0). It went red too with MovingAircraftFinding.ToString importing that condition into the answer (\"... is prohibited unless it is over a sparsely populated area\" for \"... is prohibited\")."
+    },
+    {
+      "test": "MovingAircraftOperationEntryPointTests.While_a_waiver_of_107_25_is_stated_in_force_it_declines_OutsideCurrentScope_citing_107_205_and_names_this_entry",
+      "mutation": "MovingAircraft.Operation named the other limb of § 107.25 as the suspended entry (`MapEntries.MovingVehicleOperation` for `MapEntries.MovingAircraftOperation` in the call to Waivers.Suspension), so the decline's Attempted named moving-vehicle-operation rather than moving-aircraft-operation — the two entries share the locator `§ 107.25`, so only Attempted tells them apart; both theory cases went red (Failed: 2, Passed: 0). It went red too with Operation handing the gate a statement that no waiver is in force (`waiver with { InForce = false }` for `waiver`), so a stated waiver was not honoured and the entry resolved (Failed: 2, Passed: 0)."
+    },
+    {
+      "test": "MovingAircraftOperationEntryPointTests.Stated_that_no_waiver_is_in_force_the_rule_is_evaluated_and_the_statement_recorded",
+      "mutation": "MovingAircraft.Operation handed the gate a statement that a waiver is in force whatever the caller said (`waiver with { InForce = true }` for `waiver`), so a statement that none is held still declined OutsideCurrentScope instead of being evaluated and recorded; this test went red (Failed: 1, Passed: 1)."
+    },
+    {
+      "test": "MovingAircraftOperationEntryPointTests.Without_a_waiver_statement_it_refuses_rather_than_infer_one",
+      "mutation": "Handlers.MovingAircraftOperation defaulted a missing statement to none held (`request.Waiver ?? WaiverStatement.NoneHeld(MovingAircraft.Regulation, \"the engine\")` for `Demand(request.Waiver, ...)`); this test went red (Failed: 1, Passed: 5 — the other five are the same-named tests of the other implemented entries, which stayed green)."
+    },
+    {
+      "test": "MovingAircraftOperationEntryPointTests.Without_a_statement_whether_the_aircraft_is_moving_it_refuses_rather_than_infer_one",
+      "mutation": "Handlers.MovingAircraftOperation inferred the fact the rule turns on (`request.FromAMovingAircraft ?? false` for `Demand(request.FromAMovingAircraft, ...)`), so a request that says nothing about the aircraft resolved as not prohibited instead of refusing; this test went red (Failed: 1, Passed: 0)."
+    },
+    {
+      "test": "MovingAircraftOperationEntryPointTests.A_waiver_statement_about_another_regulation_is_refused",
+      "mutation": "MovingAircraft.Operation compared the statement's regulation with itself (`waiver.Regulation` for `Regulation` in the call to Waivers.Suspension), so a waiver of § 107.51 suspended § 107.25(a); this test went red (Failed: 1, Passed: 4)."
+    },
+    {
+      "test": "MovingAircraftOperationEntryPointTests.The_dictionary_dispatch_refuses_rather_than_infer_the_facts",
+      "mutation": "Handlers.Missing stopped naming the entry whose request was short (`$\"resolving a map entry needs its request's {name}, and it was not set\"` for `$\"resolving the map entry '{entryId}' needs its request's {name}, and it was not set\"`), so the dictionary dispatch refused without saying which entry it was resolving; this test went red (Failed: 1, Passed: 0)."
+    },
+    {
+      "test": "OperationEvaluatorTests.A_fact_not_stated_is_not_read_as_false_and_not_read_as_true",
+      "mutation": "§ 107.25(a)'s rule read its own constituent backwards (`Prohibited: !stated` for `Prohibited: stated` in `MovingAircraft.Operation`), so an operation the caller states is from a moving aircraft was reported as not prohibited and one the caller states is not was reported as prohibited; this test went red on `Assert.Equal(RequirementState.Satisfied, no.State)` and `Assert.Equal(RequirementState.Violated, yes.State)` -- `Failed!  - Failed:     6, Passed:   737, Skipped:     0, Total:   743` on both net8.0 and net10.0, together with MovingAircraftOperationEntryPointTests.Operated_from_a_moving_aircraft_it_resolves_prohibited_citing_107_25, MovingAircraftOperationEntryPointTests.Operated_from_an_aircraft_that_is_not_moving_107_25_a_does_not_prohibit_it, MovingAircraftOperationEntryPointTests.Stated_that_no_waiver_is_in_force_the_rule_is_evaluated_and_the_statement_recorded, and both rows of OperationEvaluatorTests.Each_verdict_is_read_from_its_own_rule_in_its_own_direction for this entry. Re-observed and reworded for #93: the fact is now demanded after the § 107.205 gate and carried in a local, so what the rule writes is `Prohibited: stated` where it used to write `Prohibited: fromAMovingAircraft` (`docs/decisions/0008-the-waiver-gate-precedes-every-other-demand.md`)."
+    },
+    {
+      "test": "WaiverGateOrderingTests.A_waived_request_that_describes_nothing_else_is_declined_OutsideCurrentScope_citing_107_205",
+      "mutation": "`Handlers.MovingAircraftOperation` demanded the typed input ahead of the rule's § 107.205 gate -- the ordering thirteen of the fifteen gated entries took before #93 -- by wrapping the argument back up (`Demand(request.FromAMovingAircraft, request.EntryId, nameof(request.FromAMovingAircraft))` for `request.FromAMovingAircraft`). A caller stating a certificate of waiver of § 107.25 in force and describing nothing else was then refused `ArgumentException` naming `FromAMovingAircraft` -- `FactRequired`, `MissingInput=FromAMovingAircraft`, filed under `Outstanding`, which `OperationEvaluation.Outstanding` documents as \"everything the caller still owes this engine\" -- instead of being declined `OutsideCurrentScope` citing § 107.205 (`docs/decisions/0008-the-waiver-gate-precedes-every-other-demand.md`). So this test, which pins one answer for a waived request, the same across every gated entry, went red on both target frameworks: `Failed!  - Failed:     4, Passed:   739, Skipped:     0, Total:   743` for net10.0 and the same figures for net8.0. The others red with it were `WaiverGateOrderingTests.A_waived_request_is_never_asked_for_a_typed_input_the_waiver_has_made_irrelevant`; `WaiverGateOrderingTests.Nothing_a_stated_waiver_suspends_is_reported_as_something_the_caller_still_owes`; `MovingAircraftOperationEntryPointTests.The_dictionary_dispatch_refuses_rather_than_infer_the_facts`."
+    },
+    {
+      "test": "WaiverGateOrderingTests.A_waived_request_is_never_asked_for_a_typed_input_the_waiver_has_made_irrelevant",
+      "mutation": "`Handlers.MovingAircraftOperation` demanded the typed input ahead of the rule's § 107.205 gate -- the ordering thirteen of the fifteen gated entries took before #93 -- by wrapping the argument back up (`Demand(request.FromAMovingAircraft, request.EntryId, nameof(request.FromAMovingAircraft))` for `request.FromAMovingAircraft`). A caller stating a certificate of waiver of § 107.25 in force and describing nothing else was then refused `ArgumentException` naming `FromAMovingAircraft` -- `FactRequired`, `MissingInput=FromAMovingAircraft`, filed under `Outstanding`, which `OperationEvaluation.Outstanding` documents as \"everything the caller still owes this engine\" -- instead of being declined `OutsideCurrentScope` citing § 107.205 (`docs/decisions/0008-the-waiver-gate-precedes-every-other-demand.md`). So this test, which pins a waived entry asking the caller for nothing, went red on both target frameworks: `Failed!  - Failed:     4, Passed:   739, Skipped:     0, Total:   743` for net10.0 and the same figures for net8.0. The others red with it were `WaiverGateOrderingTests.A_waived_request_that_describes_nothing_else_is_declined_OutsideCurrentScope_citing_107_205`; `WaiverGateOrderingTests.Nothing_a_stated_waiver_suspends_is_reported_as_something_the_caller_still_owes`; `MovingAircraftOperationEntryPointTests.The_dictionary_dispatch_refuses_rather_than_infer_the_facts`."
+    }
+  ]
+}

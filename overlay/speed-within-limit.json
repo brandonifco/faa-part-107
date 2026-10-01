@@ -1,0 +1,53 @@
+{
+  "status": "implemented",
+  "implementedIn": {
+    "ruleset": "faa-part-107",
+    "version": 1
+  },
+  "tests": [
+    {
+      "test": "SpeedWithinLimitEntryPointTests.A_groundspeed_exceeding_neither_figure_resolves_within_the_limit_citing_107_51_a",
+      "mutation": "Groundspeed.Exceeds counted equality as exceeding (`>=` for `>`), so 100 mph was beyond the 100 mph figure and declined; this test went red. It went red too with GroundspeedFinding.Authority citing `§ 107.51` rather than the entry's `§ 107.51(a)`."
+    },
+    {
+      "test": "SpeedWithinLimitEntryPointTests.A_groundspeed_exceeding_both_figures_resolves_beyond_the_limit_citing_107_51_a",
+      "mutation": "Speed.Within reported every comparable groundspeed within the limit (`new GroundspeedFinding(groundspeed, true, limit)` for `!beyondKnots`); this test went red. It went red too with the knots figure printed as 88."
+    },
+    {
+      "test": "SpeedWithinLimitEntryPointTests.A_groundspeed_beyond_100_mph_and_not_beyond_87_knots_declines_RequiresInterpretation_citing_speed_limit_107_51_a",
+      "mutation": "Speed.Within let the knots figure govern (`beyondKnots == beyondKnots` for `beyondKnots == beyondMilesPerHour`), so 87 knots and 100.01 mph resolved within the limit instead of declining; this test went red. It went red too with the miles-per-hour figure governing, and with the decline citing operating-limitations' `§ 107.51 introductory text`. Citing speed-within-limit's own locator did NOT turn it red: both entries cite `§ 107.51(a)`, so the locator cannot tell them apart and only Attempted names speed-limit."
+    },
+    {
+      "test": "SpeedWithinLimitEntryPointTests.While_a_waiver_of_107_51_is_stated_in_force_it_declines_OutsideCurrentScope_citing_107_205_whatever_the_groundspeed",
+      "mutation": "Speed.Within skipped its own gate check (`is { } suspended && suspended.Reason == UnresolvedReason.UnsupportedRule`), so the decline came from speed-limit's gate and named speed-limit rather than speed-within-limit; this test went red. It went red too with Waivers.Suspension ignoring the statement (`return false ? ...`)."
+    },
+    {
+      "test": "SpeedWithinLimitEntryPointTests.Stated_that_no_waiver_is_in_force_the_rule_is_evaluated_and_the_statement_recorded",
+      "mutation": "Waivers.Suspension treated every statement as a waiver in force (`return true ? ...` for `return statement.InForce ? ...`), so a statement that none is held still declined OutsideCurrentScope; this test went red."
+    },
+    {
+      "test": "SpeedWithinLimitEntryPointTests.Without_a_waiver_statement_it_refuses_rather_than_infer_one",
+      "mutation": "Handlers.SpeedWithinLimit defaulted a missing statement to none held (`request.Waiver ?? WaiverStatement.NoneHeld(Speed.Regulation, \"the engine\")` for `Demand(request.Waiver, ...)`); this test went red."
+    },
+    {
+      "test": "OperationEvaluatorTests.A_waiver_statement_not_made_is_a_demand_on_the_caller_and_never_an_assumed_answer",
+      "mutation": "this entry's handler answered from a waiver statement the caller never made (`request.Waiver ?? WaiverStatement.NoneHeld(Speed.Regulation, \"the engine\")` for `Demand(request.Waiver, request.EntryId, nameof(request.Waiver))`), so silence about § 107.51 was read as no certificate of waiver being in force; this test went red on `Assert.Equal(RequirementState.FactRequired, outcome.State)` -- `Failed!  - Failed:     2, Passed:   682, Skipped:     0, Total:   684` on both net8.0 and net10.0, together with SpeedWithinLimitEntryPointTests.Without_a_waiver_statement_it_refuses_rather_than_infer_one"
+    },
+    {
+      "test": "SpeedWithinLimitEntryPointTests.Without_a_groundspeed_it_refuses",
+      "mutation": "this entry's rule answered from a groundspeed the caller never stated (`var stated = groundspeed ?? Groundspeed.InKnots(0m);` for `Demands.Of(groundspeed, MapEntries.SpeedWithinLimit, nameof(Requests.SpeedWithinLimitRequest.Groundspeed))`), so a request with no groundspeed resolved within the limit instead of refusing; this test went red -- `Failed!  - Failed:     2, Passed:   741, Skipped:     0, Total:   743` on both net8.0 and net10.0, together with `WaiverGateOrderingTests.Stated_that_no_waiver_is_in_force_the_same_request_is_refused_for_the_input_the_entry_owes` for this entry. Re-observed and reworded for #93: the demand this row used to quote was the handler's (`Demand(request.Groundspeed, ...)`), and under `docs/decisions/0008-the-waiver-gate-precedes-every-other-demand.md` the handler hands the groundspeed over unresolved and the rule demands it after the § 107.205 gate -- so the mutation moves to the rule and reddens one more test than it did."
+    },
+    {
+      "test": "WaiverGateOrderingTests.A_waived_request_that_describes_nothing_else_is_declined_OutsideCurrentScope_citing_107_205",
+      "mutation": "`Handlers.SpeedWithinLimit` demanded the typed input ahead of the rule's § 107.205 gate -- the ordering thirteen of the fifteen gated entries took before #93 -- by wrapping the argument back up (`Demand(request.Groundspeed, request.EntryId, nameof(request.Groundspeed))` for `request.Groundspeed`). A caller stating a certificate of waiver of § 107.51 in force and describing nothing else was then refused `ArgumentException` naming `Groundspeed` -- `FactRequired`, `MissingInput=Groundspeed`, filed under `Outstanding`, which `OperationEvaluation.Outstanding` documents as \"everything the caller still owes this engine\" -- instead of being declined `OutsideCurrentScope` citing § 107.205 (`docs/decisions/0008-the-waiver-gate-precedes-every-other-demand.md`). So this test, which pins one answer for a waived request, the same across every gated entry, went red on both target frameworks: `Failed!  - Failed:     3, Passed:   740, Skipped:     0, Total:   743` for net10.0 and the same figures for net8.0. The others red with it were `WaiverGateOrderingTests.Nothing_a_stated_waiver_suspends_is_reported_as_something_the_caller_still_owes`; `WaiverGateOrderingTests.A_waived_request_is_never_asked_for_a_typed_input_the_waiver_has_made_irrelevant`."
+    },
+    {
+      "test": "WaiverGateOrderingTests.A_waived_request_is_never_asked_for_a_typed_input_the_waiver_has_made_irrelevant",
+      "mutation": "`Handlers.SpeedWithinLimit` demanded the typed input ahead of the rule's § 107.205 gate -- the ordering thirteen of the fifteen gated entries took before #93 -- by wrapping the argument back up (`Demand(request.Groundspeed, request.EntryId, nameof(request.Groundspeed))` for `request.Groundspeed`). A caller stating a certificate of waiver of § 107.51 in force and describing nothing else was then refused `ArgumentException` naming `Groundspeed` -- `FactRequired`, `MissingInput=Groundspeed`, filed under `Outstanding`, which `OperationEvaluation.Outstanding` documents as \"everything the caller still owes this engine\" -- instead of being declined `OutsideCurrentScope` citing § 107.205 (`docs/decisions/0008-the-waiver-gate-precedes-every-other-demand.md`). So this test, which pins a waived entry asking the caller for nothing, went red on both target frameworks: `Failed!  - Failed:     3, Passed:   740, Skipped:     0, Total:   743` for net10.0 and the same figures for net8.0. The others red with it were `WaiverGateOrderingTests.Nothing_a_stated_waiver_suspends_is_reported_as_something_the_caller_still_owes`; `WaiverGateOrderingTests.A_waived_request_that_describes_nothing_else_is_declined_OutsideCurrentScope_citing_107_205`."
+    },
+    {
+      "test": "WaiverGateOrderingTests.Stated_that_no_waiver_is_in_force_the_same_request_is_refused_for_the_input_the_entry_owes",
+      "mutation": "`Speed.Within` stopped demanding the groundspeed after the gate and answered from a default instead (`var stated = groundspeed ?? Groundspeed.InKnots(0m);` for `Demands.Of(groundspeed, MapEntries.SpeedWithinLimit, nameof(Requests.SpeedWithinLimitRequest.Groundspeed))`), so a caller stating that no waiver of § 107.51 is in force and no groundspeed at all was told the operation is within the limit rather than being refused for the fact it owes -- the failure mode moving the gate could have introduced, and the one this test exists to rule out. It went red on both target frameworks: `Failed!  - Failed:     2, Passed:   741, Skipped:     0, Total:   743` for net10.0 and the same figures for net8.0, on `Assert.Throws() Failure: No exception was thrown`, `Expected: typeof(System.ArgumentException)`, together with `SpeedWithinLimitEntryPointTests.Without_a_groundspeed_it_refuses`."
+    }
+  ]
+}
