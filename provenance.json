@@ -19,8 +19,8 @@
   },
   "distribution": "public",
   "factory": {
-    "version": "0.0.0-dev+0f894dd47c31",
-    "commit": "0f894dd47c31b81fe4e58d5db232152aaee57bf2",
+    "version": "1.6.0",
+    "commit": "24fd802ba4f5b8a039f848c9387059a8c2aa4414",
     "dirty": false
   },
   "maps": [
@@ -77,7 +77,15 @@
       },
       {
         "path": "tools/factory/__main__.py",
-        "sha256": "a900026a1084fc270be3b8d3089d74242a9fcb54106d3303c1ba0f493abca7c2"
+        "sha256": "e97a462dc5a25aea9e57516f60977281287b5cd13381e6d143d61ec93f13d3ad"
+      },
+      {
+        "path": "tools/factory/acceptance.py",
+        "sha256": "2b9139a868da41723fca82f4351e25f99cce39006a86112999af193001b3a8d8"
+      },
+      {
+        "path": "tools/factory/acceptancecs.py",
+        "sha256": "fce826ed401677458c260de55c04e9fe1a1ea56925a73abec8802f7e0777819a"
       },
       {
         "path": "tools/factory/agentrails.py",
@@ -85,7 +93,7 @@
       },
       {
         "path": "tools/factory/backlog.py",
-        "sha256": "64208c9464b221e13041cb3299c46b8017a53ffaf6cff1159477e7d0327b7a91"
+        "sha256": "af24eee3361fb23f612d95e2c4c89c21f99202ccfc628c66dd13fba0c4c5d774"
       },
       {
         "path": "tools/factory/compose.py",
@@ -93,7 +101,7 @@
       },
       {
         "path": "tools/factory/contracts.py",
-        "sha256": "6f719acb7426c7b7d932385abdc817ca68784fc7e3c4753b1933846fe41e829a"
+        "sha256": "2b0938184d187bf931aa74b19ef53ec59f7617d264d82f9538a6681282b23ed1"
       },
       {
         "path": "tools/factory/correspondence.py",
@@ -109,11 +117,11 @@
       },
       {
         "path": "tools/factory/gate.py",
-        "sha256": "d02b67b09fca32a3a9e15625d0da9da5e4077f91bf2a91cd5e1ce2466e0f892d"
+        "sha256": "92e6ca53c4825d2fb48878f814644561927fb5fff045aa08df85d031f8afbf95"
       },
       {
         "path": "tools/factory/generate.py",
-        "sha256": "ca5f9f116c2d4dc18ae50096991c9b07760e74a071da617c623ab692ca794146"
+        "sha256": "7a0a1b370901665531a36999de148a1ee768eda8b7a318667f4de12fa6caa23d"
       },
       {
         "path": "tools/factory/intake.py",
@@ -125,7 +133,7 @@
       },
       {
         "path": "tools/factory/ownership.py",
-        "sha256": "6084605e5efa9c8fb70a95c559022e2177dc56b548bc8d2adefcc29062a7eb87"
+        "sha256": "c22262cf119dd4cdf05ab44e48c6ce1534412c8c1d5c8bd34940567bb6d5e791"
       },
       {
         "path": "tools/factory/pins.py",
@@ -133,7 +141,7 @@
       },
       {
         "path": "tools/factory/provenance.py",
-        "sha256": "bfe89f109e80901b72e1c2a875232009e5e45e3789833b577d077471a276b994"
+        "sha256": "bcfafde6a50c8b5d1f98433ae557eb9aacd93650bc5c7f73e1f31b3f381cc42e"
       },
       {
         "path": "tools/factory/rails.py",
@@ -141,7 +149,7 @@
       },
       {
         "path": "tools/factory/recipe/engine-gate.py",
-        "sha256": "40076ad702419d05e148a1a364da7d7008cd22a9ccd45aa64bf4e9d4bcf77866"
+        "sha256": "cbf6aaa5e632800bf6c49a918bfa8007b840ef14fdf4be846af6fb38de91aa13"
       },
       {
         "path": "tools/factory/recipe/map-overlay.py",
@@ -149,7 +157,7 @@
       },
       {
         "path": "tools/factory/recipe/rails/AGENTS.md",
-        "sha256": "0fc0caeb0b289d9a4ed6c3cc397529b746f07ed7ac3bebbd8cc219f85e5f51f0"
+        "sha256": "bac17949671c440fa89fe655cd990496cf0debb59fa8ca81b5bd797275594fd0"
       },
       {
         "path": "tools/factory/recipe/rails/CLAUDE.md",
@@ -157,23 +165,23 @@
       },
       {
         "path": "tools/factory/recipe/rails/adversarial-self-review.md",
-        "sha256": "9faff906492d809a701516c2a741fb89d5563e646b7a759e0d27bb64f08c3b06"
+        "sha256": "8e1c359f8aaabc70720116819fe8870ca0ddbc7e34c2235f7314e68d93810964"
       },
       {
         "path": "tools/factory/recipe/rails/agent-team.md",
-        "sha256": "e1fd3fe7e2a27ba99d485e946a00b893b2e2e39b6fece2cca001b1f9fd82c40d"
+        "sha256": "d1ee84c9c31e5f44a4be7111f686c07b89b5a7fd318e458d287ab1f0b8d6bdbe"
       },
       {
         "path": "tools/factory/recipe/rails/agents/engine-dev.md",
-        "sha256": "10ac2f2159b2b93d65f6665274453902fa252c56f2d2cd0707ac76fda2e2d9fe"
+        "sha256": "8fa4ba9fee9989fce1f9647b333e332a068ece02cf3eee315b3bdb92ac8e7dfd"
       },
       {
         "path": "tools/factory/recipe/rails/agents/repo-steward.md",
-        "sha256": "df19aaa2a13662ff88c556e11b49b4033c4efa188386e5528631142aa7579834"
+        "sha256": "00082b74a007eba0f7d6b7b541cf074431bc8aced8733574ff947161f4e8534d"
       },
       {
         "path": "tools/factory/recipe/rails/agents/rules-conformance.md",
-        "sha256": "a86b4d07daccede53261077c430114fae3236d7611e7dfc287431caded6ecc04"
+        "sha256": "241ff918ba8221b27afaf7cceeafd157bcba17178125a13dc0c6f2ac64498940"
       },
       {
         "path": "tools/factory/recipe/rails/editorconfig",
@@ -185,11 +193,11 @@
       },
       {
         "path": "tools/factory/recipe/rails/pull_request_template.md",
-        "sha256": "3a343651e908d6b6bc36594fa663c2aee9e88996147516173c39e3bea63ede78"
+        "sha256": "bb75cd6f5877d65d65cccf6e0cbfdddf86112899ecb11e6bbe61a77a9e459740"
       },
       {
         "path": "tools/factory/recipe/rails/review-evidence.md",
-        "sha256": "acd33f7680250b25b17620781c9cb0eff18b05f6fe693f55fd878e459651c3dd"
+        "sha256": "f829299ce4c7a6deff646d6196378da5ff8cf9d5ee49f2e53d3f58a54254d305"
       },
       {
         "path": "tools/factory/recipe/rails/settings.json",
@@ -201,7 +209,7 @@
       },
       {
         "path": "tools/factory/recipe/rails/tools/conformance-gate.py",
-        "sha256": "efa4ebba282b25abe388aea2721633d8565de22faaf591e09361c2ac1759c031"
+        "sha256": "3fafa402a1c56bdcdedc7d9411e6d13bec638752ecdc81f11950790d537c44d7"
       },
       {
         "path": "tools/factory/recipe/rails/tools/dispatch-agent.sh",
@@ -213,7 +221,7 @@
       },
       {
         "path": "tools/factory/recipe/rails/tools/mutate.py",
-        "sha256": "d33f7ddedc923388af4582ffb6c04a1434c09f695738ca34f191839f21847901"
+        "sha256": "eb722639671ba46c0703f699dc85177fe88f52e00ced99ccf4e90f54a30c49eb"
       },
       {
         "path": "tools/factory/recipe/rails/tools/new-issue.sh",
@@ -225,7 +233,7 @@
       },
       {
         "path": "tools/factory/recipe/rails/tools/pr-policy.py",
-        "sha256": "49e4845fb7d07855fe719c353b9493da9802f4bf80be3465a2ae8c991d957938"
+        "sha256": "80fda4f86822f5c2b9c8cd4e8a1b23f85b30a2d32b681749e788821d9d78bd07"
       },
       {
         "path": "tools/factory/recipe/rails/tools/re-produce.sh",
@@ -233,11 +241,11 @@
       },
       {
         "path": "tools/factory/recipe/rails/tools/record-verdict.py",
-        "sha256": "9dc1d7aafa536a37278bf526693893e106a43c43183bdcccddceac4e8fe45231"
+        "sha256": "8e7ba67c30672e69e714ccd801a9b5a59ba18d1aa63c08b9b50b385264672e75"
       },
       {
         "path": "tools/factory/recipe/rails/tools/repair-packet.py",
-        "sha256": "67e36ff58616171e5222ac3449bee618b13bba840f376069ecfcc7d577f8bc9f"
+        "sha256": "bb9158eaf9132975677d9be5da5150f652ac422226f666dcfffaa3d9af18a7da"
       },
       {
         "path": "tools/factory/recipe/rails/tools/requeue-gate.py",
@@ -245,23 +253,23 @@
       },
       {
         "path": "tools/factory/recipe/rails/tools/review-packet.py",
-        "sha256": "09a783f9e0a7a6e995167389f0c8398da73d3e4f44653fe451e2a8e47cacc291"
+        "sha256": "cf48164f9f65042716b1dae08436c3573dc26073fc6f22053dc1899de6e58a85"
       },
       {
         "path": "tools/factory/recipe/rails/tools/review-scope.py",
-        "sha256": "84a69642db7a30efe6729d9557725794567462354072655ff4c223c7f6cbccf4"
+        "sha256": "e96aeaf830d5bc23c4dcaa25e29fd91ac8c4be6b3ddba6a6618f4ab184a3e155"
       },
       {
         "path": "tools/factory/recipe/rails/workflows/conformance-gate.yml",
-        "sha256": "d66ae8a37a37874369ac962fbecbf9ac1b98cf0246541a61ea5089b23f8ea702"
+        "sha256": "4a18b24d803fa8a7e97ba018ab3ae4d0c9ed59fcbbc615963bbf024503b49c20"
       },
       {
         "path": "tools/factory/recipe/rails/workflows/pr-policy.yml",
-        "sha256": "caa3394a473d5fdd45b274176d8e28c48d9f5425176318194ba68fbea8453fa2"
+        "sha256": "ebf84bcf01619ae578417767d0a984102dfcb00a67b6778b4527a409a3722b6e"
       },
       {
         "path": "tools/factory/recipe/rails/workflows/verdict-requeue.yml",
-        "sha256": "8ab0d0de2df9777f3e545fedb66c118816e3c658a0fce87db63261967332780a"
+        "sha256": "e12f280ee6e9e70e413f59cc6df35d4eda26a2bd2667ba4be5e954d2fecbb4df"
       },
       {
         "path": "tools/factory/recipe/validate.sh",
@@ -269,7 +277,7 @@
       },
       {
         "path": "tools/factory/recipe/validate.yml",
-        "sha256": "c0ff0ca60d5d875d49c66417b06da72df819529d2c73eed12cadab2ca007e56f"
+        "sha256": "62d40d41634466099292d60ffd2a685edff56369fbf4fc4d060accc751d119e4"
       },
       {
         "path": "tools/factory/registry.py",
@@ -277,11 +285,15 @@
       },
       {
         "path": "tools/factory/repository.py",
-        "sha256": "016ebf6ce89886b4fc1add7a0c9dcfacaec7ced4eacdc15bee1dba1ad19fe5b1"
+        "sha256": "54c59932f00115d95a5e2b9352d8a6a1d0ea52f4ba61a36e4bb6b7d995d63f27"
+      },
+      {
+        "path": "tools/factory/reviewclass.py",
+        "sha256": "f6e0af9bb7d329d7c9243c91ab6f15aac09253f14fdb36c254c685caf1f43a1f"
       },
       {
         "path": "tools/factory/reviewscope.py",
-        "sha256": "24019953e52e8e2732414171df2debac118d757d6f6fba3618f2219ca0848105"
+        "sha256": "e2241d46ee9e154ad9816a8e6623ad1733bc2d8ccfcbc677c7691f48c4d78701"
       },
       {
         "path": "tools/factory/rulescorpus.py",
@@ -293,11 +305,23 @@
       },
       {
         "path": "tools/factory/scaffold.py",
-        "sha256": "570e95a110f34224913ce8b8ab5089313a47f8f5bf815e2249784b7dfa439c2f"
+        "sha256": "a14df9891f378bf171ba845219b6dab326b28fefdcaad52a8fb5770130f595da"
       },
       {
         "path": "tools/factory/semantics.py",
-        "sha256": "28d64330fb1034e15eb177baaf498c368ffa5cc9bb326c76f7038cbe46a677d4"
+        "sha256": "17eba290b4242a420654a8e68485d00a0f09d589e8601a3ba90fa181daeb0b24"
+      },
+      {
+        "path": "tools/factory/status.py",
+        "sha256": "974a369ce4ce317de302d6bc412ade2764b2bdbe0f38f92ac4e2d4203d64d6b3"
+      },
+      {
+        "path": "tools/factory/trace.py",
+        "sha256": "107dc97e634171256a2409d7962e6a33d80d9be886f7c2260e8281a4e73a9b81"
+      },
+      {
+        "path": "tools/factory/tracereport.py",
+        "sha256": "91d60e786187a479cf44c5e8be7871f38a71713f2df8a7401b09484b15d1ba74"
       },
       {
         "path": "tools/factory/transaction.py",
@@ -309,12 +333,12 @@
       }
     ],
     "digestRule": "sha256 over UTF-8 lines '<sha256>  <path>\\n', one per recipe file, in ascending byte order of path",
-    "digest": "ffa871d83a88789b07d0b1651caa1ef86d9aa7d9a9ba6e248bb05b1d808290cd"
+    "digest": "0e2652ff8028f75ee147e4550f9298fddab2d4501a8d083c68268fe80c27ebe2"
   },
   "generated": [
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "c0ff0ca60d5d875d49c66417b06da72df819529d2c73eed12cadab2ca007e56f"
+      "sha256": "62d40d41634466099292d60ffd2a685edff56369fbf4fc4d060accc751d119e4"
     },
     {
       "path": "RulesFactory.Packages.g.props",
@@ -334,7 +358,15 @@
     },
     {
       "path": "scripts/engine-gate.py",
-      "sha256": "40076ad702419d05e148a1a364da7d7008cd22a9ccd45aa64bf4e9d4bcf77866"
+      "sha256": "cbf6aaa5e632800bf6c49a918bfa8007b840ef14fdf4be846af6fb38de91aa13"
+    },
+    {
+      "path": "scripts/factory/acceptance.py",
+      "sha256": "2b9139a868da41723fca82f4351e25f99cce39006a86112999af193001b3a8d8"
+    },
+    {
+      "path": "scripts/factory/acceptancecs.py",
+      "sha256": "fce826ed401677458c260de55c04e9fe1a1ea56925a73abec8802f7e0777819a"
     },
     {
       "path": "scripts/factory/agentrails.py",
@@ -346,7 +378,7 @@
     },
     {
       "path": "scripts/factory/contracts.py",
-      "sha256": "6f719acb7426c7b7d932385abdc817ca68784fc7e3c4753b1933846fe41e829a"
+      "sha256": "2b0938184d187bf931aa74b19ef53ec59f7617d264d82f9538a6681282b23ed1"
     },
     {
       "path": "scripts/factory/correspondence.py",
@@ -362,7 +394,7 @@
     },
     {
       "path": "scripts/factory/generate.py",
-      "sha256": "ca5f9f116c2d4dc18ae50096991c9b07760e74a071da617c623ab692ca794146"
+      "sha256": "7a0a1b370901665531a36999de148a1ee768eda8b7a318667f4de12fa6caa23d"
     },
     {
       "path": "scripts/factory/intake.py",
@@ -374,7 +406,7 @@
     },
     {
       "path": "scripts/factory/ownership.py",
-      "sha256": "6084605e5efa9c8fb70a95c559022e2177dc56b548bc8d2adefcc29062a7eb87"
+      "sha256": "c22262cf119dd4cdf05ab44e48c6ce1534412c8c1d5c8bd34940567bb6d5e791"
     },
     {
       "path": "scripts/factory/pins.py",
@@ -382,15 +414,19 @@
     },
     {
       "path": "scripts/factory/provenance.py",
-      "sha256": "bfe89f109e80901b72e1c2a875232009e5e45e3789833b577d077471a276b994"
+      "sha256": "bcfafde6a50c8b5d1f98433ae557eb9aacd93650bc5c7f73e1f31b3f381cc42e"
     },
     {
       "path": "scripts/factory/registry.py",
       "sha256": "8b4a714acdbfc71694db10649413e6cb5241a89111f816f5532723dd232e2437"
     },
     {
+      "path": "scripts/factory/reviewclass.py",
+      "sha256": "f6e0af9bb7d329d7c9243c91ab6f15aac09253f14fdb36c254c685caf1f43a1f"
+    },
+    {
       "path": "scripts/factory/reviewscope.py",
-      "sha256": "24019953e52e8e2732414171df2debac118d757d6f6fba3618f2219ca0848105"
+      "sha256": "e2241d46ee9e154ad9816a8e6623ad1733bc2d8ccfcbc677c7691f48c4d78701"
     },
     {
       "path": "scripts/factory/rulescorpus.py",
@@ -402,11 +438,11 @@
     },
     {
       "path": "scripts/factory/scaffold.py",
-      "sha256": "570e95a110f34224913ce8b8ab5089313a47f8f5bf815e2249784b7dfa439c2f"
+      "sha256": "a14df9891f378bf171ba845219b6dab326b28fefdcaad52a8fb5770130f595da"
     },
     {
       "path": "scripts/factory/semantics.py",
-      "sha256": "28d64330fb1034e15eb177baaf498c368ffa5cc9bb326c76f7038cbe46a677d4"
+      "sha256": "17eba290b4242a420654a8e68485d00a0f09d589e8601a3ba90fa181daeb0b24"
     },
     {
       "path": "scripts/map-overlay.py",
@@ -448,18 +484,18 @@
   "managed": [
     {
       "path": ".claude/agents/engine-dev.md",
-      "recipeVersion": 11,
-      "sha256": "10ac2f2159b2b93d65f6665274453902fa252c56f2d2cd0707ac76fda2e2d9fe"
+      "recipeVersion": 12,
+      "sha256": "8fa4ba9fee9989fce1f9647b333e332a068ece02cf3eee315b3bdb92ac8e7dfd"
     },
     {
       "path": ".claude/agents/repo-steward.md",
-      "recipeVersion": 4,
-      "sha256": "df19aaa2a13662ff88c556e11b49b4033c4efa188386e5528631142aa7579834"
+      "recipeVersion": 5,
+      "sha256": "00082b74a007eba0f7d6b7b541cf074431bc8aced8733574ff947161f4e8534d"
     },
     {
       "path": ".claude/agents/rules-conformance.md",
-      "recipeVersion": 7,
-      "sha256": "a86b4d07daccede53261077c430114fae3236d7611e7dfc287431caded6ecc04"
+      "recipeVersion": 8,
+      "sha256": "241ff918ba8221b27afaf7cceeafd157bcba17178125a13dc0c6f2ac64498940"
     },
     {
       "path": ".claude/hooks/primary-checkout-guard.py",
@@ -478,28 +514,28 @@
     },
     {
       "path": ".github/pull_request_template.md",
-      "recipeVersion": 5,
-      "sha256": "3a343651e908d6b6bc36594fa663c2aee9e88996147516173c39e3bea63ede78"
+      "recipeVersion": 6,
+      "sha256": "bb75cd6f5877d65d65cccf6e0cbfdddf86112899ecb11e6bbe61a77a9e459740"
     },
     {
       "path": ".github/workflows/conformance-gate.yml",
-      "recipeVersion": 2,
-      "sha256": "d66ae8a37a37874369ac962fbecbf9ac1b98cf0246541a61ea5089b23f8ea702"
+      "recipeVersion": 5,
+      "sha256": "4a18b24d803fa8a7e97ba018ab3ae4d0c9ed59fcbbc615963bbf024503b49c20"
     },
     {
       "path": ".github/workflows/pr-policy.yml",
-      "recipeVersion": 1,
-      "sha256": "caa3394a473d5fdd45b274176d8e28c48d9f5425176318194ba68fbea8453fa2"
+      "recipeVersion": 3,
+      "sha256": "ebf84bcf01619ae578417767d0a984102dfcb00a67b6778b4527a409a3722b6e"
     },
     {
       "path": ".github/workflows/verdict-requeue.yml",
-      "recipeVersion": 2,
-      "sha256": "8ab0d0de2df9777f3e545fedb66c118816e3c658a0fce87db63261967332780a"
+      "recipeVersion": 4,
+      "sha256": "e12f280ee6e9e70e413f59cc6df35d4eda26a2bd2667ba4be5e954d2fecbb4df"
     },
     {
       "path": "AGENTS.md",
-      "recipeVersion": 27,
-      "sha256": "0fc0caeb0b289d9a4ed6c3cc397529b746f07ed7ac3bebbd8cc219f85e5f51f0"
+      "recipeVersion": 30,
+      "sha256": "bac17949671c440fa89fe655cd990496cf0debb59fa8ca81b5bd797275594fd0"
     },
     {
       "path": "CLAUDE.md",
@@ -508,8 +544,8 @@
     },
     {
       "path": "Directory.Build.props",
-      "recipeVersion": 2,
-      "sha256": "73c373b1457e4149eb7ab7da1aed49314536ca8945dea8022c1efbd49c7a1a8f"
+      "recipeVersion": 3,
+      "sha256": "06222da635f4a0085395208fd47ebcb3d999bd1acfe49ba16d9aea9d3b1ac893"
     },
     {
       "path": "NuGet.config",
@@ -518,18 +554,18 @@
     },
     {
       "path": "docs/adversarial-self-review.md",
-      "recipeVersion": 1,
-      "sha256": "9faff906492d809a701516c2a741fb89d5563e646b7a759e0d27bb64f08c3b06"
+      "recipeVersion": 3,
+      "sha256": "8e1c359f8aaabc70720116819fe8870ca0ddbc7e34c2235f7314e68d93810964"
     },
     {
       "path": "docs/agent-team.md",
-      "recipeVersion": 10,
-      "sha256": "e1fd3fe7e2a27ba99d485e946a00b893b2e2e39b6fece2cca001b1f9fd82c40d"
+      "recipeVersion": 11,
+      "sha256": "d1ee84c9c31e5f44a4be7111f686c07b89b5a7fd318e458d287ab1f0b8d6bdbe"
     },
     {
       "path": "docs/review-evidence.md",
-      "recipeVersion": 1,
-      "sha256": "acd33f7680250b25b17620781c9cb0eff18b05f6fe693f55fd878e459651c3dd"
+      "recipeVersion": 2,
+      "sha256": "f829299ce4c7a6deff646d6196378da5ff8cf9d5ee49f2e53d3f58a54254d305"
     },
     {
       "path": "global.json",
@@ -543,8 +579,8 @@
     },
     {
       "path": "tools/conformance-gate.py",
-      "recipeVersion": 5,
-      "sha256": "efa4ebba282b25abe388aea2721633d8565de22faaf591e09361c2ac1759c031"
+      "recipeVersion": 6,
+      "sha256": "3fafa402a1c56bdcdedc7d9411e6d13bec638752ecdc81f11950790d537c44d7"
     },
     {
       "path": "tools/dispatch-agent.sh",
@@ -558,8 +594,8 @@
     },
     {
       "path": "tools/mutate.py",
-      "recipeVersion": 1,
-      "sha256": "d33f7ddedc923388af4582ffb6c04a1434c09f695738ca34f191839f21847901"
+      "recipeVersion": 2,
+      "sha256": "eb722639671ba46c0703f699dc85177fe88f52e00ced99ccf4e90f54a30c49eb"
     },
     {
       "path": "tools/new-issue.sh",
@@ -573,8 +609,8 @@
     },
     {
       "path": "tools/pr-policy.py",
-      "recipeVersion": 15,
-      "sha256": "49e4845fb7d07855fe719c353b9493da9802f4bf80be3465a2ae8c991d957938"
+      "recipeVersion": 16,
+      "sha256": "80fda4f86822f5c2b9c8cd4e8a1b23f85b30a2d32b681749e788821d9d78bd07"
     },
     {
       "path": "tools/re-produce.sh",
@@ -583,13 +619,13 @@
     },
     {
       "path": "tools/record-verdict.py",
-      "recipeVersion": 6,
-      "sha256": "9dc1d7aafa536a37278bf526693893e106a43c43183bdcccddceac4e8fe45231"
+      "recipeVersion": 7,
+      "sha256": "8e7ba67c30672e69e714ccd801a9b5a59ba18d1aa63c08b9b50b385264672e75"
     },
     {
       "path": "tools/repair-packet.py",
-      "recipeVersion": 6,
-      "sha256": "67e36ff58616171e5222ac3449bee618b13bba840f376069ecfcc7d577f8bc9f"
+      "recipeVersion": 7,
+      "sha256": "bb9158eaf9132975677d9be5da5150f652ac422226f666dcfffaa3d9af18a7da"
     },
     {
       "path": "tools/requeue-gate.py",
@@ -598,13 +634,13 @@
     },
     {
       "path": "tools/review-packet.py",
-      "recipeVersion": 17,
-      "sha256": "09a783f9e0a7a6e995167389f0c8398da73d3e4f44653fe451e2a8e47cacc291"
+      "recipeVersion": 18,
+      "sha256": "cf48164f9f65042716b1dae08436c3573dc26073fc6f22053dc1899de6e58a85"
     },
     {
       "path": "tools/review-scope.py",
-      "recipeVersion": 1,
-      "sha256": "84a69642db7a30efe6729d9557725794567462354072655ff4c223c7f6cbccf4"
+      "recipeVersion": 2,
+      "sha256": "e96aeaf830d5bc23c4dcaa25e29fd91ac8c4be6b3ddba6a6618f4ab184a3e155"
     }
   ],
   "engineOwned": [

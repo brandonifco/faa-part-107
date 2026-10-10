@@ -145,6 +145,7 @@ CHARTER = ".claude/agents/rules-conformance.md"
 POLICY = ".github/agent-policy.json"
 ATTESTATIONS = "reviews/attestations"
 SELF_REVIEWS = "reviews/self-review"
+RULING_REVIEWS = "reviews/rulings"
 INVARIANTS = "reviews/invariants.json"
 
 
@@ -202,12 +203,117 @@ switch this throw true try typeof uint ulong unchecked unsafe ushort using var v
 yield""".split())
 
 
+def _open_literal(text, i):
+    """(the frame of the literal that starts at `i`, the index after its opening quote).
+
+    A raw string literal holds no hole this scanner follows, so it is not opened as a frame: the
+    frame is None and the index is already the one just past its closing quotes.
+    """
+    n, k = len(text), i
+    while k < n and text[k] in "$@":
+        k += 1
+    prefix = text[i:k]
+    quotes = 0
+    while k + quotes < n and text[k + quotes] == '"':
+        quotes += 1
+    if quotes >= 3:                                           # a raw string literal
+        j = text.find('"' * quotes, k + quotes)
+        return None, n if j < 0 else j + quotes
+    return {"hole": False, "verbatim": "@" in prefix, "interpolated": "$" in prefix}, k + 1
+
+
+def _literal_end(text, i):
+    """The index just past the string literal that starts at `i` (with its `$`/`@` prefix).
+
+    An interpolated string's holes are code, and code can hold a string of its own:
+    `$"{(x ? $"Round {n}'s" : "none")}"`. So a hole is scanned as code to its closing brace -- nested
+    literals, char literals, comments, braces and parentheses included -- up to its format clause, a
+    `:` outside every brace and parenthesis (C# requires a conditional in a hole to be
+    parenthesised, so this `:` is never one), after which everything up to the `}` is format text.
+    The outer literal ends at the first quote *outside* every hole (#581).
+
+    One loop over an explicit stack of open literals and holes, so no depth of nesting can exhaust
+    the interpreter's stack and none is cut short (#598): a scanner that gave up at some depth would
+    blank everything after it, and every declaration there would leave the reference graph -- the
+    one direction the review model may never err in.
+    """
+    n = len(text)
+    frame, j = _open_literal(text, i)
+    if frame is None:
+        return j
+    stack = [frame]
+    while j < n and stack:
+        top, c = stack[-1], text[j]
+        if not top["hole"]:
+            if c == "\\" and not top["verbatim"]:
+                j += 2
+            elif c == '"':
+                if top["verbatim"] and text[j + 1:j + 2] == '"':
+                    j += 2
+                else:
+                    stack.pop()
+                    j += 1
+            elif top["interpolated"] and c in "{}" and text[j + 1:j + 2] == c:
+                j += 2                                        # `{{` or `}}`: a brace, not a hole
+            elif top["interpolated"] and c == "{":
+                stack.append({"hole": True, "verbatim": top["verbatim"], "braces": 0, "parens": 0})
+                j += 1
+            else:
+                j += 1
+        elif text.startswith("//", j):
+            end = text.find("\n", j)
+            j = n if end < 0 else end + 1
+        elif text.startswith("/*", j):
+            end = text.find("*/", j + 2)
+            j = n if end < 0 else end + 2
+        elif c == '"' or (c in "$@" and '"' in text[j:j + 3]):
+            opened, j = _open_literal(text, j)
+            if opened is not None:
+                stack.append(opened)
+        elif c == "'":
+            j = _char_end(text, j)
+        elif c in "([":
+            top["parens"] += 1
+            j += 1
+        elif c in ")]":
+            top["parens"] = max(top["parens"] - 1, 0)
+            j += 1
+        elif c == "{":
+            top["braces"] += 1
+            j += 1
+        elif c == "}":
+            if top["braces"] == 0:
+                stack.pop()
+            else:
+                top["braces"] -= 1
+            j += 1
+        elif (c == ":" and top["braces"] == 0 and top["parens"] == 0 and text[j + 1:j + 2] != ":"
+              and text[j - 1:j] != ":"):
+            j += 1                                            # the format clause: text up to the `}`
+            while j < n and text[j] != "}":
+                j += 2 if text[j] == "\\" and not top["verbatim"] else 1
+            stack.pop()
+            j += 1
+        else:
+            j += 1
+    return min(j, n)
+
+
+def _char_end(text, i):
+    """The index just past the char literal that starts at `i`."""
+    j = i + 1
+    while j < len(text) and text[j] != "'":
+        j += 2 if text[j] == "\\" else 1
+    return j + 1
+
+
 def blank_literals(text):
     """`text` with every comment and every string or character literal's contents replaced by spaces.
 
     Only for finding where a type's body and its members are: a brace inside `$"{x}"` or a comment
     is not structure. Newlines are kept, so positions still mean lines. Identifiers are read from
-    the unblanked text elsewhere, because a name inside a string can still be code.
+    the unblanked text elsewhere, because a name inside a string can still be code. An interpolated
+    string is blanked whole, holes included, and ends where `_literal_end` says it does.
     """
     out, i, n = list(text), 0, len(text)
 
@@ -229,37 +335,13 @@ def blank_literals(text):
             blank(i, j)
             i = j
         elif c == '"' or (c in "$@" and '"' in text[i:i + 3]):
-            k = i
-            while k < n and text[k] in "$@":
-                k += 1
-            verbatim = "@" in text[i:k]
-            quotes = 0
-            while k + quotes < n and text[k + quotes] == '"':
-                quotes += 1
-            if quotes >= 3:                                   # a raw string literal
-                j = text.find('"' * quotes, k + quotes)
-                j = n if j < 0 else j + quotes
-            else:
-                j = k + 1
-                while j < n:
-                    if text[j] == "\\" and not verbatim:
-                        j += 2
-                        continue
-                    if text[j] == '"':
-                        if verbatim and j + 1 < n and text[j + 1] == '"':
-                            j += 2
-                            continue
-                        j += 1
-                        break
-                    j += 1
+            j = _literal_end(text, i)
             blank(i, j)
             i = j
         elif c == "'":
-            j = i + 1
-            while j < n and text[j] != "'":
-                j += 2 if text[j] == "\\" else 1
-            blank(i, j + 1)
-            i = j + 1
+            j = _char_end(text, i)
+            blank(i, j)
+            i = j
         else:
             i += 1
     return "".join(out)
@@ -452,8 +534,31 @@ def resolve_implemented_in(value, paths):
 
 
 def test_names(row):
-    return [str(test.get("name")) for test in (row or {}).get("tests") or []
-            if isinstance(test, dict) and test.get("name")]
+    """The tests an overlay row names, under the key the overlay writes them by: `test`.
+
+    `scripts/map-overlay.py` and `rulings.py` read `test`, and every engine writes it. This read
+    `name` until #577, so in every real engine no claim was anchored on its own tests, and a repair
+    that weakened one invalidated nothing.
+    """
+    return [str(test.get("test")) for test in (row or {}).get("tests") or []
+            if isinstance(test, dict) and test.get("test")]
+
+
+def declaring_test_files(name, index):
+    """The test files `name` can be declared in: by its method, and by its class when it has one.
+
+    An overlay names a test as the runner reports it -- `ClassTests.Method`, or the method alone --
+    and an identifier never holds a dot, so the dotted name is looked up a part at a time: the
+    method, narrowed to the files that also mention the class when any do. Empty when no file
+    mentions the method, which `state` answers by depending on every test file.
+    """
+    parts = [part for part in str(name).split(".") if part]
+    if not parts:
+        return []
+    found = set(index.get(parts[-1], ()))
+    if len(parts) > 1:
+        found = (found & set(index.get(parts[-2], ()))) or found
+    return sorted(found)
 
 
 TEST_METHOD = re.compile(r"\b(?:void|Task|ValueTask)\s+@?([A-Za-z_][A-Za-z0-9_]*)\s*\(")
@@ -585,7 +690,7 @@ def state(snapshot):
             else:
                 anchors += found
         for name in test_names(row):
-            declaring = test_index.get(name)
+            declaring = declaring_test_files(name, test_index)
             if declaring:
                 anchors += declaring
             else:
@@ -1148,6 +1253,78 @@ def self_review_problems(record, entry_id, digest, declared_tests):
     return out
 
 
+# --- the review of a ruling ----------------------------------------------------------------------
+
+RULING_REVIEW_FORMAT = 1
+#: What an implementer owes before a reviewer is paid to read a *ruling*: the decision-scoped
+#: counterpart of the twenty classes, for a change that decides how rules are read and implements
+#: none (0076). The attack on a ruling is not an off-by-one; it is a ruling that contradicts one in
+#: force, rests on nothing the owner said, or makes behaviour already built wrong without saying so.
+RULING_REVIEW_CLASSES = (
+    ("corpus-basis", "What does the corpus say on each question this decides, and does the ruling follow it or depart from it? A departure is the owner's, and says so."),
+    ("owner-authority", "Who made each ruling, where, and is every one the owner's own answer rather than an implementer's inference?"),
+    ("conflicts", "Which recorded decisions or overlay rulings does this contradict, supersede or narrow, and how is each resolved?"),
+    ("implemented-behaviour", "Which implemented entries does this make wrong, and which issue changes them? If none, why none?"),
+    ("unreached-cases", "What does the ruling leave open, and does the engine decline it rather than guess?"),
+    ("pinning-test", "For each ruling, the test that will pin it when it is built, or why none can exist yet."),
+)
+RULING_REVIEW_IDS = tuple(identifier for identifier, _ in RULING_REVIEW_CLASSES)
+RULING_REVIEW_OUTCOMES = ("answered", "not-applicable")
+
+
+def ruling_review_stem(path):
+    """The record's name for a decision record at `path`: `docs/decisions/0007-x.md` -> `0007-x`."""
+    return path.rsplit("/", 1)[-1][:-3] if path.endswith(".md") else path.rsplit("/", 1)[-1]
+
+
+def ruling_review_skeleton(path, digest):
+    """The record an implementer fills in for one decision record: every class, unanswered."""
+    return {"rulingReviewFormat": RULING_REVIEW_FORMAT, "decision": path, "recordSha256": digest,
+            "scope": "", "entries": [],
+            "classes": {identifier: {"outcome": "", "answer": "", "reason": ""} for identifier in RULING_REVIEW_IDS}}
+
+
+def ruling_review_problems(record, path, digest):
+    """Every way `record` does not show the review of the ruling at `path`. Empty when it does.
+
+    `digest` is the SHA-256 of the decision record's bytes at the head under review, so a record
+    made before the last edit to the ruling is stale. An answer is held to the floor a self-review
+    reason is: a sentence somebody could disagree with, and not a word that fills a box.
+    """
+    if not isinstance(record, dict):
+        return [f"{path}: no ruling review record"]
+    out = []
+    if record.get("rulingReviewFormat") != RULING_REVIEW_FORMAT:
+        out.append(f"{path}: rulingReviewFormat is {record.get('rulingReviewFormat')!r}, not {RULING_REVIEW_FORMAT}")
+    if record.get("decision") != path:
+        out.append(f"{path}: the record is for {record.get('decision')!r}")
+    if record.get("recordSha256") != digest:
+        out.append(f"{path}: the record was made against decision bytes {str(record.get('recordSha256'))[:12]}, and "
+                   f"the decision is now {digest[:12]}: it was edited since, so review it again")
+    if _placeholder(str(record.get("scope") or "")):
+        out.append(f"{path}: `scope` says nothing anybody can check; say what this ruling decides")
+    entries = record.get("entries")
+    if not isinstance(entries, list) or not all(isinstance(e, str) and e for e in entries):
+        out.append(f"{path}: `entries` is a list of the entry ids this ruling affects, and empty when its scope is general")
+    classes = record.get("classes") if isinstance(record.get("classes"), dict) else {}
+    for identifier in RULING_REVIEW_IDS:
+        answer = classes.get(identifier)
+        if not isinstance(answer, dict):
+            out.append(f"{path}: {identifier} is not answered")
+            continue
+        outcome = answer.get("outcome")
+        text = answer.get("answer") if outcome == "answered" else answer.get("reason")
+        if outcome not in RULING_REVIEW_OUTCOMES:
+            out.append(f"{path}: {identifier} has outcome {outcome!r}; one of {', '.join(RULING_REVIEW_OUTCOMES)}")
+        elif _placeholder(str(text or "")):
+            out.append(f"{path}: {identifier} is {outcome} with no "
+                       f"{'answer' if outcome == 'answered' else 'reason'} anybody can check")
+    unknown = sorted(set(classes) - set(RULING_REVIEW_IDS))
+    if unknown:
+        out.append(f"{path}: unknown classes {', '.join(unknown)}")
+    return out
+
+
 # --- the delta packet ----------------------------------------------------------------------------
 
 
@@ -1207,7 +1384,7 @@ def render_delta_packet(*, prior, prior_digest, head, base, current, impact_reco
     lines.append("\n## 6. Tests and mutations\n")
     for entry, items in sorted(tests.items()):
         lines.append(f"- `{entry}`")
-        lines += [f"  - `{t.get('name')}` — mutation: {t.get('mutation')}" for t in items] or [
+        lines += [f"  - `{t.get('test')}` — mutation: {t.get('mutation')}" for t in items] or [
             "  - **no test named in the overlay** — that is a finding"]
     lines.append("\n## 7. The implementation in scope\n")
     lines.append("Every hand-written file the review set rests on, by the lexical reference graph. Changed files "
