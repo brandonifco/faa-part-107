@@ -161,61 +161,157 @@ public sealed class CorrespondenceTests
         Assert.Equal(cited, Registry.Citations(entryId));
     }
 
+    // The one request both paths can build is the one that states nothing (#692): a RuleRequest carries
+    // assertions only, so the string path cannot state an input the engine declared on a request type.
+    private static void AssertSameOutcome(Func<Resolution<object>> stringPath, Func<Resolution<object>> typedPath)
+    {
+        var viaString = Outcome(stringPath);
+        var viaTyped = Outcome(typedPath);
+        Assert.Equal(viaTyped.Thrown?.GetType(), viaString.Thrown?.GetType());
+        if (viaString.Thrown is not null)
+        {
+            return;
+        }
+
+        Assert.Equal(viaTyped.Declined is null, viaString.Declined is null);
+        if (viaString.Declined is null)
+        {
+            Assert.True(Equals(viaTyped.Value, viaString.Value), "the string and typed entry points resolved to different values");
+            return;
+        }
+
+        Assert.Equal(viaTyped.Declined!.Reason, viaString.Declined.Reason);
+        Assert.Equal(viaTyped.Declined.Locator, viaString.Declined.Locator);
+        Assert.Equal(viaTyped.Declined.Attempted, viaString.Declined.Attempted);
+    }
+
+    private static (Exception? Thrown, object? Value, UnresolvedResult? Declined) Outcome(Func<Resolution<object>> resolve)
+    {
+        try
+        {
+            return resolve().Match<(Exception?, object?, UnresolvedResult?)>(v => (null, v, null), u => (null, null, u));
+        }
+        catch (Exception exception)
+        {
+            return (exception, null, null);
+        }
+    }
+
+    [Fact]
+    public void speed_limit__string_entry_point_is_the_typed_one_with_no_input_stated() =>
+        AssertSameOutcome(() => Registry.Resolve("speed-limit", RuleRequest.Empty), () => EntryPoints.SpeedLimit.Resolve(global::FaaPart107.Requests.SpeedLimitRequest.Empty));
+
     [Fact]
     public void speed_limit__is_implemented_so_a_hand_written_handler_answers_it() =>
         Assert.True(Registry.HasImplementation("speed-limit"), "speed-limit is implemented in the overlay and has no [Implements] handler");
+
+    [Fact]
+    public void altitude_limit__string_entry_point_is_the_typed_one_with_no_input_stated() =>
+        AssertSameOutcome(() => Registry.Resolve("altitude-limit", RuleRequest.Empty), () => EntryPoints.AltitudeLimit.Resolve(global::FaaPart107.Requests.AltitudeLimitRequest.Empty));
 
     [Fact]
     public void altitude_limit__is_implemented_so_a_hand_written_handler_answers_it() =>
         Assert.True(Registry.HasImplementation("altitude-limit"), "altitude-limit is implemented in the overlay and has no [Implements] handler");
 
     [Fact]
+    public void visibility_minimum__string_entry_point_is_the_typed_one_with_no_input_stated() =>
+        AssertSameOutcome(() => Registry.Resolve("visibility-minimum", RuleRequest.Empty), () => EntryPoints.VisibilityMinimum.Resolve(global::FaaPart107.Requests.VisibilityMinimumRequest.Empty));
+
+    [Fact]
     public void visibility_minimum__is_implemented_so_a_hand_written_handler_answers_it() =>
         Assert.True(Registry.HasImplementation("visibility-minimum"), "visibility-minimum is implemented in the overlay and has no [Implements] handler");
+
+    [Fact]
+    public void cloud_clearance__string_entry_point_is_the_typed_one_with_no_input_stated() =>
+        AssertSameOutcome(() => Registry.Resolve("cloud-clearance", RuleRequest.Empty), () => EntryPoints.CloudClearance.Resolve(global::FaaPart107.Requests.CloudClearanceRequest.Empty));
 
     [Fact]
     public void cloud_clearance__is_implemented_so_a_hand_written_handler_answers_it() =>
         Assert.True(Registry.HasImplementation("cloud-clearance"), "cloud-clearance is implemented in the overlay and has no [Implements] handler");
 
     [Fact]
+    public void civil_twilight_window__string_entry_point_is_the_typed_one_with_no_input_stated() =>
+        AssertSameOutcome(() => Registry.Resolve("civil-twilight-window", RuleRequest.Empty), () => EntryPoints.CivilTwilightWindow.Resolve(global::FaaPart107.Requests.CivilTwilightWindowRequest.Empty));
+
+    [Fact]
     public void civil_twilight_window__is_implemented_so_a_hand_written_handler_answers_it() =>
         Assert.True(Registry.HasImplementation("civil-twilight-window"), "civil-twilight-window is implemented in the overlay and has no [Implements] handler");
+
+    [Fact]
+    public void speed_within_limit__string_entry_point_is_the_typed_one_with_no_input_stated() =>
+        AssertSameOutcome(() => Registry.Resolve("speed-within-limit", RuleRequest.Empty), () => EntryPoints.SpeedWithinLimit.Resolve(global::FaaPart107.Requests.SpeedWithinLimitRequest.Empty));
 
     [Fact]
     public void speed_within_limit__is_implemented_so_a_hand_written_handler_answers_it() =>
         Assert.True(Registry.HasImplementation("speed-within-limit"), "speed-within-limit is implemented in the overlay and has no [Implements] handler");
 
     [Fact]
+    public void altitude_within_limit__string_entry_point_is_the_typed_one_with_no_input_stated() =>
+        AssertSameOutcome(() => Registry.Resolve("altitude-within-limit", RuleRequest.Empty), () => EntryPoints.AltitudeWithinLimit.Resolve(global::FaaPart107.Requests.AltitudeWithinLimitRequest.Empty));
+
+    [Fact]
     public void altitude_within_limit__is_implemented_so_a_hand_written_handler_answers_it() =>
         Assert.True(Registry.HasImplementation("altitude-within-limit"), "altitude-within-limit is implemented in the overlay and has no [Implements] handler");
+
+    [Fact]
+    public void weather_minimums_met__string_entry_point_is_the_typed_one_with_no_input_stated() =>
+        AssertSameOutcome(() => Registry.Resolve("weather-minimums-met", RuleRequest.Empty), () => EntryPoints.WeatherMinimumsMet.Resolve(global::FaaPart107.Requests.WeatherMinimumsMetRequest.Empty));
 
     [Fact]
     public void weather_minimums_met__is_implemented_so_a_hand_written_handler_answers_it() =>
         Assert.True(Registry.HasImplementation("weather-minimums-met"), "weather-minimums-met is implemented in the overlay and has no [Implements] handler");
 
     [Fact]
+    public void operating_limitations__string_entry_point_is_the_typed_one_with_no_input_stated() =>
+        AssertSameOutcome(() => Registry.Resolve("operating-limitations", RuleRequest.Empty), () => EntryPoints.OperatingLimitations.Resolve(global::FaaPart107.Requests.OperatingLimitationsRequest.Empty));
+
+    [Fact]
     public void operating_limitations__is_implemented_so_a_hand_written_handler_answers_it() =>
         Assert.True(Registry.HasImplementation("operating-limitations"), "operating-limitations is implemented in the overlay and has no [Implements] handler");
+
+    [Fact]
+    public void prominent_objects__string_entry_point_is_the_typed_one_with_no_input_stated() =>
+        AssertSameOutcome(() => Registry.Resolve("prominent-objects", RuleRequest.Empty), () => EntryPoints.ProminentObjects.Resolve(global::FaaPart107.Requests.ProminentObjectsRequest.Empty));
 
     [Fact]
     public void prominent_objects__is_implemented_so_a_hand_written_handler_answers_it() =>
         Assert.True(Registry.HasImplementation("prominent-objects"), "prominent-objects is implemented in the overlay and has no [Implements] handler");
 
     [Fact]
+    public void single_aircraft__string_entry_point_is_the_typed_one_with_no_input_stated() =>
+        AssertSameOutcome(() => Registry.Resolve("single-aircraft", RuleRequest.Empty), () => EntryPoints.SingleAircraft.Resolve(global::FaaPart107.Requests.SingleAircraftRequest.Empty));
+
+    [Fact]
     public void single_aircraft__is_implemented_so_a_hand_written_handler_answers_it() =>
         Assert.True(Registry.HasImplementation("single-aircraft"), "single-aircraft is implemented in the overlay and has no [Implements] handler");
+
+    [Fact]
+    public void airspace_authorized__string_entry_point_is_the_typed_one_with_no_input_stated() =>
+        AssertSameOutcome(() => Registry.Resolve("airspace-authorized", RuleRequest.Empty), () => EntryPoints.AirspaceAuthorized.Resolve(global::FaaPart107.Requests.AirspaceAuthorizedRequest.Empty));
 
     [Fact]
     public void airspace_authorized__is_implemented_so_a_hand_written_handler_answers_it() =>
         Assert.True(Registry.HasImplementation("airspace-authorized"), "airspace-authorized is implemented in the overlay and has no [Implements] handler");
 
     [Fact]
+    public void restricted_area_permitted__string_entry_point_is_the_typed_one_with_no_input_stated() =>
+        AssertSameOutcome(() => Registry.Resolve("restricted-area-permitted", RuleRequest.Empty), () => EntryPoints.RestrictedAreaPermitted.Resolve(global::FaaPart107.Requests.RestrictedAreaPermittedRequest.Empty));
+
+    [Fact]
     public void restricted_area_permitted__is_implemented_so_a_hand_written_handler_answers_it() =>
         Assert.True(Registry.HasImplementation("restricted-area-permitted"), "restricted-area-permitted is implemented in the overlay and has no [Implements] handler");
 
     [Fact]
+    public void moving_vehicle_operation__string_entry_point_is_the_typed_one_with_no_input_stated() =>
+        AssertSameOutcome(() => Registry.Resolve("moving-vehicle-operation", RuleRequest.Empty), () => EntryPoints.MovingVehicleOperation.Resolve(global::FaaPart107.Requests.MovingVehicleOperationRequest.Empty));
+
+    [Fact]
     public void moving_vehicle_operation__is_implemented_so_a_hand_written_handler_answers_it() =>
         Assert.True(Registry.HasImplementation("moving-vehicle-operation"), "moving-vehicle-operation is implemented in the overlay and has no [Implements] handler");
+
+    [Fact]
+    public void moving_aircraft_operation__string_entry_point_is_the_typed_one_with_no_input_stated() =>
+        AssertSameOutcome(() => Registry.Resolve("moving-aircraft-operation", RuleRequest.Empty), () => EntryPoints.MovingAircraftOperation.Resolve(global::FaaPart107.Requests.MovingAircraftOperationRequest.Empty));
 
     [Fact]
     public void moving_aircraft_operation__is_implemented_so_a_hand_written_handler_answers_it() =>
@@ -226,6 +322,10 @@ public sealed class CorrespondenceTests
         AssertDeclines("night-operation", UnresolvedReason.MissingRulesData, EntryPoints.NightOperation.Resolve(global::FaaPart107.Requests.NightOperationRequest.Empty), new SourceLocator("cfr-14-107", "§ 107.29(a)"));
 
     [Fact]
+    public void night_training_completed__string_entry_point_is_the_typed_one_with_no_input_stated() =>
+        AssertSameOutcome(() => Registry.Resolve("night-training-completed", RuleRequest.Empty), () => EntryPoints.NightTrainingCompleted.Resolve(global::FaaPart107.Requests.NightTrainingCompletedRequest.Empty));
+
+    [Fact]
     public void night_training_completed__is_implemented_so_a_hand_written_handler_answers_it() =>
         Assert.True(Registry.HasImplementation("night-training-completed"), "night-training-completed is implemented in the overlay and has no [Implements] handler");
 
@@ -234,12 +334,20 @@ public sealed class CorrespondenceTests
         AssertDeclines("knowledge-recency", UnresolvedReason.OutsideCurrentScope, EntryPoints.KnowledgeRecency.Resolve(global::FaaPart107.Requests.KnowledgeRecencyRequest.Empty), new SourceLocator("cfr-14-107", "§ 107.65"));
 
     [Fact]
+    public void night_waiver_termination__string_entry_point_is_the_typed_one_with_no_input_stated() =>
+        AssertSameOutcome(() => Registry.Resolve("night-waiver-termination", RuleRequest.Empty), () => EntryPoints.NightWaiverTermination.Resolve(global::FaaPart107.Requests.NightWaiverTerminationRequest.Empty));
+
+    [Fact]
     public void night_waiver_termination__is_implemented_so_a_hand_written_handler_answers_it() =>
         Assert.True(Registry.HasImplementation("night-waiver-termination"), "night-waiver-termination is implemented in the overlay and has no [Implements] handler");
 
     [Fact]
     public void night_waiver_bar__declines_UnsupportedRule_row_2() =>
         AssertDeclines("night-waiver-bar", UnresolvedReason.UnsupportedRule, EntryPoints.NightWaiverBar.Resolve(global::FaaPart107.Requests.NightWaiverBarRequest.Empty), new SourceLocator("cfr-14-107", "§ 107.29(d)"));
+
+    [Fact]
+    public void civil_twilight_operation__string_entry_point_is_the_typed_one_with_no_input_stated() =>
+        AssertSameOutcome(() => Registry.Resolve("civil-twilight-operation", RuleRequest.Empty), () => EntryPoints.CivilTwilightOperation.Resolve(global::FaaPart107.Requests.CivilTwilightOperationRequest.Empty));
 
     [Fact]
     public void civil_twilight_operation__is_implemented_so_a_hand_written_handler_answers_it() =>
@@ -254,12 +362,24 @@ public sealed class CorrespondenceTests
         AssertDeclines("hazardous-material", UnresolvedReason.MissingRulesData, EntryPoints.HazardousMaterial.Resolve(global::FaaPart107.Requests.HazardousMaterialRequest.Empty), new SourceLocator("cfr-14-107", "§ 107.36"));
 
     [Fact]
+    public void right_of_way__string_entry_point_is_the_typed_one_with_no_input_stated() =>
+        AssertSameOutcome(() => Registry.Resolve("right-of-way", RuleRequest.Empty), () => EntryPoints.RightOfWay.Resolve(global::FaaPart107.Requests.RightOfWayRequest.Empty));
+
+    [Fact]
     public void right_of_way__is_implemented_so_a_hand_written_handler_answers_it() =>
         Assert.True(Registry.HasImplementation("right-of-way"), "right-of-way is implemented in the overlay and has no [Implements] handler");
 
     [Fact]
+    public void well_clear__string_entry_point_is_the_typed_one_with_no_input_stated() =>
+        AssertSameOutcome(() => Registry.Resolve("well-clear", RuleRequest.Empty), () => EntryPoints.WellClear.Resolve(global::FaaPart107.Requests.WellClearRequest.Empty));
+
+    [Fact]
     public void well_clear__is_implemented_so_a_hand_written_handler_answers_it() =>
         Assert.True(Registry.HasImplementation("well-clear"), "well-clear is implemented in the overlay and has no [Implements] handler");
+
+    [Fact]
+    public void collision_hazard_proximity__string_entry_point_is_the_typed_one_with_no_input_stated() =>
+        AssertSameOutcome(() => Registry.Resolve("collision-hazard-proximity", RuleRequest.Empty), () => EntryPoints.CollisionHazardProximity.Resolve(global::FaaPart107.Requests.CollisionHazardProximityRequest.Empty));
 
     [Fact]
     public void collision_hazard_proximity__is_implemented_and_answers_or_demands_the_assertion()
@@ -278,6 +398,10 @@ public sealed class CorrespondenceTests
     }
 
     [Fact]
+    public void reasonable_protection__string_entry_point_is_the_typed_one_with_no_input_stated() =>
+        AssertSameOutcome(() => Registry.Resolve("reasonable-protection", RuleRequest.Empty), () => EntryPoints.ReasonableProtection.Resolve(global::FaaPart107.Requests.ReasonableProtectionRequest.Empty));
+
+    [Fact]
     public void reasonable_protection__is_implemented_and_answers_or_demands_the_assertion()
     {
         if (Registry.HasImplementation("reasonable-protection"))
@@ -294,8 +418,16 @@ public sealed class CorrespondenceTests
     }
 
     [Fact]
+    public void over_human_beings__string_entry_point_is_the_typed_one_with_no_input_stated() =>
+        AssertSameOutcome(() => Registry.Resolve("over-human-beings", RuleRequest.Empty), () => EntryPoints.OverHumanBeings.Resolve(global::FaaPart107.Requests.OverHumanBeingsRequest.Empty));
+
+    [Fact]
     public void over_human_beings__is_implemented_so_a_hand_written_handler_answers_it() =>
         Assert.True(Registry.HasImplementation("over-human-beings"), "over-human-beings is implemented in the overlay and has no [Implements] handler");
+
+    [Fact]
+    public void direct_participation__string_entry_point_is_the_typed_one_with_no_input_stated() =>
+        AssertSameOutcome(() => Registry.Resolve("direct-participation", RuleRequest.Empty), () => EntryPoints.DirectParticipation.Resolve(global::FaaPart107.Requests.DirectParticipationRequest.Empty));
 
     [Fact]
     public void direct_participation__is_implemented_so_a_hand_written_handler_answers_it() =>
@@ -304,6 +436,10 @@ public sealed class CorrespondenceTests
     [Fact]
     public void subpart_d_categories__declines_OutsideCurrentScope_row_1() =>
         AssertDeclines("subpart-d-categories", UnresolvedReason.OutsideCurrentScope, EntryPoints.SubpartDCategories.Resolve(global::FaaPart107.Requests.SubpartDCategoriesRequest.Empty), new SourceLocator("cfr-14-107", "subpart D"));
+
+    [Fact]
+    public void flash_rate_sufficient__string_entry_point_is_the_typed_one_with_no_input_stated() =>
+        AssertSameOutcome(() => Registry.Resolve("flash-rate-sufficient", RuleRequest.Empty), () => EntryPoints.FlashRateSufficient.Resolve(global::FaaPart107.Requests.FlashRateSufficientRequest.Empty));
 
     [Fact]
     public void flash_rate_sufficient__is_implemented_and_answers_or_demands_the_assertion()
@@ -322,6 +458,10 @@ public sealed class CorrespondenceTests
     }
 
     [Fact]
+    public void intensity_reduction_in_interest_of_safety__string_entry_point_is_the_typed_one_with_no_input_stated() =>
+        AssertSameOutcome(() => Registry.Resolve("intensity-reduction-in-interest-of-safety", RuleRequest.Empty), () => EntryPoints.IntensityReductionInInterestOfSafety.Resolve(global::FaaPart107.Requests.IntensityReductionInInterestOfSafetyRequest.Empty));
+
+    [Fact]
     public void intensity_reduction_in_interest_of_safety__is_implemented_and_answers_or_demands_the_assertion()
     {
         if (Registry.HasImplementation("intensity-reduction-in-interest-of-safety"))
@@ -338,12 +478,24 @@ public sealed class CorrespondenceTests
     }
 
     [Fact]
+    public void anti_collision_lighting__string_entry_point_is_the_typed_one_with_no_input_stated() =>
+        AssertSameOutcome(() => Registry.Resolve("anti-collision-lighting", RuleRequest.Empty), () => EntryPoints.AntiCollisionLighting.Resolve(global::FaaPart107.Requests.AntiCollisionLightingRequest.Empty));
+
+    [Fact]
     public void anti_collision_lighting__is_implemented_so_a_hand_written_handler_answers_it() =>
         Assert.True(Registry.HasImplementation("anti-collision-lighting"), "anti-collision-lighting is implemented in the overlay and has no [Implements] handler");
 
     [Fact]
+    public void visual_line_of_sight__string_entry_point_is_the_typed_one_with_no_input_stated() =>
+        AssertSameOutcome(() => Registry.Resolve("visual-line-of-sight", RuleRequest.Empty), () => EntryPoints.VisualLineOfSight.Resolve(global::FaaPart107.Requests.VisualLineOfSightRequest.Empty));
+
+    [Fact]
     public void visual_line_of_sight__is_implemented_so_a_hand_written_handler_answers_it() =>
         Assert.True(Registry.HasImplementation("visual-line-of-sight"), "visual-line-of-sight is implemented in the overlay and has no [Implements] handler");
+
+    [Fact]
+    public void unaided_visual_contact__string_entry_point_is_the_typed_one_with_no_input_stated() =>
+        AssertSameOutcome(() => Registry.Resolve("unaided-visual-contact", RuleRequest.Empty), () => EntryPoints.UnaidedVisualContact.Resolve(global::FaaPart107.Requests.UnaidedVisualContactRequest.Empty));
 
     [Fact]
     public void unaided_visual_contact__is_implemented_and_answers_or_demands_the_assertion()
@@ -362,12 +514,24 @@ public sealed class CorrespondenceTests
     }
 
     [Fact]
+    public void visual_observer_conditions__string_entry_point_is_the_typed_one_with_no_input_stated() =>
+        AssertSameOutcome(() => Registry.Resolve("visual-observer-conditions", RuleRequest.Empty), () => EntryPoints.VisualObserverConditions.Resolve(global::FaaPart107.Requests.VisualObserverConditionsRequest.Empty));
+
+    [Fact]
     public void visual_observer_conditions__is_implemented_so_a_hand_written_handler_answers_it() =>
         Assert.True(Registry.HasImplementation("visual-observer-conditions"), "visual-observer-conditions is implemented in the overlay and has no [Implements] handler");
 
     [Fact]
+    public void effective_communication__string_entry_point_is_the_typed_one_with_no_input_stated() =>
+        AssertSameOutcome(() => Registry.Resolve("effective-communication", RuleRequest.Empty), () => EntryPoints.EffectiveCommunication.Resolve(global::FaaPart107.Requests.EffectiveCommunicationRequest.Empty));
+
+    [Fact]
     public void effective_communication__is_implemented_so_a_hand_written_handler_answers_it() =>
         Assert.True(Registry.HasImplementation("effective-communication"), "effective-communication is implemented in the overlay and has no [Implements] handler");
+
+    [Fact]
+    public void observer_coordination__string_entry_point_is_the_typed_one_with_no_input_stated() =>
+        AssertSameOutcome(() => Registry.Resolve("observer-coordination", RuleRequest.Empty), () => EntryPoints.ObserverCoordination.Resolve(global::FaaPart107.Requests.ObserverCoordinationRequest.Empty));
 
     [Fact]
     public void observer_coordination__is_implemented_and_answers_or_demands_the_assertion()
@@ -386,8 +550,16 @@ public sealed class CorrespondenceTests
     }
 
     [Fact]
+    public void preflight_actions__string_entry_point_is_the_typed_one_with_no_input_stated() =>
+        AssertSameOutcome(() => Registry.Resolve("preflight-actions", RuleRequest.Empty), () => EntryPoints.PreflightActions.Resolve(global::FaaPart107.Requests.PreflightActionsRequest.Empty));
+
+    [Fact]
     public void preflight_actions__is_implemented_so_a_hand_written_handler_answers_it() =>
         Assert.True(Registry.HasImplementation("preflight-actions"), "preflight-actions is implemented in the overlay and has no [Implements] handler");
+
+    [Fact]
+    public void preflight_risk_assessment__string_entry_point_is_the_typed_one_with_no_input_stated() =>
+        AssertSameOutcome(() => Registry.Resolve("preflight-risk-assessment", RuleRequest.Empty), () => EntryPoints.PreflightRiskAssessment.Resolve(global::FaaPart107.Requests.PreflightRiskAssessmentRequest.Empty));
 
     [Fact]
     public void preflight_risk_assessment__is_implemented_and_answers_or_demands_the_assertion()
@@ -406,6 +578,10 @@ public sealed class CorrespondenceTests
     }
 
     [Fact]
+    public void participant_briefing__string_entry_point_is_the_typed_one_with_no_input_stated() =>
+        AssertSameOutcome(() => Registry.Resolve("participant-briefing", RuleRequest.Empty), () => EntryPoints.ParticipantBriefing.Resolve(global::FaaPart107.Requests.ParticipantBriefingRequest.Empty));
+
+    [Fact]
     public void participant_briefing__is_implemented_and_answers_or_demands_the_assertion()
     {
         if (Registry.HasImplementation("participant-briefing"))
@@ -422,8 +598,16 @@ public sealed class CorrespondenceTests
     }
 
     [Fact]
+    public void control_links_working__string_entry_point_is_the_typed_one_with_no_input_stated() =>
+        AssertSameOutcome(() => Registry.Resolve("control-links-working", RuleRequest.Empty), () => EntryPoints.ControlLinksWorking.Resolve(global::FaaPart107.Requests.ControlLinksWorkingRequest.Empty));
+
+    [Fact]
     public void control_links_working__is_implemented_so_a_hand_written_handler_answers_it() =>
         Assert.True(Registry.HasImplementation("control-links-working"), "control-links-working is implemented in the overlay and has no [Implements] handler");
+
+    [Fact]
+    public void sufficient_available_power__string_entry_point_is_the_typed_one_with_no_input_stated() =>
+        AssertSameOutcome(() => Registry.Resolve("sufficient-available-power", RuleRequest.Empty), () => EntryPoints.SufficientAvailablePower.Resolve(global::FaaPart107.Requests.SufficientAvailablePowerRequest.Empty));
 
     [Fact]
     public void sufficient_available_power__is_implemented_and_answers_or_demands_the_assertion()
@@ -442,8 +626,16 @@ public sealed class CorrespondenceTests
     }
 
     [Fact]
+    public void attached_object_secure__string_entry_point_is_the_typed_one_with_no_input_stated() =>
+        AssertSameOutcome(() => Registry.Resolve("attached-object-secure", RuleRequest.Empty), () => EntryPoints.AttachedObjectSecure.Resolve(global::FaaPart107.Requests.AttachedObjectSecureRequest.Empty));
+
+    [Fact]
     public void attached_object_secure__is_implemented_so_a_hand_written_handler_answers_it() =>
         Assert.True(Registry.HasImplementation("attached-object-secure"), "attached-object-secure is implemented in the overlay and has no [Implements] handler");
+
+    [Fact]
+    public void attached_object_no_adverse_effect__string_entry_point_is_the_typed_one_with_no_input_stated() =>
+        AssertSameOutcome(() => Registry.Resolve("attached-object-no-adverse-effect", RuleRequest.Empty), () => EntryPoints.AttachedObjectNoAdverseEffect.Resolve(global::FaaPart107.Requests.AttachedObjectNoAdverseEffectRequest.Empty));
 
     [Fact]
     public void attached_object_no_adverse_effect__is_implemented_and_answers_or_demands_the_assertion()
