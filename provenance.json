@@ -19,7 +19,7 @@
   },
   "distribution": "public",
   "factory": {
-    "version": "1.6.0",
+    "version": "0.0.0-dev+dfb3651e2e6c",
     "commit": "dfb3651e2e6cb96326e7c94c8cc3b1ff7b2fa3ec",
     "dirty": false
   },
@@ -73,7 +73,7 @@
     "files": [
       {
         "path": "tools/check-map.py",
-        "sha256": "e51ab4de773f7cdff859514856e3956622f0aaf43c36ee5977f9eba9086baa82"
+        "sha256": "387078fbcc8a3f3298cd30d0db589afa4e3a0c7389932f3f88b052e35d8f42b9"
       },
       {
         "path": "tools/factory/__main__.py",
@@ -89,7 +89,7 @@
       },
       {
         "path": "tools/factory/agentrails.py",
-        "sha256": "609331810ed102c17453e0de5a773398e4fbc0f3f058ba8c82f115f03976a608"
+        "sha256": "bddaec3f08458716cf38b4abe78681a48b8af9ae7933bbdcbfbbdea4c18778b4"
       },
       {
         "path": "tools/factory/backlog.py",
@@ -105,7 +105,7 @@
       },
       {
         "path": "tools/factory/correspondence.py",
-        "sha256": "1247d9b3bd2b15ad2537acfe714583c27bebfc0a0c8ae130f1e89d3abf749e30"
+        "sha256": "3e8266507d991f7a60164a4c586c303347812c7be8d58b5b225c0d0abdba6407"
       },
       {
         "path": "tools/factory/csharp.py",
@@ -125,7 +125,7 @@
       },
       {
         "path": "tools/factory/intake.py",
-        "sha256": "df923af440fa12e5bc05e96e7a79d2248b46bcc00f950b659261bc910675d8ab"
+        "sha256": "c0bc1339c364072ae1e5214f4bd61dea110c78e54c3dd3d803d29ae2a55d2dbc"
       },
       {
         "path": "tools/factory/overlay.py",
@@ -133,7 +133,7 @@
       },
       {
         "path": "tools/factory/ownership.py",
-        "sha256": "c22262cf119dd4cdf05ab44e48c6ce1534412c8c1d5c8bd34940567bb6d5e791"
+        "sha256": "594b4112791eb48f777158ca458ef4bc3fcb8127fe3a69bd70b80c563026b430"
       },
       {
         "path": "tools/factory/pins.py",
@@ -145,11 +145,11 @@
       },
       {
         "path": "tools/factory/rails.py",
-        "sha256": "c6ce3c601083e64e17f1b55de4820f3190dae600a372ab61a8345d952362c596"
+        "sha256": "0c3a7cf1a97de6fe2da9a7c8e7bd52c72660ac5117e95ea01531b08fa6a30986"
       },
       {
         "path": "tools/factory/recipe/engine-gate.py",
-        "sha256": "cbf6aaa5e632800bf6c49a918bfa8007b840ef14fdf4be846af6fb38de91aa13"
+        "sha256": "47c4e98db866819bd39e692cf8c810bec7e45bd0fec47bf5f7689a79927f4ec8"
       },
       {
         "path": "tools/factory/recipe/map-overlay.py",
@@ -157,11 +157,11 @@
       },
       {
         "path": "tools/factory/recipe/rails/AGENTS.md",
-        "sha256": "bac17949671c440fa89fe655cd990496cf0debb59fa8ca81b5bd797275594fd0"
+        "sha256": "da23c9c26b08914f17e93ebb382189056714d66b1c522004c40b923d9d3174ad"
       },
       {
         "path": "tools/factory/recipe/rails/CLAUDE.md",
-        "sha256": "04c07ad36e742fa60efafeca54d20bd96d16b6e338a44e46fad2b679ab8dfd9f"
+        "sha256": "52708e15f1a34b95c4cde951ce8d0c9017782214744243becb1cdff31f0246d2"
       },
       {
         "path": "tools/factory/recipe/rails/adversarial-self-review.md",
@@ -169,7 +169,7 @@
       },
       {
         "path": "tools/factory/recipe/rails/agent-team.md",
-        "sha256": "d1ee84c9c31e5f44a4be7111f686c07b89b5a7fd318e458d287ab1f0b8d6bdbe"
+        "sha256": "65df631ed7e888eb036b887e685fce0b6f7cb43b0eca96eff9662558b570a86d"
       },
       {
         "path": "tools/factory/recipe/rails/agents/engine-dev.md",
@@ -188,12 +188,16 @@
         "sha256": "4109d1ef55053ef656e536d7818934deb73016fbe950f153bae6b2a163591cb2"
       },
       {
+        "path": "tools/factory/recipe/rails/hooks/agent-lifecycle-guard.py",
+        "sha256": "6cc64e91494604524f714f1debe8543079a86b230a73e84d88376f4a1f2d61c1"
+      },
+      {
         "path": "tools/factory/recipe/rails/hooks/primary-checkout-guard.py",
         "sha256": "2f15d7192c5328376c1cd1836229c699d1d48f90ef35b451e48fa79b7fbef238"
       },
       {
         "path": "tools/factory/recipe/rails/pull_request_template.md",
-        "sha256": "bb75cd6f5877d65d65cccf6e0cbfdddf86112899ecb11e6bbe61a77a9e459740"
+        "sha256": "8cbc014a28b157ebcd2177d704d97c6466113c654b08c98c5f1b2613bb840887"
       },
       {
         "path": "tools/factory/recipe/rails/review-evidence.md",
@@ -201,15 +205,15 @@
       },
       {
         "path": "tools/factory/recipe/rails/settings.json",
-        "sha256": "4d410acd10ba5b6ed2d3c6a016cc2cfde1cf8e621da54424755376a80da30aa0"
+        "sha256": "faf5e784fd01cd527f4e94630ddef2f77118c8ad922f25a85bc6fff3c0e03097"
       },
       {
         "path": "tools/factory/recipe/rails/tools/agent-doctor.py",
-        "sha256": "04b0ebbffc8638fa322543a8591096abb54ef5c5a7e5be4151de6e4066fff4ff"
+        "sha256": "98faa2dc6431a2acc2dd1689b5a4cfaf7286383d69b7033b6f7c7de24dbe2d19"
       },
       {
         "path": "tools/factory/recipe/rails/tools/conformance-gate.py",
-        "sha256": "3fafa402a1c56bdcdedc7d9411e6d13bec638752ecdc81f11950790d537c44d7"
+        "sha256": "9e45021f5530ead651a8242c603411c45ca2fede1c4ed8b381a535888dbf0849"
       },
       {
         "path": "tools/factory/recipe/rails/tools/dispatch-agent.sh",
@@ -217,11 +221,11 @@
       },
       {
         "path": "tools/factory/recipe/rails/tools/entry-packet.py",
-        "sha256": "0f37570f3995218e4ca893f254ce3476290e4b96429ee5bd4152cfe223f63cdc"
+        "sha256": "6e30ca0b65ab9d8935b72afb7abfdedf8c69815bf753f2da26bae6b9dc3c31c4"
       },
       {
         "path": "tools/factory/recipe/rails/tools/mutate.py",
-        "sha256": "eb722639671ba46c0703f699dc85177fe88f52e00ced99ccf4e90f54a30c49eb"
+        "sha256": "c4aaae40c6dcbca44c35ac817ddd410dc6d2a478a35da86f10631376be08fc7f"
       },
       {
         "path": "tools/factory/recipe/rails/tools/new-issue.sh",
@@ -233,7 +237,7 @@
       },
       {
         "path": "tools/factory/recipe/rails/tools/pr-policy.py",
-        "sha256": "80fda4f86822f5c2b9c8cd4e8a1b23f85b30a2d32b681749e788821d9d78bd07"
+        "sha256": "57d44ff3b624e9fc91e86c3ef2c368e73a2511eecdc6c96f5859611c36390726"
       },
       {
         "path": "tools/factory/recipe/rails/tools/re-produce.sh",
@@ -241,11 +245,11 @@
       },
       {
         "path": "tools/factory/recipe/rails/tools/record-verdict.py",
-        "sha256": "8e7ba67c30672e69e714ccd801a9b5a59ba18d1aa63c08b9b50b385264672e75"
+        "sha256": "6b0f2023b588e3b0eb0e494c0d7f8bcdab4aa499e1f052e8b0cb2edf5e8dbbb2"
       },
       {
         "path": "tools/factory/recipe/rails/tools/repair-packet.py",
-        "sha256": "bb9158eaf9132975677d9be5da5150f652ac422226f666dcfffaa3d9af18a7da"
+        "sha256": "f890f847774ebd20076ff3a065b627499c4ae7b6946dd0d443e5683e96bd027f"
       },
       {
         "path": "tools/factory/recipe/rails/tools/requeue-gate.py",
@@ -253,23 +257,23 @@
       },
       {
         "path": "tools/factory/recipe/rails/tools/review-packet.py",
-        "sha256": "cf48164f9f65042716b1dae08436c3573dc26073fc6f22053dc1899de6e58a85"
+        "sha256": "c4bde73f35b7e329ca0e40ccbfb1183a588b81a0adfa6736c09992a1a755618c"
       },
       {
         "path": "tools/factory/recipe/rails/tools/review-scope.py",
-        "sha256": "e96aeaf830d5bc23c4dcaa25e29fd91ac8c4be6b3ddba6a6618f4ab184a3e155"
+        "sha256": "54cb91892f154d60bc9389e4ce9cb0b6beeb61ee336188efaa26f71c16962b7b"
       },
       {
         "path": "tools/factory/recipe/rails/workflows/conformance-gate.yml",
-        "sha256": "4a18b24d803fa8a7e97ba018ab3ae4d0c9ed59fcbbc615963bbf024503b49c20"
+        "sha256": "c7a851e4315564900372bf34f59248f759059bb8877133de2275232083ea7b4a"
       },
       {
         "path": "tools/factory/recipe/rails/workflows/pr-policy.yml",
-        "sha256": "ebf84bcf01619ae578417767d0a984102dfcb00a67b6778b4527a409a3722b6e"
+        "sha256": "5019c42773f426f5be8a2d5779272550c5aa953dcddc596e6d3027140f3ccdbe"
       },
       {
         "path": "tools/factory/recipe/rails/workflows/verdict-requeue.yml",
-        "sha256": "e12f280ee6e9e70e413f59cc6df35d4eda26a2bd2667ba4be5e954d2fecbb4df"
+        "sha256": "a01aba3ecc21386a1d1dda306660ea55b4724abb323cf46a2f2a75f1fcac2091"
       },
       {
         "path": "tools/factory/recipe/validate.sh",
@@ -277,19 +281,19 @@
       },
       {
         "path": "tools/factory/recipe/validate.yml",
-        "sha256": "62d40d41634466099292d60ffd2a685edff56369fbf4fc4d060accc751d119e4"
+        "sha256": "7d7a9eb4a3fd3e819db50c0d6673c7a6e0f0f0eef16f94da947e5157ee56b401"
       },
       {
         "path": "tools/factory/registry.py",
-        "sha256": "8b4a714acdbfc71694db10649413e6cb5241a89111f816f5532723dd232e2437"
+        "sha256": "0cb5c55c0a831bc29d8bff7d90cc33953ee732a8135288c286663f015ed812e8"
       },
       {
         "path": "tools/factory/repository.py",
-        "sha256": "54c59932f00115d95a5e2b9352d8a6a1d0ea52f4ba61a36e4bb6b7d995d63f27"
+        "sha256": "213800e4082b10cee15b7d563c9a030e39c924cbedf1939a5bf1cfa38294d1b5"
       },
       {
         "path": "tools/factory/reviewclass.py",
-        "sha256": "f6e0af9bb7d329d7c9243c91ab6f15aac09253f14fdb36c254c685caf1f43a1f"
+        "sha256": "2bc06b16755fc164c4e03bfba45528ffa45b9a807dd03114574c66685baddc1b"
       },
       {
         "path": "tools/factory/reviewscope.py",
@@ -333,12 +337,12 @@
       }
     ],
     "digestRule": "sha256 over UTF-8 lines '<sha256>  <path>\\n', one per recipe file, in ascending byte order of path",
-    "digest": "0e2652ff8028f75ee147e4550f9298fddab2d4501a8d083c68268fe80c27ebe2"
+    "digest": "c800874776c286dff1241ed572f4bf4949495021c61ba4c92f08dc6ef2a9d613"
   },
   "generated": [
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "62d40d41634466099292d60ffd2a685edff56369fbf4fc4d060accc751d119e4"
+      "sha256": "7d7a9eb4a3fd3e819db50c0d6673c7a6e0f0f0eef16f94da947e5157ee56b401"
     },
     {
       "path": "RulesFactory.Packages.g.props",
@@ -358,7 +362,7 @@
     },
     {
       "path": "scripts/engine-gate.py",
-      "sha256": "cbf6aaa5e632800bf6c49a918bfa8007b840ef14fdf4be846af6fb38de91aa13"
+      "sha256": "47c4e98db866819bd39e692cf8c810bec7e45bd0fec47bf5f7689a79927f4ec8"
     },
     {
       "path": "scripts/factory/acceptance.py",
@@ -370,7 +374,7 @@
     },
     {
       "path": "scripts/factory/agentrails.py",
-      "sha256": "609331810ed102c17453e0de5a773398e4fbc0f3f058ba8c82f115f03976a608"
+      "sha256": "bddaec3f08458716cf38b4abe78681a48b8af9ae7933bbdcbfbbdea4c18778b4"
     },
     {
       "path": "scripts/factory/compose.py",
@@ -382,7 +386,7 @@
     },
     {
       "path": "scripts/factory/correspondence.py",
-      "sha256": "1247d9b3bd2b15ad2537acfe714583c27bebfc0a0c8ae130f1e89d3abf749e30"
+      "sha256": "3e8266507d991f7a60164a4c586c303347812c7be8d58b5b225c0d0abdba6407"
     },
     {
       "path": "scripts/factory/csharp.py",
@@ -398,7 +402,7 @@
     },
     {
       "path": "scripts/factory/intake.py",
-      "sha256": "df923af440fa12e5bc05e96e7a79d2248b46bcc00f950b659261bc910675d8ab"
+      "sha256": "c0bc1339c364072ae1e5214f4bd61dea110c78e54c3dd3d803d29ae2a55d2dbc"
     },
     {
       "path": "scripts/factory/overlay.py",
@@ -406,7 +410,7 @@
     },
     {
       "path": "scripts/factory/ownership.py",
-      "sha256": "c22262cf119dd4cdf05ab44e48c6ce1534412c8c1d5c8bd34940567bb6d5e791"
+      "sha256": "594b4112791eb48f777158ca458ef4bc3fcb8127fe3a69bd70b80c563026b430"
     },
     {
       "path": "scripts/factory/pins.py",
@@ -418,11 +422,11 @@
     },
     {
       "path": "scripts/factory/registry.py",
-      "sha256": "8b4a714acdbfc71694db10649413e6cb5241a89111f816f5532723dd232e2437"
+      "sha256": "0cb5c55c0a831bc29d8bff7d90cc33953ee732a8135288c286663f015ed812e8"
     },
     {
       "path": "scripts/factory/reviewclass.py",
-      "sha256": "f6e0af9bb7d329d7c9243c91ab6f15aac09253f14fdb36c254c685caf1f43a1f"
+      "sha256": "2bc06b16755fc164c4e03bfba45528ffa45b9a807dd03114574c66685baddc1b"
     },
     {
       "path": "scripts/factory/reviewscope.py",
@@ -466,7 +470,7 @@
     },
     {
       "path": "src/FaaPart107/Generated/Registry.g.cs",
-      "sha256": "c323cc411a366fd46da8712b5180cd30f06a77f004190fa91a9483e249f17328"
+      "sha256": "96fb54005d221a634b352519da1f2c3d946ada18390038c873162a88df748f0a"
     },
     {
       "path": "src/FaaPart107/Generated/Requests.g.cs",
@@ -474,7 +478,7 @@
     },
     {
       "path": "tests/FaaPart107.Tests/Generated/CorrespondenceTests.g.cs",
-      "sha256": "fc765dc2d8f9f91a8ae22e0312c140014997260aafac06cf17ba11d3a0ba296b"
+      "sha256": "e36acbf42244a37c68c4d33e13f741aee7ef360dd6cdab2ea7066f3803e99b4c"
     },
     {
       "path": "tests/FaaPart107.Tests/Generated/ProvenanceTests.g.cs",
@@ -498,14 +502,19 @@
       "sha256": "241ff918ba8221b27afaf7cceeafd157bcba17178125a13dc0c6f2ac64498940"
     },
     {
+      "path": ".claude/hooks/agent-lifecycle-guard.py",
+      "recipeVersion": 1,
+      "sha256": "6cc64e91494604524f714f1debe8543079a86b230a73e84d88376f4a1f2d61c1"
+    },
+    {
       "path": ".claude/hooks/primary-checkout-guard.py",
       "recipeVersion": 3,
       "sha256": "2f15d7192c5328376c1cd1836229c699d1d48f90ef35b451e48fa79b7fbef238"
     },
     {
       "path": ".claude/settings.json",
-      "recipeVersion": 1,
-      "sha256": "4d410acd10ba5b6ed2d3c6a016cc2cfde1cf8e621da54424755376a80da30aa0"
+      "recipeVersion": 2,
+      "sha256": "faf5e784fd01cd527f4e94630ddef2f77118c8ad922f25a85bc6fff3c0e03097"
     },
     {
       "path": ".editorconfig",
@@ -514,33 +523,33 @@
     },
     {
       "path": ".github/pull_request_template.md",
-      "recipeVersion": 6,
-      "sha256": "bb75cd6f5877d65d65cccf6e0cbfdddf86112899ecb11e6bbe61a77a9e459740"
+      "recipeVersion": 7,
+      "sha256": "8cbc014a28b157ebcd2177d704d97c6466113c654b08c98c5f1b2613bb840887"
     },
     {
       "path": ".github/workflows/conformance-gate.yml",
-      "recipeVersion": 5,
-      "sha256": "4a18b24d803fa8a7e97ba018ab3ae4d0c9ed59fcbbc615963bbf024503b49c20"
+      "recipeVersion": 6,
+      "sha256": "c7a851e4315564900372bf34f59248f759059bb8877133de2275232083ea7b4a"
     },
     {
       "path": ".github/workflows/pr-policy.yml",
-      "recipeVersion": 3,
-      "sha256": "ebf84bcf01619ae578417767d0a984102dfcb00a67b6778b4527a409a3722b6e"
+      "recipeVersion": 4,
+      "sha256": "5019c42773f426f5be8a2d5779272550c5aa953dcddc596e6d3027140f3ccdbe"
     },
     {
       "path": ".github/workflows/verdict-requeue.yml",
-      "recipeVersion": 4,
-      "sha256": "e12f280ee6e9e70e413f59cc6df35d4eda26a2bd2667ba4be5e954d2fecbb4df"
+      "recipeVersion": 5,
+      "sha256": "a01aba3ecc21386a1d1dda306660ea55b4724abb323cf46a2f2a75f1fcac2091"
     },
     {
       "path": "AGENTS.md",
-      "recipeVersion": 30,
-      "sha256": "bac17949671c440fa89fe655cd990496cf0debb59fa8ca81b5bd797275594fd0"
+      "recipeVersion": 35,
+      "sha256": "da23c9c26b08914f17e93ebb382189056714d66b1c522004c40b923d9d3174ad"
     },
     {
       "path": "CLAUDE.md",
-      "recipeVersion": 1,
-      "sha256": "04c07ad36e742fa60efafeca54d20bd96d16b6e338a44e46fad2b679ab8dfd9f"
+      "recipeVersion": 2,
+      "sha256": "52708e15f1a34b95c4cde951ce8d0c9017782214744243becb1cdff31f0246d2"
     },
     {
       "path": "Directory.Build.props",
@@ -559,8 +568,8 @@
     },
     {
       "path": "docs/agent-team.md",
-      "recipeVersion": 11,
-      "sha256": "d1ee84c9c31e5f44a4be7111f686c07b89b5a7fd318e458d287ab1f0b8d6bdbe"
+      "recipeVersion": 12,
+      "sha256": "65df631ed7e888eb036b887e685fce0b6f7cb43b0eca96eff9662558b570a86d"
     },
     {
       "path": "docs/review-evidence.md",
@@ -574,13 +583,13 @@
     },
     {
       "path": "tools/agent-doctor.py",
-      "recipeVersion": 8,
-      "sha256": "04b0ebbffc8638fa322543a8591096abb54ef5c5a7e5be4151de6e4066fff4ff"
+      "recipeVersion": 9,
+      "sha256": "98faa2dc6431a2acc2dd1689b5a4cfaf7286383d69b7033b6f7c7de24dbe2d19"
     },
     {
       "path": "tools/conformance-gate.py",
-      "recipeVersion": 6,
-      "sha256": "3fafa402a1c56bdcdedc7d9411e6d13bec638752ecdc81f11950790d537c44d7"
+      "recipeVersion": 7,
+      "sha256": "9e45021f5530ead651a8242c603411c45ca2fede1c4ed8b381a535888dbf0849"
     },
     {
       "path": "tools/dispatch-agent.sh",
@@ -589,13 +598,13 @@
     },
     {
       "path": "tools/entry-packet.py",
-      "recipeVersion": 7,
-      "sha256": "0f37570f3995218e4ca893f254ce3476290e4b96429ee5bd4152cfe223f63cdc"
+      "recipeVersion": 8,
+      "sha256": "6e30ca0b65ab9d8935b72afb7abfdedf8c69815bf753f2da26bae6b9dc3c31c4"
     },
     {
       "path": "tools/mutate.py",
-      "recipeVersion": 2,
-      "sha256": "eb722639671ba46c0703f699dc85177fe88f52e00ced99ccf4e90f54a30c49eb"
+      "recipeVersion": 3,
+      "sha256": "c4aaae40c6dcbca44c35ac817ddd410dc6d2a478a35da86f10631376be08fc7f"
     },
     {
       "path": "tools/new-issue.sh",
@@ -609,8 +618,8 @@
     },
     {
       "path": "tools/pr-policy.py",
-      "recipeVersion": 16,
-      "sha256": "80fda4f86822f5c2b9c8cd4e8a1b23f85b30a2d32b681749e788821d9d78bd07"
+      "recipeVersion": 18,
+      "sha256": "57d44ff3b624e9fc91e86c3ef2c368e73a2511eecdc6c96f5859611c36390726"
     },
     {
       "path": "tools/re-produce.sh",
@@ -619,13 +628,13 @@
     },
     {
       "path": "tools/record-verdict.py",
-      "recipeVersion": 7,
-      "sha256": "8e7ba67c30672e69e714ccd801a9b5a59ba18d1aa63c08b9b50b385264672e75"
+      "recipeVersion": 8,
+      "sha256": "6b0f2023b588e3b0eb0e494c0d7f8bcdab4aa499e1f052e8b0cb2edf5e8dbbb2"
     },
     {
       "path": "tools/repair-packet.py",
-      "recipeVersion": 7,
-      "sha256": "bb9158eaf9132975677d9be5da5150f652ac422226f666dcfffaa3d9af18a7da"
+      "recipeVersion": 8,
+      "sha256": "f890f847774ebd20076ff3a065b627499c4ae7b6946dd0d443e5683e96bd027f"
     },
     {
       "path": "tools/requeue-gate.py",
@@ -634,13 +643,13 @@
     },
     {
       "path": "tools/review-packet.py",
-      "recipeVersion": 18,
-      "sha256": "cf48164f9f65042716b1dae08436c3573dc26073fc6f22053dc1899de6e58a85"
+      "recipeVersion": 19,
+      "sha256": "c4bde73f35b7e329ca0e40ccbfb1183a588b81a0adfa6736c09992a1a755618c"
     },
     {
       "path": "tools/review-scope.py",
-      "recipeVersion": 2,
-      "sha256": "e96aeaf830d5bc23c4dcaa25e29fd91ac8c4be6b3ddba6a6618f4ab184a3e155"
+      "recipeVersion": 3,
+      "sha256": "54cb91892f154d60bc9389e4ce9cb0b6beeb61ee336188efaa26f71c16962b7b"
     }
   ],
   "engineOwned": [

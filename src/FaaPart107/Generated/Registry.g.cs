@@ -218,6 +218,58 @@ public static class Registry
     private static readonly ImmutableDictionary<string, RegisteredEntry> ById =
         All.ToImmutableDictionary(e => e.Id, StringComparer.Ordinal);
 
+    private static readonly ImmutableDictionary<string, Type> RequestTypes =
+        new Dictionary<string, Type>(StringComparer.Ordinal)
+        {
+            ["speed-limit"] = typeof(global::FaaPart107.Requests.SpeedLimitRequest),
+            ["altitude-limit"] = typeof(global::FaaPart107.Requests.AltitudeLimitRequest),
+            ["visibility-minimum"] = typeof(global::FaaPart107.Requests.VisibilityMinimumRequest),
+            ["cloud-clearance"] = typeof(global::FaaPart107.Requests.CloudClearanceRequest),
+            ["civil-twilight-window"] = typeof(global::FaaPart107.Requests.CivilTwilightWindowRequest),
+            ["speed-within-limit"] = typeof(global::FaaPart107.Requests.SpeedWithinLimitRequest),
+            ["altitude-within-limit"] = typeof(global::FaaPart107.Requests.AltitudeWithinLimitRequest),
+            ["weather-minimums-met"] = typeof(global::FaaPart107.Requests.WeatherMinimumsMetRequest),
+            ["operating-limitations"] = typeof(global::FaaPart107.Requests.OperatingLimitationsRequest),
+            ["prominent-objects"] = typeof(global::FaaPart107.Requests.ProminentObjectsRequest),
+            ["single-aircraft"] = typeof(global::FaaPart107.Requests.SingleAircraftRequest),
+            ["airspace-authorized"] = typeof(global::FaaPart107.Requests.AirspaceAuthorizedRequest),
+            ["restricted-area-permitted"] = typeof(global::FaaPart107.Requests.RestrictedAreaPermittedRequest),
+            ["moving-vehicle-operation"] = typeof(global::FaaPart107.Requests.MovingVehicleOperationRequest),
+            ["moving-aircraft-operation"] = typeof(global::FaaPart107.Requests.MovingAircraftOperationRequest),
+            ["night-operation"] = typeof(global::FaaPart107.Requests.NightOperationRequest),
+            ["night-training-completed"] = typeof(global::FaaPart107.Requests.NightTrainingCompletedRequest),
+            ["knowledge-recency"] = typeof(global::FaaPart107.Requests.KnowledgeRecencyRequest),
+            ["night-waiver-termination"] = typeof(global::FaaPart107.Requests.NightWaiverTerminationRequest),
+            ["night-waiver-bar"] = typeof(global::FaaPart107.Requests.NightWaiverBarRequest),
+            ["civil-twilight-operation"] = typeof(global::FaaPart107.Requests.CivilTwilightOperationRequest),
+            ["civil-twilight-alaska"] = typeof(global::FaaPart107.Requests.CivilTwilightAlaskaRequest),
+            ["hazardous-material"] = typeof(global::FaaPart107.Requests.HazardousMaterialRequest),
+            ["right-of-way"] = typeof(global::FaaPart107.Requests.RightOfWayRequest),
+            ["well-clear"] = typeof(global::FaaPart107.Requests.WellClearRequest),
+            ["collision-hazard-proximity"] = typeof(global::FaaPart107.Requests.CollisionHazardProximityRequest),
+            ["reasonable-protection"] = typeof(global::FaaPart107.Requests.ReasonableProtectionRequest),
+            ["over-human-beings"] = typeof(global::FaaPart107.Requests.OverHumanBeingsRequest),
+            ["direct-participation"] = typeof(global::FaaPart107.Requests.DirectParticipationRequest),
+            ["subpart-d-categories"] = typeof(global::FaaPart107.Requests.SubpartDCategoriesRequest),
+            ["flash-rate-sufficient"] = typeof(global::FaaPart107.Requests.FlashRateSufficientRequest),
+            ["intensity-reduction-in-interest-of-safety"] = typeof(global::FaaPart107.Requests.IntensityReductionInInterestOfSafetyRequest),
+            ["anti-collision-lighting"] = typeof(global::FaaPart107.Requests.AntiCollisionLightingRequest),
+            ["visual-line-of-sight"] = typeof(global::FaaPart107.Requests.VisualLineOfSightRequest),
+            ["unaided-visual-contact"] = typeof(global::FaaPart107.Requests.UnaidedVisualContactRequest),
+            ["visual-observer-conditions"] = typeof(global::FaaPart107.Requests.VisualObserverConditionsRequest),
+            ["effective-communication"] = typeof(global::FaaPart107.Requests.EffectiveCommunicationRequest),
+            ["observer-coordination"] = typeof(global::FaaPart107.Requests.ObserverCoordinationRequest),
+            ["preflight-actions"] = typeof(global::FaaPart107.Requests.PreflightActionsRequest),
+            ["preflight-risk-assessment"] = typeof(global::FaaPart107.Requests.PreflightRiskAssessmentRequest),
+            ["participant-briefing"] = typeof(global::FaaPart107.Requests.ParticipantBriefingRequest),
+            ["control-links-working"] = typeof(global::FaaPart107.Requests.ControlLinksWorkingRequest),
+            ["sufficient-available-power"] = typeof(global::FaaPart107.Requests.SufficientAvailablePowerRequest),
+            ["attached-object-secure"] = typeof(global::FaaPart107.Requests.AttachedObjectSecureRequest),
+            ["attached-object-no-adverse-effect"] = typeof(global::FaaPart107.Requests.AttachedObjectNoAdverseEffectRequest),
+            ["waiver-policy"] = typeof(global::FaaPart107.Requests.WaiverPolicyRequest),
+            ["waivable-regulations"] = typeof(global::FaaPart107.Requests.WaivableRegulationsRequest),
+        }.ToImmutableDictionary(StringComparer.Ordinal);
+
     private static readonly Lazy<ImmutableDictionary<string, Func<RuleRequest, Resolution<object>>>> Implementations =
         new(DiscoverImplementations);
 
@@ -242,6 +294,33 @@ public static class Registry
     public static ImmutableArray<SourceLocator> Citations(string entryId) => Entry(entryId).Locators;
 
     /// <summary>
+    /// The inputs the engine declared on the request type of <paramref name="entryId"/>: its public
+    /// instance properties with a public <c>set</c> or <c>init</c> accessor, other than
+    /// <see cref="IEntryRequest.EntryId"/> and <see cref="IEntryRequest.Assertions"/>, in
+    /// metadata-token order (stable for a build; the order of declaration within one file). Empty for
+    /// an entry that declares none. These are what <see cref="Resolve(string, RuleRequest)"/> cannot
+    /// state: a <see cref="RuleRequest"/> carries assertions only, so on that path an entry resolves
+    /// as though the caller stated none of them.
+    /// To state them, resolve through <see cref="Resolve(IEntryRequest)"/> or <see cref="EntryPoints"/>.
+    /// </summary>
+    /// <param name="entryId">A map entry id.</param>
+    /// <returns>The names of the entry's declared inputs.</returns>
+    /// <exception cref="KeyNotFoundException">The map has no such entry.</exception>
+    public static ImmutableArray<string> DeclaredInputs(string entryId)
+    {
+        var entry = Entry(entryId);
+        const BindingFlags Declared = BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly;
+        return RequestTypes[entry.Id]
+            .GetProperties(Declared)
+            .Where(p => p.GetIndexParameters().Length == 0
+                && p.SetMethod is { IsPublic: true }
+                && p.Name is not (nameof(IEntryRequest.EntryId) or nameof(IEntryRequest.Assertions)))
+            .OrderBy(p => p.MetadataToken)
+            .Select(p => p.Name)
+            .ToImmutableArray();
+    }
+
+    /// <summary>
     /// Whether a hand-written handler exists for <paramref name="entryId"/>: a typed partial method
     /// of <see cref="Handlers"/>, or an <see cref="ImplementsAttribute"/> method.
     /// </summary>
@@ -254,9 +333,11 @@ public static class Registry
     /// Resolves <paramref name="entryId"/>: through its hand-written handler when the entry is
     /// <c>implemented</c> and has one (the typed handler first, which answers unless an optional
     /// hook leaves the resolution null), otherwise through the default its correspondence row fixes.
-    /// A typed handler receives a request of its entry's type built from <paramref name="request"/>
-    /// alone, so any input property an engine declares on that type has its default value; to pass
-    /// inputs, resolve through <see cref="Resolve(IEntryRequest)"/> or <see cref="EntryPoints"/>.
+    /// A <see cref="RuleRequest"/> carries assertions only (row 8), so on this path an entry resolves
+    /// as though the caller stated none of its <see cref="DeclaredInputs(string)"/>: a typed handler
+    /// receives a request of its entry's type built from <paramref name="request"/> alone, with every
+    /// input property at its default value. To state them, resolve through
+    /// <see cref="Resolve(IEntryRequest)"/> or <see cref="EntryPoints"/>.
     /// </summary>
     /// <param name="entryId">A map entry id.</param>
     /// <param name="request">What the caller asserts.</param>
@@ -270,9 +351,9 @@ public static class Registry
     /// <summary>
     /// Resolves the entry <paramref name="request"/> is for, exactly as
     /// <see cref="Resolve(string, RuleRequest)"/> does for its id and assertions, except that a
-    /// typed handler receives <paramref name="request"/> itself, with every input property the
-    /// engine declared on its type. The typed entry points in <see cref="EntryPoints"/> resolve
-    /// through here.
+    /// typed handler receives <paramref name="request"/> itself, with every input the engine declared
+    /// on its type (<see cref="DeclaredInputs(string)"/>) as the caller stated it. This is the path
+    /// that can state them; the typed entry points in <see cref="EntryPoints"/> resolve through here.
     /// </summary>
     /// <param name="request">A request for one map entry.</param>
     /// <returns>The resolution.</returns>
